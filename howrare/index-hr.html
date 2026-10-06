@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HowRare? | GNIXO</title>
+    <!-- Fuente Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        if (!localStorage.getItem('whenwastimeline_idioma')) {
+            localStorage.setItem('whenwastimeline_idioma', 'en');
+        }
+    </script>
+    <style>
+        :root {
+            --bg-color: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --primary-red: #ff2a2a;
+            --primary-red-hover: #e02424;
+            --text-white: #ffffff;
+            --text-gray: #b0b0b0;
+            --border-color: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* BARRA SUPERIOR (VOLVER Y SELECTOR) */
+        .top-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-volver {
+            background-color: #ffffff;
+            color: var(--primary-red);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .btn-volver:hover {
+            background-color: #fff0f0;
+        }
+
+        .select-idioma {
+            background-color: var(--primary-red);
+            color: var(--text-white);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--text-white);
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: var(--text-white);
+        }
+
+        header h1 span {
+            color: var(--primary-red);
+        }
+
+        header p {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+        }
+
+        .game-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            font-weight: 600;
+        }
+
+        .score-board span span {
+            color: var(--text-white);
+        }
+
+        .event-image-container {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .event-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .event-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 24px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+        }
+
+        /* Estilo del Slider Avanzado */
+        .slider-section {
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        .value-display {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--primary-red);
+            margin-bottom: 12px;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: var(--primary-red);
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            margin-top: -8px;
+            box-shadow: 0 0 10px rgba(255, 42, 42, 0.5);
+            transition: transform 0.1s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .scale-markers {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            margin-top: 8px;
+            padding: 0 2px;
+            width: 100%;
+        }
+
+        /* Botón de Acción */
+        .btn {
+            background-color: var(--primary-red);
+            color: var(--text-white);
+            border: none;
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 15px rgba(255, 42, 42, 0.4);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-red-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Pantalla de Resultados */
+        .result-box {
+            display: none;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-diff {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-gray);
+        }
+
+        .result-diff span {
+            font-weight: 700;
+            color: var(--text-white);
+        }
+
+        .points-earned {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--primary-red);
+            margin-bottom: 20px;
+        }
+
+        .actual-value-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .actual-value-card b {
+            color: var(--primary-red);
+            font-size: 1.2rem;
+        }
+
+        /* Estilos para la Pantalla Final */
+        .final-screen-badge {
+            background: linear-gradient(135deg, rgba(255, 42, 42, 0.15), rgba(255, 42, 42, 0.05));
+            border: 2px solid var(--primary-red);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 25px rgba(255, 42, 42, 0.2);
+        }
+
+        .final-screen-badge i {
+            font-size: 2.5rem;
+            color: var(--primary-red);
+            margin-bottom: 10px;
+        }
+
+        .final-screen-badge h3 {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-gray);
+            margin-bottom: 5px;
+        }
+
+        .final-screen-badge .player-tier {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text-white);
+        }
+
+        .final-score-big {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--primary-red);
+            line-height: 1;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(255, 42, 42, 0.4);
+        }
+
+        .final-subtitle {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- BARRA SUPERIOR CON BOTÓN VOLVER Y SELECTOR DE IDIOMA -->
+        <div class="top-bar">
+            <a href="../" id="txt-volver" class="btn-volver">← Back to Menu</a>
+            <select id="select-idioma" onchange="cambiarIdioma(this.value)" class="select-idioma">
+                <option value="en">🇬🇧 EN</option>
+                <option value="es">🇪🇸 ES</option>
+                <option value="fr">🇫🇷 FR</option>
+                <option value="de">🇩🇪 DE</option>
+            </select>
+        </div>
+
+        <header>
+            <h1>How<span>Rare</span>?</h1>
+            <p id="txt-subtitulo">Adivina la probabilidad exacta del suceso</p>
+        </header>
+
+        <div class="game-card">
+            <!-- Interfaz de Juego -->
+            <div id="game-interface" style="width: 100%;">
+                <div class="score-board">
+                    <span id="lbl-ronda">Ronda: <span id="round-num">1</span> / 5</span>
+                    <span id="lbl-puntuacion">Puntuación: <span id="total-score">0</span> pts</span>
+                </div>
+
+                <div class="event-image-container">
+                    <img id="event-img" src="" alt="Imagen del evento">
+                </div>
+
+                <div class="event-title" id="event-title">Cargando evento...</div>
+
+                <div class="slider-section">
+                    <div class="value-display" id="slider-val-display">50.00%</div>
+                    <input type="range" id="rare-slider" min="0" max="1000" value="500">
+                    <div class="scale-markers">
+                        <span id="lbl-imposible">0% (Imposible)</span>
+                        <span id="lbl-seguro">100% (Seguro)</span>
+                    </div>
+                </div>
+
+                <button class="btn" id="guess-btn">¡COMPROBAR!</button>
+            </div>
+
+            <!-- Interfaz de Resultados de Ronda -->
+            <div class="result-box" id="result-interface">
+                <div class="result-diff" id="result-header-text">Tu respuesta se desvió un:</div>
+                <div class="result-diff"><span id="diff-value">0%</span></div>
+                <div class="points-earned" id="points-earned">+0 PUNTOS</div>
+                
+                <div class="actual-value-card" id="actual-card-box">
+                    El porcentaje real era: <br><b id="real-value-display">0%</b>
+                </div>
+
+                <button class="btn" id="next-btn">SIGUIENTE CASO</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const i18nHR = {
+            en: {
+                volver: "← Back to Menu",
+                subtitulo: "Guess the exact probability of the event",
+                ronda: "Round:",
+                puntuacion: "Score:",
+                pts: "pts",
+                imposible: "0% (Impossible)",
+                seguro: "100% (Certain)",
+                comprobar: "CHECK PRICE!",
+                desvio: "Your guess was off by:",
+                puntosGanados: "POINTS",
+                porcentajeReal: "The real percentage was:",
+                siguiente: "NEXT CASE",
+                jugarOtraVez: "PLAY AGAIN 🔄",
+                clasificacionGlobal: "Global Rank",
+                acumulado: "Total score accumulated in 5 rounds",
+                completado: "You have completed the <b>HowRare?</b> probability challenge!",
+                tiers: {
+                    t1: "Top 1% — Legendary math mind!",
+                    t2: "Top 5% — Elite statistician!",
+                    t3: "Top 20% — Great intuition!",
+                    t4: "Top 50% — Average player",
+                    t5: "Top 99% — Room for improvement!"
+                }
+            },
+            es: {
+                volver: "← Volver al Menú",
+                subtitulo: "Adivina la probabilidad exacta del suceso",
+                ronda: "Ronda:",
+                puntuacion: "Puntuación:",
+                pts: "pts",
+                imposible: "0% (Imposible)",
+                seguro: "100% (Seguro)",
+                comprobar: "¡COMPROBAR!",
+                desvio: "Tu respuesta se desvió un:",
+                puntosGanados: "PUNTOS",
+                porcentajeReal: "El porcentaje real era:",
+                siguiente: "SIGUIENTE CASO",
+                jugarOtraVez: "JUGAR OTRA VEZ 🔄",
+                clasificacionGlobal: "Clasificación Global",
+                acumulado: "Puntuación total acumulada en 5 rondas",
+                completado: "¡Has completado el reto de probabilidades de <b>HowRare?</b> con éxito!",
+                tiers: {
+                    t1: "Top 1% — ¡Mente matemática legendaria!",
+                    t2: "Top 5% — ¡Estadista de élite!",
+                    t3: "Top 20% — ¡Gran intuición!",
+                    t4: "Top 50% — Jugador promedio",
+                    t5: "Top 99% — ¡Aún puedes mejorar!"
+                }
+            },
+            fr: {
+                volver: "← Retour au menu",
+                subtitulo: "Devinez la probabilité exacte de l'événement",
+                ronda: "Manche :",
+                puntuacion: "Score :",
+                pts: "pts",
+                imposible: "0% (Impossible)",
+                seguro: "100% (Certain)",
+                comprobar: "VÉRIFIER !",
+                desvio: "Votre réponse était écartée de :",
+                puntosGanados: "POINTS",
+                porcentajeReal: "Le pourcentage réel était de :",
+                siguiente: "CAS SUIVANT",
+                jugarOtraVez: "REJOUER 🔄",
+                clasificacionGlobal: "Classement Mondial",
+                acumulado: "Score total accumulé en 5 manches",
+                completado: "Vous avez terminé le défi de probabilité <b>HowRare?</b> !",
+                tiers: {
+                    t1: "Top 1% — Esprit mathématique légendaire !",
+                    t2: "Top 5% — Statisticien d'élite !",
+                    t3: "Top 20% — Grande intuition !",
+                    t4: "Top 50% — Joueur moyen",
+                    t5: "Top 99% — Vous pouvez vous améliorer !"
+                }
+            },
+            de: {
+                volver: "← Zurück zum Menü",
+                subtitulo: "Errade die exakte Wahrscheinlichkeit des Ereignisses",
+                ronda: "Runde:",
+                puntuacion: "Punktzahl:",
+                pts: "Pkt",
+                imposible: "0% (Unmöglich)",
+                seguro: "100% (Sicher)",
+                comprobar: "PRÜFEN!",
+                desvio: "Deine Antwort lag daneben um:",
+                puntosGanados: "PUNKTE",
+                porcentajeReal: "Der echte Prozentsatz war:",
+                siguiente: "NÄCHSTER FALL",
+                jugarOtraVez: "ERNEUT SPIELEN 🔄",
+                clasificacionGlobal: "Globale Rangliste",
+                acumulado: "Gesamtpunktzahl aus 5 Runden",
+                completado: "Du hast die <b>HowRare?</b> Wahrscheinlichkeits-Herausforderung gemeistert!",
+                tiers: {
+                    t1: "Top 1% — Legendäres Mathe-Genie!",
+                    t2: "Top 5% — Elite-Statistiker!",
+                    t3: "Top 20% — Starke Intuition!",
+                    t4: "Top 50% — Durchschnittlicher Spieler",
+                    t5: "Top 99% — Noch Raum für Verbesserungen!"
+                }
+            }
+        };
+
+        const eventsDB = [
+            { 
+                title: { en: "Winning the Christmas Lottery jackpot (1 in 100,000)", es: "Ganar el gordo de la Lotería de Navidad (1 entre 100.000)", fr: "Gagner le gros lot de la Loterie de Noël", de: "Den Hauptgewinn der Weihnachtswebelotterie gewinnen" }, 
+                real: 0.001, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Money_money.jpg?width=600" 
+            },
+            { 
+                title: { en: "Being struck by lightning in your lifetime", es: "Que te caiga un rayo a lo largo de tu vida", fr: "Être frappé par la foudre au cours de sa vie", de: "Im Laufe des Lebens vom Blitz getroffen werden" }, 
+                real: 0.0066, img: "https://commons.wikimedia.org/wiki/Special:FilePath/A_Lightning.jpg?width=600" 
+            },
+            { 
+                title: { en: "Finding a four-leaf clover on the first try", es: "Encontrar un trébol de cuatro hojas a la primera", fr: "Trouver un trèfle à quatre feuilles du premier coup", de: "Auf Anhieb ein vierblättriges Kleeblatt finden" }, 
+                real: 0.01, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Four_leaf_clover.JPG?width=600" 
+            },
+            { 
+                title: { en: "Being born with heterochromia (different colored eyes)", es: "Nacer con heterocromía (ojos de diferente color)", fr: "Naître avec de l'hétérochromie (yeux de couleurs différentes)", de: "Mit Heterochromie (unterschiedlich farbigen Augen) geboren werden" }, 
+                real: 0.06, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Heterochromia_iridum_cat.jpg?width=600" 
+            },
+            { 
+                title: { en: "Finding two yolks in a single egg", es: "Encontrar dos yemas al romper un huevo", fr: "Trouver deux jaunes dans un seul œuf", de: "Zwei Dotter in einem Ei finden" }, 
+                real: 0.1, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Egg_Cup_and_egg.jpg?width=600" 
+            },
+            { 
+                title: { en: "Being attacked by a shark while swimming in the ocean", es: "Ser atacado por un tiburón nadando en el mar", fr: "Être attaqué par un requin en nageant dans l'océan", de: "Beim Schwimmen im Meer von einem Hai angegriffen werden" }, 
+                real: 0.000026, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Great_white_shark_south_africa.jpg?width=600" 
+            },
+            { 
+                title: { en: "Being hit by a meteorite", es: "Ser alcanzado por un meteorito", fr: "Être frappé par une météorite", de: "Von einem Meteoriten getroffen werden" }, 
+                real: 0.000003, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Chelyabinsk_Meteor_meteorite_fragment.jpg?width=600" 
+            },
+            { 
+                title: { en: "Getting a Royal Flush on the first poker hand", es: "Conseguir una Escalera Real en la primera mano de póker", fr: "Obtenir une Quinte Flush Royale dès la première main de poker", de: "Ein Royal Flush auf der ersten Pokerhand erhalten" }, 
+                real: 0.000154, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Playing_Cards.jpg?width=600" 
+            },
+            { 
+                title: { en: "Having spontaneous identical twins", es: "Tener un embarazo de gemelos idénticos espontáneo", fr: "Avoir une grossesse spontanée de vrais jumeaux", de: "Spontan identische Zwillinge bekommen" }, 
+                real: 0.4, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Twins.jpg?width=600" 
+            },
+            { 
+                title: { en: "A coin landing perfectly on its edge when tossed", es: "Que una moneda caiga perfectamente de canto al lanzarla", fr: "Une pièce qui tombe parfaitement sur la tranche", de: "Eine Münze, die beim Werfen auf dem Rand stehen bleibt" }, 
+                real: 0.016, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Coin_coin.JPG?width=600" 
+            },
+            { 
+                title: { en: "Being left-handed in the global population", es: "Ser zurdo en la población mundial", fr: "Être gaucher dans la population mondiale", de: "Linkshänder in der Weltbevölkerung sein" }, 
+                real: 10.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Playing_cards.jpg?width=600" 
+            },
+            { 
+                title: { en: "Having naturally green eyes", es: "Tener los ojos verdes de forma natural", fr: "Avoir naturellement les yeux verts", de: "Natürliche grüne Augen haben" }, 
+                real: 2.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Cat_pic.jpg?width=600" 
+            },
+            { 
+                title: { en: "Having natural red hair", es: "Tener el pelo pelirrojo natural", fr: "Avoir naturellement des cheveux roux", de: "Natürlich rotes Haar haben" }, 
+                real: 1.5, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Butterfly_.jpg?width=600" 
+            },
+            { 
+                title: { en: "Bowling a strike on a random attempt", es: "Conseguir un pleno de un tiro al jugar a los bolos (strike)", fr: "Faire un strike lors d'un lancer de bowling", de: "Einen Strike beim Bowlen erzielen" }, 
+                real: 8.5, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Ball_1.jpg?width=600" 
+            },
+            { 
+                title: { en: "Suffering a major flight delay on a commercial airline", es: "Sufrir un retraso grave en un vuelo comercial", fr: "Subir un retard majeur sur un vol commercial", de: "Eine schwere Flugverspätung erleben" }, 
+                real: 4.5, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Airplane_in_flight.jpg?width=600" 
+            },
+            { 
+                title: { en: "Finding paper money lying on the street", es: "Encontrar un billete de dinero tirado en la calle", fr: "Trouver un billet de banque par terre dans la rue", de: "Geldscheine auf der Straße finden" }, 
+                real: 2.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Money_Money_-_panoramio.jpg?width=600" 
+            },
+            { 
+                title: { en: "Being born on February 29 in a leap year", es: "Nacer el 29 de febrero en un año bisiesto", fr: "Naître un 29 février une année bissextile", de: "Am 29. Februar in einem Schaltjahr geboren werden" }, 
+                real: 0.068, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Moon_.jpg?width=600" 
+            },
+            { 
+                title: { en: "Getting a flat tire during a year of driving", es: "Sufrir un pinchazo en la rueda del coche durante un año", fr: "Avoir un pneu crevé au cours d'une année de conduite", de: "Einen platten Reifen innerhalb eines Jahres haben" }, 
+                real: 7.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Car_-_%E0%B4%95%E0%B4%BE%E0%B4%BC.JPG?width=600" 
+            },
+            { 
+                title: { en: "Seeing a total solar eclipse from your hometown", es: "Ver un eclipse solar total desde tu ciudad", fr: "Voir une éclipse solaire totale depuis votre ville", de: "Eine totale Sonnenfinsternis in deiner Stadt sehen" }, 
+                real: 0.25, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Solar_eclipse_1999_4_NR.jpg?width=600" 
+            },
+            { 
+                title: { en: "Drawing an Ace as the first card from a deck", es: "Sacar un As al robar la primera carta de una baraja", fr: "Tirer un As comme première carte d'un jeu", de: "Ein Ass als erste Karte aus einem Deck ziehen" }, 
+                real: 7.69, img: "https://commons.wikimedia.org/wiki/Special:FilePath/King_playing_cards.jpg?width=600" 
+            },
+            { 
+                title: { en: "Rolling a 6 on a standard six-sided die", es: "Sacar un 6 al tirar un dado estándar de seis caras", fr: "Obtenir un 6 en lançant un dé classique à 6 faces", de: "Eine 6 auf einem gewöhnlichen Würfel würfeln" }, 
+                real: 16.67, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Dice.jpg?width=600" 
+            },
+            { 
+                title: { en: "Having O-negative blood type (universal donor)", es: "Tener sangre del tipo O negativo (donante universal)", fr: "Avoir le groupe sanguin O négatif (donneur universel)", de: "Blutgruppe 0-negativ haben (Universalspender)" }, 
+                real: 7.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Phone_image.png?width=600" 
+            },
+            { 
+                title: { en: "Rain occurring on any random day in London", es: "Que llueva en un día cualquiera en Londres", fr: "Un jour de pluie n'importe quel jour à Londres", de: "Regen an einem beliebigen Tag in London" }, 
+                real: 38.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Cloud.svg?width=600" 
+            },
+            { 
+                title: { en: "Getting exactly two heads when flipping three coins", es: "Sacar exactamente dos caras al lanzar tres monedas", fr: "Obtenir exactement deux faces en lançant trois pièces", de: "Genau zwei Köpfe beim Werfen von drei Münzen erhalten" }, 
+                real: 37.5, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Coin_flip_outcomes.png?width=600" 
+            },
+            { 
+                title: { en: "Falling asleep while watching a movie at night", es: "Quedarte dormido viéndote una película por la noche", fr: "S'endormir en regardant un film la nuit", de: "Nachts beim Filmsehen einschlafen" }, 
+                real: 42.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Moon.jpg?width=600" 
+            },
+            { 
+                title: { en: "Having at least one food or environmental allergy", es: "Tener al menos una alergia alimentaria o ambiental", fr: "Avoir au moins une allergie alimentaire ou environnementale", de: "Mindestens eine Lebensmittel- oder Umweltallergie haben" }, 
+                real: 30.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Flower_.jpg?width=600" 
+            },
+            { 
+                title: { en: "Having cheek dimples when smiling", es: "Tener hoyuelos en las mejillas al sonreír", fr: "Avoir des fossettes sur les joues en souriant", de: "Grübchen auf den Wangen beim Lächeln haben" }, 
+                real: 20.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Cat_cat.jpg?width=600" 
+            },
+            { 
+                title: { en: "Toast landing butter-side down on the floor", es: "Que la tostada caiga al suelo con la mantequilla hacia abajo", fr: "La tartine qui tombe du côté beurre au sol", de: "Der Toast landet mit der Butterseite nach unten auf dem Boden" }, 
+                real: 50.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Coffee_.jpg?width=600" 
+            },
+            { 
+                title: { en: "Receiving a spam telemarketing call during the day", es: "Recibir una llamada Spam o comercial durante el día", fr: "Recevoir un appel publicitaire ou spam pendant la journée", de: "Tagsüber einen Werbe- oder Spam-Anruf erhalten" }, 
+                real: 45.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Phone_.jpg?width=600" 
+            },
+            { 
+                title: { en: "Landing a relationship from a first Tinder date", es: "Conseguir pareja en una primera cita de Tinder", fr: "Trouver une relation dès un premier rendez-vous Tinder", de: "Eine Beziehung beim ersten Tinder-Date finden" }, 
+                real: 12.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Phone_image.png?width=600" 
+            },
+            { 
+                title: { en: "Flipping heads on a coin toss", es: "Obtener cara al lanzar una moneda al aire", fr: "Obtenir pile en lançant une pièce", de: "Kopf beim Münzwurf erhalten" }, 
+                real: 50.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Coin_coin.JPG?width=600" 
+            },
+            { 
+                title: { en: "Rolling an even number on a standard die", es: "Sacar un número par al lanzar un dado estándar", fr: "Obtenir un nombre pair avec un dé classique", de: "Eine gerade Zahl auf einem gewöhnlichen Würfel würfeln" }, 
+                real: 50.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Dice-0.svg?width=600" 
+            },
+            { 
+                title: { en: "Drawing a red card from a standard poker deck", es: "Robar una carta de color rojo en una baraja de póker", fr: "Tirer une carte rouge d'un jeu de poker", de: "Eine rote Karte aus einem Kartendeck ziehen" }, 
+                real: 50.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Playing_Cards.JPG?width=600" 
+            },
+            { 
+                title: { en: "Having brown eyes in the world population", es: "Tener los ojos de color marrón en el mundo", fr: "Avoir les yeux marron dans la population mondiale", de: "Braune Augen in der Weltbevölkerung haben" }, 
+                real: 75.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Cat_cat.jpg?width=600" 
+            },
+            { 
+                title: { en: "Being able to roll your tongue into a U-shape", es: "Ser capaz de doblar la lengua en forma de U", fr: "Être capable de rouler sa langue en U", de: "Die Zunge U-förmig rollen können" }, 
+                real: 70.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Cat_cat.jpg?width=600" 
+            },
+            { 
+                title: { en: "Checking your phone within 10 minutes of waking up", es: "Mirar el móvil en los primeros 10 minutos al despertarte", fr: "Regarder son téléphone dans les 10 min suivant le réveil", de: "In den ersten 10 Minuten nach dem Aufstehen aufs Handy schauen" }, 
+                real: 88.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Phone_.jpg?width=600" 
+            },
+            { 
+                title: { en: "Seeing at least one dog during a 30-min walk in the city", es: "Ver al menos un perro paseando si caminas 30 min por la ciudad", fr: "Voir au moins un chien lors d'une marche de 30 min en ville", de: "Bei einem 30-minütigen Stadtspaziergang mindestens einen Hund sehen" }, 
+                real: 92.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Dog_dog.jpg?width=600" 
+            },
+            { 
+                title: { en: "A car starting on the first try when turning the key/button", es: "Que un coche arranque a la primera al girar la llave/botón", fr: "Une voiture qui démarre du premier coup en tournant la clé", de: "Ein Auto, das beim ersten Versuch anspringt" }, 
+                real: 99.5, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Car_-_%E0%B4%95%E0%B4%BE%E0%B4%BC.JPG?width=600" 
+            },
+            { 
+                title: { en: "Finding an unmatched sock in your laundry load", es: "Encontrar al menos un calcetín desparejado en la colada", fr: "Trouver au moins une chaussette orpheline dans la lessive", de: "Mindestens eine einzelne Socke in der Wäsche finden" }, 
+                real: 65.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Book_stock_image.png?width=600" 
+            },
+            { 
+                title: { en: "Getting at least one heads when flipping 5 coins", es: "Que salga al menos una cara si lanzas 5 monedas seguidas", fr: "Obtenir au moins une fois pile en lançant 5 pièces", de: "Mindestens einmal Kopf beim Werfen von 5 Münzen erhalten" }, 
+                real: 96.87, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Coin_Toss_(3635981474).jpg?width=600" 
+            }
+        ];
+
+        let currentRound = 1;
+        let totalScore = 0;
+        let currentGameEvents = [];
+        let activeEvent = null;
+
+        const slider = document.getElementById('rare-slider');
+        const sliderValDisplay = document.getElementById('slider-val-display');
+        const eventTitle = document.getElementById('event-title');
+        const eventImg = document.getElementById('event-img');
+        const guessBtn = document.getElementById('guess-btn');
+        const nextBtn = document.getElementById('next-btn');
+        
+        const gameInterface = document.getElementById('game-interface');
+        const resultInterface = document.getElementById('result-interface');
+        
+        const roundNumEl = document.getElementById('round-num');
+        const totalScoreEl = document.getElementById('total-score');
+        const diffValueEl = document.getElementById('diff-value');
+        const pointsEarnedEl = document.getElementById('points-earned');
+        const realValueDisplay = document.getElementById('real-value-display');
+        const resultHeaderText = document.getElementById('result-header-text');
+        const actualCardBox = document.getElementById('actual-card-box');
+
+        function cambiarIdioma(lang) {
+            localStorage.setItem('whenwastimeline_idioma', lang);
+            aplicarTextosUI(lang);
+        }
+
+        function aplicarTextosUI(lang) {
+            const t = i18nHR[lang] || i18nHR.en;
+            document.getElementById('select-idioma').value = lang;
+            document.getElementById('txt-volver').textContent = t.volver;
+            document.getElementById('txt-subtitulo').textContent = t.subtitulo;
+            document.getElementById('lbl-ronda').childNodes[0].textContent = t.ronda + " ";
+            document.getElementById('lbl-puntuacion').childNodes[0].textContent = t.puntuacion + " ";
+            document.getElementById('lbl-imposible').textContent = t.imposible;
+            document.getElementById('lbl-seguro').textContent = t.seguro;
+            document.getElementById('guess-btn').textContent = t.comprobar;
+
+            if (activeEvent) {
+                eventTitle.textContent = activeEvent.title[lang] || activeEvent.title.en;
+            }
+        }
+
+        function sliderToPercentage(val) {
+            let v = parseInt(val);
+            if (v <= 500) {
+                return (v / 500) * 1.0;
+            } else {
+                let normalized = (v - 500) / 500;
+                return 1.0 + Math.pow(normalized, 2) * 99.0;
+            }
+        }
+
+        function percentageToSlider(percentage) {
+            let p = parseFloat(percentage);
+            if (p <= 1.0) {
+                return (p / 1.0) * 500;
+            } else {
+                let normalized = Math.sqrt((p - 1.0) / 99.0);
+                return 500 + (normalized * 500);
+            }
+        }
+
+        slider.addEventListener('input', () => {
+            let realVal = sliderToPercentage(slider.value);
+            if (realVal < 0.01) {
+                sliderValDisplay.textContent = realVal.toFixed(4) + "%";
+            } else if (realVal < 1) {
+                sliderValDisplay.textContent = realVal.toFixed(3) + "%";
+            } else if (realVal < 10) {
+                sliderValDisplay.textContent = realVal.toFixed(2) + "%";
+            } else {
+                sliderValDisplay.textContent = realVal.toFixed(1) + "%";
+            }
+        });
+
+        function initGame() {
+            currentRound = 1;
+            totalScore = 0;
+            currentGameEvents = [...eventsDB].sort(() => Math.random() - 0.5);
+            loadRound();
+        }
+
+        function loadRound() {
+            const lang = localStorage.getItem('whenwastimeline_idioma') || 'en';
+            const t = i18nHR[lang] || i18nHR.en;
+
+            if (currentRound > 5) {
+                gameInterface.style.display = "none";
+                resultInterface.style.display = "block";
+                
+                let tierTitle = "";
+                let tierIcon = "";
+                
+                if (totalScore >= 4500) {
+                    tierTitle = t.tiers.t1;
+                    tierIcon = "fa-crown";
+                } else if (totalScore >= 3500) {
+                    tierTitle = t.tiers.t2;
+                    tierIcon = "fa-fire";
+                } else if (totalScore >= 2500) {
+                    tierTitle = t.tiers.t3;
+                    tierIcon = "fa-chart-line";
+                } else if (totalScore >= 1500) {
+                    tierTitle = t.tiers.t4;
+                    tierIcon = "fa-user";
+                } else {
+                    tierTitle = t.tiers.t5;
+                    tierIcon = "fa-seedling";
+                }
+
+                resultHeaderText.style.display = "none";
+                diffValueEl.parentElement.style.display = "none";
+                
+                pointsEarnedEl.innerHTML = `
+                    <div class="final-screen-badge">
+                        <i class="fa-solid ${tierIcon}"></i>
+                        <h3>${t.clasificacionGlobal}</h3>
+                        <div class="player-tier">${tierTitle}</div>
+                    </div>
+                    <div class="final-score-big">${totalScore} PTS</div>
+                    <div class="final-subtitle">${t.acumulado}</div>
+                `;
+                
+                actualCardBox.innerHTML = t.completado;
+                
+                nextBtn.textContent = t.jugarOtraVez;
+                nextBtn.onclick = initGame;
+                return;
+            }
+
+            resultHeaderText.style.display = "block";
+            resultHeaderText.textContent = t.desvio;
+            diffValueEl.parentElement.style.display = "block";
+            actualCardBox.style.display = "block";
+            gameInterface.style.display = "block";
+            resultInterface.style.display = "none";
+            
+            roundNumEl.textContent = currentRound;
+            totalScoreEl.textContent = totalScore;
+
+            activeEvent = currentGameEvents[currentRound - 1];
+            eventTitle.textContent = activeEvent.title[lang] || activeEvent.title.en;
+            eventImg.src = activeEvent.img;
+
+            slider.value = 500;
+            slider.dispatchEvent(new Event('input'));
+        }
+
+        guessBtn.addEventListener('click', () => {
+            const lang = localStorage.getItem('whenwastimeline_idioma') || 'en';
+            const t = i18nHR[lang] || i18nHR.en;
+
+            let userGuessPercentage = sliderToPercentage(slider.value);
+            let actualPercentage = activeEvent.real;
+
+            let userSliderPos = parseFloat(slider.value);
+            let actualSliderPos = percentageToSlider(actualPercentage);
+
+            let sliderError = Math.abs(userSliderPos - actualSliderPos);
+            
+            let maxPoints = 1000;
+            let roundPoints = Math.max(0, Math.round(maxPoints * (1 - Math.min(sliderError / 150, 1))));
+
+            totalScore += roundPoints;
+
+            let numDiff = Math.abs(userGuessPercentage - actualPercentage);
+
+            gameInterface.style.display = "none";
+            resultInterface.style.display = "block";
+            
+            resultHeaderText.style.display = "block";
+            resultHeaderText.textContent = t.desvio;
+            diffValueEl.parentElement.style.display = "block";
+            diffValueEl.textContent = numDiff < 0.01 ? numDiff.toFixed(4) + "%" : numDiff.toFixed(2) + "%";
+            pointsEarnedEl.textContent = `+${roundPoints} ${t.puntosGanados}`;
+            
+            actualCardBox.innerHTML = `${t.porcentajeReal} <br><b>${actualPercentage}%</b>`;
+
+            currentRound++;
+            nextBtn.textContent = t.siguiente;
+            nextBtn.onclick = loadRound;
+        });
+
+        window.onload = () => {
+            const langGuardado = localStorage.getItem('whenwastimeline_idioma') || 'en';
+            aplicarTextosUI(langGuardado);
+            initGame();
+        };
+    </script>
+</body>
+</html>

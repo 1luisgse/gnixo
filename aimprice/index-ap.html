@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RCN3CB1RMZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-RCN3CB1RMZ');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AimPrice | GNIXO</title>
+    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin>
+    <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        if (!localStorage.getItem('whenwastimeline_idioma')) {
+            localStorage.setItem('whenwastimeline_idioma', 'en');
+        }
+    </script>
+    <style>
+        body {
+            background-color: #1c1c1c;
+            color: #ff0000;
+            font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+        }
+        .classic-card {
+            background: #ff0000;
+            border: 2px solid #ff0000;
+            box-shadow: 0 10px 30px -10px rgba(255, 0, 0, 0.3);
+        }
+        .classic-badge {
+            background-color: #ffffff;
+            color: #ff0000;
+            border: 1px solid #ffffff;
+        }
+
+        /* ESTILOS PERSONALIZADOS PARA EL FADER Y SU THUMB CIRCULAR */
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        /* Track para Chrome/Safari/Edge */
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            background: #ff4d4d;
+            border-radius: 9999px;
+        }
+        /* Thumb para Chrome/Safari/Edge */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 36px;
+            width: 36px;
+            border-radius: 50%;
+            background: #ffffff url('aimprice/fader.png') center/cover no-repeat;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            margin-top: -14px;
+        }
+        /* Track para Firefox */
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 8px;
+            background: #ff4d4d;
+            border-radius: 9999px;
+        }
+        /* Thumb para Firefox */
+        input[type=range]::-moz-range-thumb {
+            height: 36px;
+            width: 36px;
+            border-radius: 50%;
+            background: #ffffff url('aimprice/fader.png') center/cover no-repeat;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        /* ANIMACIONES Y ESTILOS PARA INDICADOR DE PISTA */
+        @keyframes bounce-up {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes bounce-down {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+        .animate-bounce-up {
+            animation: bounce-up 0.6s infinite ease-in-out;
+        }
+        .animate-bounce-down {
+            animation: bounce-down 0.6s infinite ease-in-out;
+        }
+        .pista-badge {
+            background: #ffffff;
+            color: #ff0000;
+            border: 2px solid #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between py-8 px-4 select-none relative">
+
+    <!-- BOTÓN VOLVER Y SELECTOR DE IDIOMA -->
+    <div class="w-full max-w-xl flex justify-between items-center mb-6 relative z-20">
+        <a href="../" id="txt-volver" class="classic-badge text-xs font-semibold py-1.5 px-4 rounded-xl hover:bg-[#fff0f0] transition no-underline shadow-sm">
+            ← Back to Menu
+        </a>
+        <select id="select-idioma" onchange="cambiarIdioma(this.value)" class="bg-[#ff0000] text-[#ffffff] text-xs font-semibold py-1.5 px-3 rounded-xl border border-[#ffffff] focus:outline-none cursor-pointer shadow-sm">
+            <option value="en">🇬🇧 EN</option>
+            <option value="es">🇪🇸 ES</option>
+            <option value="fr">🇫🇷 FR</option>
+            <option value="de">🇩🇪 DE</option>
+        </select>
+    </div>
+
+    <!-- CABECERA DEL JUEGO -->
+    <header id="header-juego" class="text-center max-w-xl relative z-10 mb-6">
+        <div class="inline-block classic-badge text-[11px] font-semibold py-1 px-4 rounded-full uppercase tracking-widest mb-2 shadow-sm">
+            🏷️ AimPrice Arena
+        </div>
+        <h1 class="text-2xl md:text-3xl font-bold tracking-wide text-[#ffffff] uppercase">
+            Guess the <span class="text-[#ffe6e6] italic font-normal">Exact Price</span>
+        </h1>
+        <p id="txt-instruccion" class="text-xs text-[#ffffff] mt-1 font-serif">
+            Precise logarithmic fader and strictly restricted scoring!
+        </p>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL DEL JUEGO -->
+    <main class="max-w-xl w-full classic-card rounded-2xl p-6 relative z-10 flex flex-col items-center text-white">
+        
+        <!-- INTENTOS Y RONDA -->
+        <div id="panel-marcadores" class="w-full flex justify-between items-center text-xs font-bold text-[#ffffff] mb-4 pb-3 border-b border-[#ff4d4d]">
+            <span id="txt-ronda">Round 1 / 5</span>
+            <span id="txt-intentos" class="bg-[#ffffff] text-[#ff0000] px-3 py-1 rounded-full border border-[#ffffff]">Attempts: 0</span>
+        </div>
+
+        <!-- CONTENEDOR DE IMAGEN ADAPTATIVO CON ESTADO DE CARGA -->
+        <div id="contenedor-imagen" class="w-56 h-56 sm:w-64 sm:h-64 bg-[#ffffff] rounded-xl border border-[#ffffff] flex items-center justify-center overflow-hidden mb-4 relative shadow-inner p-2 transition-all duration-300">
+            <!-- SPINNER DE CARGA -->
+            <div id="loading-spinner" class="absolute inset-0 flex flex-col items-center justify-center bg-[#ffffff] z-10">
+                <div class="w-8 h-8 border-4 border-[#ff0000] border-t-transparent rounded-full animate-spin mb-2"></div>
+                <span class="text-[10px] font-bold text-[#ff0000] uppercase tracking-wider">Loading...</span>
+            </div>
+            <!-- IMAGEN DEL PRODUCTO -->
+            <img id="producto-img" src="" alt="Product" decoding="async" fetchpriority="high" class="max-h-56 sm:max-h-64 max-w-full object-contain opacity-0 transition-opacity duration-300" onload="imagenCargada()" onerror="imagenError()">
+        </div>
+
+        <!-- NOMBRE DEL PRODUCTO -->
+        <h2 id="producto-nombre" class="text-base sm:text-lg font-bold text-[#ffffff] text-center mb-6 px-2">
+            Loading product...
+        </h2>
+
+        <!-- ÁREA DE APUESTA -->
+        <div id="panel-apuesta" class="w-full bg-[#cc0000] p-4 rounded-xl border border-[#ff4d4d] mb-6">
+            <div class="text-center mb-2">
+                <span class="text-xs font-semibold text-[#ffe6e6] uppercase tracking-wider" id="txt-label-apuesta">Your Bid:</span>
+                <div id="precio-usuario-display" class="text-2xl sm:text-3xl font-bold text-[#ffffff] my-1">0 €</div>
+            </div>
+
+            <!-- FADER LOGARÍTMICO PURO (0 a 1000) -->
+            <input type="range" id="fader-precio" min="0" max="1000" step="1" value="0" oninput="actualizarPrecioFader(this.value)" class="w-full mb-4 cursor-pointer">
+
+            <!-- BOTONES DE PRECISIÓN: 3 FILAS DE 4 COLUMNAS -->
+            <div class="grid grid-cols-4 gap-1.5 mb-1.5">
+                <button onclick="modificarPrecioRelativo(-100000)" class="classic-badge text-xs font-bold py-2 rounded-lg hover:bg-[#fff0f0] transition shadow-sm">-100k</button>
+                <button onclick="modificarPrecioRelativo(100000)" class="classic-badge text-xs font-bold py-2 rounded-lg hover:bg-[#fff0f0] transition shadow-sm">+100k</button>
+                <button onclick="modificarPrecioRelativo(-10000)" class="classic-badge text-xs font-bold py-2 rounded-lg hover:bg-[#fff0f0] transition shadow-sm">-10k</button>
+                <button onclick="modificarPrecioRelativo(10000)" class="classic-badge text-xs font-bold py-2 rounded-lg hover:bg-[#fff0f0] transition shadow-sm">+10k</button>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5 mb-1.5">
+                <button onclick="modificarPrecioRelativo(-1000)" class="classic-badge text-xs font-bold py-2 rounded-lg hover:bg-[#fff0f0] transition shadow-sm">-1k</button>
+                <button onclick="modificarPrecioRelativo(1000)" class="classic-badge text-xs font-bold py-2 rounded-lg hover:bg-[#fff0f0] transition shadow-sm">+1k</button>
+                <button onclick="modificarPrecioRelativo(-100)" class="classic-badge text-xs font-bold py-2 rounded-lg hover:bg-[#fff0f0] transition shadow-sm">-100</button>
+                <button onclick="modificarPrecioRelativo(100)" class="classic-badge text-xs font-bold py-2 rounded-lg hover:bg-[#fff0f0] transition shadow-sm">+100</button>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5">
+                <button onclick="modificarPrecioRelativo(-10)" class="classic-badge text-xs font-bold py-2 rounded-lg hover:bg-[#fff0f0] transition shadow-sm">-10</button>
+                <button onclick="modificarPrecioRelativo(10)" class="classic-badge text-xs font-bold py-2 rounded-lg hover:bg-[#fff0f0] transition shadow-sm">+10</button>
+                <button onclick="modificarPrecioRelativo(-1)" class="classic-badge text-xs font-bold py-2 rounded-lg hover:bg-[#fff0f0] transition shadow-sm">-1</button>
+                <button onclick="modificarPrecioRelativo(1)" class="classic-badge text-xs font-bold py-2 rounded-lg hover:bg-[#fff0f0] transition shadow-sm">+1</button>
+            </div>
+        </div>
+
+        <!-- BOTÓN DE COMPROBAR INTENTO -->
+        <button id="btn-comprobar" onclick="comprobarIntento()" class="w-full bg-[#ffffff] text-[#ff0000] text-xs font-bold uppercase tracking-widest py-3.5 rounded-xl hover:bg-[#fff0f0] transition shadow-md border border-[#ffffff]">
+            Check Price!
+        </button>
+
+        <!-- PISTA (MÁS ALTO / MÁS BAJO) CON ANIMACIÓN -->
+        <div id="pista-container" class="w-full mt-4 p-4 rounded-xl pista-badge text-center hidden flex flex-col items-center justify-center transition-all duration-300">
+            <div id="pista-icono" class="text-4xl mb-1"></div>
+            <p id="txt-pista" class="text-sm font-extrabold uppercase tracking-wider text-[#ff0000]"></p>
+        </div>
+
+        <!-- PANTALLA DE VICTORIA DE RONDA -->
+        <div id="victoria-container" class="w-full mt-4 p-5 rounded-xl bg-[#cc0000] border border-[#ff4d4d] text-center hidden">
+            <h3 id="txt-vic-titulo" class="text-sm font-bold text-[#ffffff] uppercase mb-1">¡Exacto!</h3>
+            <div id="medalla-display" class="text-4xl my-2">🥇</div>
+            <p id="txt-vic-detalles" class="text-xs text-[#ffffff] mb-4 font-sans"></p>
+            <button id="btn-siguiente" onclick="siguienteRonda()" class="classic-badge text-xs font-bold py-2.5 px-6 rounded-xl uppercase tracking-wider hover:bg-[#fff0f0] transition shadow-sm">
+                Next Product →
+            </button>
+        </div>
+
+        <!-- PANTALLA DE RESUMEN FINAL -->
+        <div id="resumen-final-container" class="w-full mt-2 hidden text-left font-sans">
+            <h3 class="text-center text-lg font-bold text-[#ffffff] uppercase mb-3">📊 Sofa Championship Summary</h3>
+            <div id="lista-resumen-rondas" class="space-y-2 mb-4"></div>
+            <div class="bg-[#cc0000] p-4 rounded-xl border border-[#ff4d4d] text-center">
+                <div id="nota-final-display" class="text-2xl font-bold text-[#ffffff] mb-1">Final Score: 10 / 10</div>
+                <p id="veredicto-final-texto" class="text-xs text-[#ffffff] mb-4 font-serif"></p>
+                <button onclick="reiniciarJuego()" class="classic-badge text-xs font-bold py-2.5 px-6 rounded-xl uppercase tracking-wider hover:bg-[#fff0f0] transition shadow-sm">
+                    Play Again 🔄
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- PIE -->
+    <footer class="mt-8 text-center text-[11px] text-[#ffffff] font-sans">
+        © 2026 GNIXO. AimPrice Arena.
+    </footer>
+
+    <script>
+        const catalogoProductos = [
+            { nombre:{en:"PlayStation 5 Console",es:"Consola PlayStation 5",fr:"Console PlayStation 5",de:"PlayStation 5 Konsole"}, precio:550, img:"https://commons.wikimedia.org/wiki/Special:FilePath/PlayStation_5.jpg" },
+            { nombre:{en:"iPhone 15 Pro Max",es:"iPhone 15 Pro Max",fr:"iPhone 15 Pro Max",de:"iPhone 15 Pro Max"}, precio:1479, img:"https://commons.wikimedia.org/wiki/Special:FilePath/iPhone_15_pro_max.png" },
+            { nombre:{en:"Rolex Submariner",es:"Rolex Submariner",fr:"Rolex Submariner",de:"Rolex Submariner"}, precio:10250, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Rolex-Submariner.jpg" },
+            { nombre:{en:"Tesla Model 3",es:"Tesla Model 3",fr:"Tesla Model 3",de:"Tesla Model 3"}, precio:39990, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Tesla_Model_3.jpg" },
+            { nombre:{en:"Nintendo Switch OLED",es:"Nintendo Switch OLED",fr:"Nintendo Switch OLED",de:"Nintendo Switch OLED"}, precio:349, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Switch_OLED.jpg" },
+            { nombre:{en:"Apple MacBook Pro 16-inch M2 Max",es:"Apple MacBook Pro 16 pulgadas M2 Max",fr:"Apple MacBook Pro 16 pouces M2 Max",de:"Apple MacBook Pro 16 Zoll M2 Max"}, precio:3299, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Apple_MacBook_Pro_16%22_M2_Max.jpg" },
+            { nombre:{en:"Nike Air Jordan 1",es:"Nike Air Jordan 1",fr:"Nike Air Jordan 1",de:"Nike Air Jordan 1"}, precio:180, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Nike_Air_Jordan_I.jpg" },
+            { nombre:{en:"Mona Lisa Painting",es:"Cuadro de La Mona Lisa",fr:"Tableau de La Joconde",de:"Gemälde der Mona Lisa"}, precio:8600000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Leonardo_da_Vinci_-_Mona_Lisa.jpg" },
+            { nombre:{en:"LEGO Millennium Falcon",es:"LEGO Halcón Milenario",fr:"LEGO Faucon Millenium",de:"LEGO Millennium Falke"}, precio:849, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Millennium_falcon_lego.jpg" },
+            { nombre:{en:"Professional Espresso Machine",es:"Cafetera Espresso Profesional",fr:"Machine à café espresso professionnelle",de:"Professionelle Espressomaschine"}, precio:6500, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Espresso_Machine.jpg" },
+            { nombre:{en:"Private Jet",es:"Jet Privado",fr:"Jet Privé",de:"Privatjet"}, precio:9500000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/A_private_jet_lands_at_Gibraltar_Airport_(1).JPG" },
+            { nombre:{en:"Apple AirPods Pro",es:"Apple AirPods Pro",fr:"Apple AirPods Pro",de:"Apple AirPods Pro"}, precio:249, img:"https://commons.wikimedia.org/wiki/Special:FilePath/AirPods_Pro.jpg" },
+            { nombre:{en:"Xbox Series X",es:"Xbox Series X",fr:"Xbox Series X",de:"Xbox Series X"}, precio:599, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Xbox_Series_X.png" },
+            { nombre:{en:"PlayStation 4",es:"PlayStation 4",fr:"PlayStation 4",de:"PlayStation 4"}, precio:399, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Playstation4.png" },
+            { nombre:{en:"Nintendo DS",es:"Nintendo DS",fr:"Nintendo DS",de:"Nintendo DS"}, precio:149, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Nintendo_DS.jpg" },
+            { nombre:{en:"Sony PSP",es:"Sony PSP",fr:"Sony PSP",de:"Sony PSP"}, precio:169, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Psp-1000.jpg" },
+            { nombre:{en:"Apple iPod Photo 4th Generation",es:"Apple iPod Photo de 4ª generación",fr:"Apple iPod Photo 4e génération",de:"Apple iPod Photo 4. Generation"}, precio:299, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Ipod_photo.jpg" },
+            { nombre:{en:"Amazon Kindle 2",es:"Amazon Kindle 2",fr:"Amazon Kindle 2",de:"Amazon Kindle 2"}, precio:359, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Kindle.jpg" },
+            { nombre:{en:"Ferrari F40",es:"Ferrari F40",fr:"Ferrari F40",de:"Ferrari F40"}, precio:2500000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/FerrariF40.jpg" },
+            { nombre:{en:"Vespa Scooter",es:"Scooter Vespa",fr:"Scooter Vespa",de:"Vespa Roller"}, precio:5000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Vespa.JPG" },
+            { nombre:{en:"Coca-Cola Bottle",es:"Botella de Coca-Cola",fr:"Bouteille de Coca-Cola",de:"Coca-Cola-Flasche"}, precio:2, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Coca-cola_bottle.jpg" },
+            { nombre:{en:"Gold Bar",es:"Lingote de Oro",fr:"Lingot d'or",de:"Goldbarren"}, precio:2500000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Gold_bar.png" },
+            { nombre:{en:"Diamond",es:"Diamante",fr:"Diamant",de:"Diamant"}, precio:50000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Diamond_1.jpg" },
+            { nombre:{en:"Polaroid Camera",es:"Cámara Polaroid",fr:"Appareil photo Polaroid",de:"Polaroid-Kamera"}, precio:150, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Polaroid_OneStep.jpg" },
+            { nombre:{en:"Rolex Daytona",es:"Rolex Daytona",fr:"Rolex Daytona",de:"Rolex Daytona"}, precio:30000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/RolexDaytona.jpg" },
+            { nombre:{en:"Concorde Supersonic Aircraft",es:"Avión supersónico Concorde",fr:"Avion supersonique Concorde",de:"Überschallflugzeug Concorde"}, precio:100000000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/The_Concorde.jpg" },
+            { nombre:{en:"Nintendo Game Boy Color",es:"Nintendo Game Boy Color",fr:"Nintendo Game Boy Color",de:"Nintendo Game Boy Color"}, precio:89, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Wikipedia_gameboycolor.jpg" },
+            { nombre:{en:"Nintendo Game Boy Advance",es:"Nintendo Game Boy Advance",fr:"Nintendo Game Boy Advance",de:"Nintendo Game Boy Advance"}, precio:99, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Wikipedia_gameboyadvance.jpg" },
+            { nombre:{en:"Nintendo Game Boy Advance SP",es:"Nintendo Game Boy Advance SP",fr:"Nintendo Game Boy Advance SP",de:"Nintendo Game Boy Advance SP"}, precio:129, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Wikipedia_gameboyadvancesp.jpg" },
+            { nombre:{en:"Nintendo GameCube",es:"Nintendo GameCube",fr:"Nintendo GameCube",de:"Nintendo GameCube"}, precio:199, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Nintendo_GameCube.jpg" },
+            { nombre:{en:"PlayStation 2",es:"PlayStation 2",fr:"PlayStation 2",de:"PlayStation 2"}, precio:149, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Playstation_2.jpg" },
+            { nombre:{en:"Xbox 360",es:"Xbox 360",fr:"Xbox 360",de:"Xbox 360"}, precio:299, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Xbox360.jpg" },
+            { nombre:{en:"Apple iPod",es:"Apple iPod",fr:"Apple iPod",de:"Apple iPod"}, precio:299, img:"https://commons.wikimedia.org/wiki/Special:FilePath/IPod.png" },
+            { nombre:{en:"Apple Macintosh Plus",es:"Apple Macintosh Plus",fr:"Apple Macintosh Plus",de:"Apple Macintosh Plus"}, precio:2600, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Apple_Macintosh_Plus.jpg" },
+            { nombre:{en:"Canon EOS Camera",es:"Cámara Canon EOS",fr:"Appareil photo Canon EOS",de:"Canon EOS Kamera"}, precio:800, img:"https://commons.wikimedia.org/wiki/Special:FilePath/CanonEOS.JPG" },
+            { nombre:{en:"Fender Stratocaster",es:"Fender Stratocaster",fr:"Fender Stratocaster",de:"Fender Stratocaster"}, precio:1500, img:"https://commons.wikimedia.org/wiki/Special:FilePath/FenderStratocaster.jpg" },
+            { nombre:{en:"Nokia 3310",es:"Nokia 3310",fr:"Nokia 3310",de:"Nokia 3310"}, precio:129, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Nokia3310.jpg" },
+            { nombre:{en:"Nintendo Wii",es:"Nintendo Wii",fr:"Nintendo Wii",de:"Nintendo Wii"}, precio:249, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Nintendo_Wii_Video_Game_Console_Pal.JPG" },
+            { nombre:{en:"Nintendo Wii U",es:"Nintendo Wii U",fr:"Nintendo Wii U",de:"Nintendo Wii U"}, precio:299, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Nintendo-Wii-U-Console-BR.jpg" },
+            { nombre:{en:"Apple iPad",es:"Apple iPad",fr:"Apple iPad",de:"Apple iPad"}, precio:499, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPad.jpg" },
+            { nombre:{en:"Boeing 747-400",es:"Boeing 747-400",fr:"Boeing 747-400",de:"Boeing 747-400"}, precio:250000000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/LH_Boeing_747-400.jpg" },
+            { nombre:{en:"Volkswagen Beetle",es:"Volkswagen Escarabajo",fr:"Volkswagen Coccinelle",de:"Volkswagen Käfer"}, precio:22000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/A_Volkswagen_Beetle.jpg" },
+            { nombre:{en:"Ford Mustang",es:"Ford Mustang",fr:"Ford Mustang",de:"Ford Mustang"}, precio:55000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Ford_Mustang.jpg" },
+            { nombre:{en:"Tesla Roadster",es:"Tesla Roadster",fr:"Tesla Roadster",de:"Tesla Roadster"}, precio:200000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Tesla_Roadster.JPG" },
+            { nombre:{en:"Espresso Machine",es:"Cafetera Espresso",fr:"Machine Espresso",de:"Espressomaschine"}, precio:2500, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Espresso_machine.jpg" },
+            { nombre:{en:"Coffee Maker",es:"Cafetera",fr:"Cafetière",de:"Kaffeemaschine"}, precio:80, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Coffee_maker.jpg" },
+            { nombre:{en:"Hair Dryer",es:"Secador de Pelo",fr:"Sèche-cheveux",de:"Haartrockner"}, precio:60, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Hair_dryer.jpg" },
+            { nombre:{en:"Toaster",es:"Tostadora",fr:"Grille-pain",de:"Toaster"}, precio:40, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Toaster.png" },
+            { nombre:{en:"Skateboard",es:"Skateboard",fr:"Skateboard",de:"Skateboard"}, precio:120, img:"https://commons.wikimedia.org/wiki/Special:FilePath/SkateBoard.jpg" },
+            { nombre:{en:"Sunglasses",es:"Gafas de Sol",fr:"Lunettes de Soleil",de:"Sonnenbrille"}, precio:100, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Sunglasses.jpg" },
+            { nombre:{en:"VHS Cassette",es:"Casete VHS",fr:"Cassette VHS",de:"VHS-Kassette"}, precio:10, img:"https://commons.wikimedia.org/wiki/Special:FilePath/VHS-cassette.jpg" },
+            { nombre:{en:"Gramophone",es:"Gramófono",fr:"Gramophone",de:"Grammophon"}, precio:800, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Gramophone.jpg" },
+            { nombre:{en:"Concorde Aircraft",es:"Avión Concorde",fr:"Avion Concorde",de:"Concorde-Flugzeug"}, precio:100000000, img:"https://commons.wikimedia.org/wiki/Special:FilePath/The_Concorde.jpg" },
+            { nombre:{en:"Nintendo Wii Game Disc",es:"Disco de juego Nintendo Wii",fr:"Disque de jeu Nintendo Wii",de:"Nintendo Wii-Spieledisc"}, precio:30, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Wii_game_disc.jpg" },
+            { nombre:{en:"Wii Wheel",es:"Volante Wii",fr:"Volant Wii",de:"Wii-Lenkrad"}, precio:15, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Wii-Wheel.png" },
+            { nombre:{en:"Nokia 3310 Mobile Phone",es:"Teléfono Nokia 3310",fr:"Téléphone Nokia 3310",de:"Nokia 3310 Mobiltelefon"}, precio:129, img:"https://commons.wikimedia.org/wiki/Special:FilePath/Nokia_3310_mobile_phone.jpg" },
+        ];
+
+        const i18nAim = {
+            en: {
+                volver: "← Back to Menu",
+                instruccion: "Precise logarithmic fader and strictly restricted scoring!",
+                ronda: "Round",
+                intentos: "Attempts",
+                comprobar: "Check Price!",
+                siguiente: "Next Product →",
+                masAlto: "HIGHER! The real price is higher",
+                masBajo: "LOWER! The real price is lower",
+                resumenIntentos: "Attempts:",
+                cacaMsg: "💩 That took more than 40 attempts... Total disaster from the sofa!"
+            },
+            es: {
+                volver: "← Volver al Menú",
+                instruccion: "¡Fader logarítmico preciso y puntuación final ultra estricta!",
+                ronda: "Ronda",
+                intentos: "Intentos",
+                comprobar: "¡Comprobar Precio!",
+                siguiente: "Siguiente Producto →",
+                masAlto: "¡MÁS ALTO! El precio real es mayor",
+                masBajo: "¡MÁS BAJO! El precio real es menor",
+                resumenIntentos: "Intentos:",
+                cacaMsg: "💩 ¡Has tardado más de 40 intentos... Una auténtica caca desde el sofá!"
+            },
+            fr: {
+                volver: "← Retour au menu",
+                instruccion: "Curseur logarithmique précis et notation très stricte !",
+                ronda: "Manche",
+                intentos: "Essais",
+                comprobar: "Vérifier le prix !",
+                siguiente: "Produit suivant →",
+                masAlto: "PLUS HAUT ! Le vrai prix est plus élevé",
+                masBajo: "PLUS BAS ! Le vrai prix est moins élevé",
+                resumenIntentos: "Essais :",
+                cacaMsg: "💩 Trop d'essais... Une vraie caca depuis le canapé !"
+            },
+            de: {
+                volver: "← Zurück zum Menü",
+                instruccion: "Präziser logarithmischer Regler und strenges Bewertungssystem!",
+                ronda: "Runde",
+                intentos: "Versuche",
+                comprobar: "Preis prüfen!",
+                siguiente: "Nächstes Produkt →",
+                masAlto: "HÖHER! Der echte Preis ist höher",
+                masBajo: "NIEDRIGER! Der echte Preis ist niedriger",
+                resumenIntentos: "Versuche:",
+                cacaMsg: "💩 Zu viele Versuche... Totaler Reinfall vom Sofa aus!"
+            }
+        };
+
+        let productosSeleccionados = [];
+        let rondaActual = 0;
+        let intentosActuales = 0;
+        let precioActualUsuario = 0;
+        let juegoTerminado = false;
+        let historialPartida = [];
+        let temporizadorCargaImagen;
+        let usandoImagenRespaldo = false;
+
+        function obtenerUrlImagenOptimizada(url) {
+            if (url.includes('commons.wikimedia.org/wiki/Special:FilePath/')) {
+                return `${url}${url.includes('?') ? '&' : '?'}width=512`;
+            }
+            return url;
+        }
+
+        function precargarSiguientesImagenes() {
+            productosSeleccionados.slice(rondaActual + 1, rondaActual + 3).forEach(producto => {
+                const imagen = new Image();
+                imagen.decoding = 'async';
+                imagen.src = obtenerUrlImagenOptimizada(producto.img);
+            });
+        }
+
+        function faderAPrecio(valFader) {
+            if (valFader <= 0) return 0;
+            if (valFader >= 1000) return 10000000;
+            let minLog = Math.log10(1);
+            let maxLog = Math.log10(10000000);
+            let escala = valFader / 1000;
+            let valorLog = minLog + escala * (maxLog - minLog);
+            let precio = Math.round(Math.pow(10, valorLog));
+            
+            if (precio < 100) return Math.round(precio);
+            if (precio < 1000) return Math.round(precio / 5) * 5;
+            if (precio < 10000) return Math.round(precio / 50) * 50;
+            if (precio < 100000) return Math.round(precio / 500) * 500;
+            if (precio < 1000000) return Math.round(precio / 5000) * 5000;
+            return Math.round(precio / 50000) * 50000;
+        }
+
+        function precioAFader(precio) {
+            if (precio <= 0) return 0;
+            if (precio >= 10000000) return 1000;
+            let minLog = Math.log10(1);
+            let maxLog = Math.log10(10000000);
+            let precioLog = Math.log10(precio);
+            let escala = (precioLog - minLog) / (maxLog - minLog);
+            return Math.round(escala * 1000);
+        }
+
+        function cambiarIdioma(lang) {
+            localStorage.setItem('whenwastimeline_idioma', lang);
+            aplicarTextosUI(lang);
+        }
+
+        function aplicarTextosUI(lang) {
+            const t = i18nAim[lang] || i18nAim.en;
+            document.getElementById('select-idioma').value = lang;
+            document.getElementById('txt-volver').textContent = t.volver;
+            document.getElementById('txt-instruccion').textContent = t.instruccion;
+            document.getElementById('btn-comprobar').textContent = t.comprobar;
+            document.getElementById('btn-siguiente').textContent = t.siguiente;
+            if (!juegoTerminado || rondaActual < 5) {
+                actualizarMarcadoresUI();
+            }
+        }
+
+        function actualizarMarcadoresUI() {
+            const lang = localStorage.getItem('whenwastimeline_idioma') || 'en';
+            const t = i18nAim[lang] || i18nAim.en;
+            document.getElementById('txt-ronda').textContent = `${t.ronda} ${rondaActual + 1} / 5`;
+            document.getElementById('txt-intentos').textContent = `${t.intentos}: ${intentosActuales}`;
+        }
+
+        function iniciarNuevaPartida() {
+            const mezcla = [...catalogoProductos].sort(() => 0.5 - Math.random());
+            productosSeleccionados = mezcla.slice(0, 5);
+            rondaActual = 0;
+            historialPartida = [];
+            cargarProducto();
+        }
+
+        function cargarProducto() {
+            if (rondaActual >= 5) {
+                finalizarJuegoTotal();
+                return;
+            }
+
+            intentosActuales = 0;
+            juegoTerminado = false;
+            actualizarMarcadoresUI();
+
+            document.getElementById('pista-container').classList.add('hidden');
+            document.getElementById('victoria-container').classList.add('hidden');
+            document.getElementById('btn-comprobar').classList.remove('hidden');
+
+            const p = productosSeleccionados[rondaActual];
+            const lang = localStorage.getItem('whenwastimeline_idioma') || 'en';
+
+            document.getElementById('producto-nombre').textContent = p.nombre[lang] || p.nombre.en;
+            
+            // Restablecer el contenedor a tamaño fijo cuadrado mientras carga
+            const contenedorImg = document.getElementById('contenedor-imagen');
+            contenedorImg.className = "w-56 h-56 sm:w-64 sm:h-64 bg-[#ffffff] rounded-xl border border-[#ffffff] flex items-center justify-center overflow-hidden mb-4 relative shadow-inner p-2 transition-all duration-300";
+            
+            const spinner = document.getElementById('loading-spinner');
+            spinner.classList.remove('hidden');
+
+            const imgEl = document.getElementById('producto-img');
+            clearTimeout(temporizadorCargaImagen);
+            usandoImagenRespaldo = false;
+            imgEl.classList.remove('opacity-100');
+            imgEl.classList.add('opacity-0');
+            imgEl.src = obtenerUrlImagenOptimizada(p.img);
+            temporizadorCargaImagen = setTimeout(imagenError, 8000);
+        }
+
+        function imagenCargada() {
+            clearTimeout(temporizadorCargaImagen);
+            const spinner = document.getElementById('loading-spinner');
+            spinner.classList.add('hidden');
+
+            const imgEl = document.getElementById('producto-img');
+            imgEl.classList.remove('opacity-0');
+            imgEl.classList.add('opacity-100');
+
+            // Una vez cargada, quitar tamaño fijo para que se ajuste perfectamente a la imagen
+            const contenedorImg = document.getElementById('contenedor-imagen');
+            contenedorImg.className = "w-auto max-w-full bg-[#ffffff] rounded-xl border border-[#ffffff] flex items-center justify-center overflow-hidden mb-4 relative shadow-inner p-2 transition-all duration-300";
+            precargarSiguientesImagenes();
+        }
+
+        function imagenError() {
+            clearTimeout(temporizadorCargaImagen);
+            const imgEl = document.getElementById('producto-img');
+            if (!usandoImagenRespaldo) {
+                usandoImagenRespaldo = true;
+                imgEl.src = "https://images.unsplash.com/photo-1547996160-81f3a37525de?w=600&auto=format&fit=crop&q=80";
+                temporizadorCargaImagen = setTimeout(imagenError, 5000);
+                return;
+            }
+
+            document.getElementById('loading-spinner').classList.add('hidden');
+            imgEl.classList.remove('opacity-0');
+            imgEl.classList.add('opacity-100');
+        }
+
+        function actualizarPrecioFader(valFader) {
+            if (juegoTerminado) return;
+            precioActualUsuario = faderAPrecio(parseInt(valFader));
+            actualizarDisplayPrecio();
+        }
+
+        function modificarPrecioRelativo(cantidad) {
+            if (juegoTerminado) return;
+            let nuevoPrecio = precioActualUsuario + cantidad;
+            if (nuevoPrecio < 0) nuevoPrecio = 0;
+            if (nuevoPrecio > 10000000) nuevoPrecio = 10000000;
+
+            precioActualUsuario = nuevoPrecio;
+            document.getElementById('fader-precio').value = precioAFader(precioActualUsuario);
+            actualizarDisplayPrecio();
+        }
+
+        function actualizarDisplayPrecio() {
+            document.getElementById('precio-usuario-display').textContent = `${precioActualUsuario.toLocaleString()} €`;
+        }
+
+        function comprobarIntento() {
+            if (juegoTerminado) return;
+            intentosActuales++;
+            actualizarMarcadoresUI();
+
+            const p = productosSeleccionados[rondaActual];
+            const precioReal = p.precio;
+            const lang = localStorage.getItem('whenwastimeline_idioma') || 'en';
+            const t = i18nAim[lang] || i18nAim.en;
+
+            const pistaContainer = document.getElementById('pista-container');
+            const pistaIcono = document.getElementById('pista-icono');
+            const txtPista = document.getElementById('txt-pista');
+
+            if (precioActualUsuario === precioReal) {
+                juegoTerminado = true;
+                pistaContainer.classList.add('hidden');
+                document.getElementById('btn-comprobar').classList.add('hidden');
+
+                let medallaEmoji = "";
+                let textoMedallaExtra = "";
+                if (intentosActuales <= 5) {
+                    medallaEmoji = "🥇";
+                    textoMedallaExtra = (lang === 'es') ? "¡Medalla de Oro!" : "Gold Medal!";
+                } else if (intentosActuales <= 20) {
+                    medallaEmoji = "🥈";
+                    textoMedallaExtra = (lang === 'es') ? "¡Medalla de Plata!" : "Silver Medal!";
+                } else if (intentosActuales <= 40) {
+                    medallaEmoji = "🥉";
+                    textoMedallaExtra = (lang === 'es') ? "¡Medalla de Bronce!" : "Bronze Medal!";
+                } else {
+                    medallaEmoji = "💩";
+                    textoMedallaExtra = t.cacaMsg;
+                }
+
+                historialPartida.push({
+                    producto: p.nombre[lang] || p.nombre.en,
+                    precio: precioReal,
+                    intentos: intentosActuales,
+                    medalla: medallaEmoji
+                });
+
+                document.getElementById('medalla-display').textContent = medallaEmoji;
+                document.getElementById('txt-vic-detalles').innerHTML = `${t.resumenIntentos} <b>${intentosActuales}</b><br><span class="text-[#ffe6e6] font-semibold mt-1 inline-block">${textoMedallaExtra}</span> (Real: ${precioReal.toLocaleString()} €)`;
+                document.getElementById('victoria-container').classList.remove('hidden');
+
+            } else {
+                pistaContainer.classList.remove('hidden');
+                txtPista.textContent = (precioActualUsuario < precioReal) ? t.masAlto : t.masBajo;
+
+                if (precioActualUsuario < precioReal) {
+                    pistaIcono.innerHTML = '⬆️';
+                    pistaIcono.className = 'text-4xl mb-1 animate-bounce-up';
+                } else {
+                    pistaIcono.innerHTML = '⬇️';
+                    pistaIcono.className = 'text-4xl mb-1 animate-bounce-down';
+                }
+            }
+        }
+
+        function siguienteRonda() {
+            rondaActual++;
+            cargarProducto();
+        }
+
+        function finalizarJuegoTotal() {
+            juegoTerminado = true;
+            document.getElementById('panel-marcadores').classList.add('hidden');
+            document.getElementById('contenedor-imagen').classList.add('hidden');
+            document.getElementById('producto-nombre').classList.add('hidden');
+            document.getElementById('panel-apuesta').classList.add('hidden');
+            document.getElementById('pista-container').classList.add('hidden');
+            document.getElementById('victoria-container').classList.add('hidden');
+            document.getElementById('header-juego').classList.add('hidden');
+
+            let todasOro = historialPartida.every(h => h.intentos <= 5);
+            let nota = 0;
+
+            if (todasOro) {
+                nota = 10;
+            } else {
+                let totalIntentos = historialPartida.reduce((acc, curr) => acc + curr.intentos, 0);
+                let mediaIntentos = totalIntentos / 5;
+                
+                nota = 9 - Math.floor((mediaIntentos - 5.01) / 3);
+                if (nota < 1) nota = 1;
+            }
+
+            const lang = localStorage.getItem('whenwastimeline_idioma') || 'en';
+            const listaEl = document.getElementById('lista-resumen-rondas');
+            listaEl.innerHTML = "";
+            historialPartida.forEach((h, idx) => {
+                listaEl.innerHTML += `
+                    <div class="flex justify-between items-center text-xs bg-[#cc0000] p-2.5 rounded-lg border border-[#ff4d4d] text-white">
+                        <span class="font-bold">#${idx + 1} ${h.producto}</span>
+                        <span class="text-[#ffe6e6]">${h.intentos} attempts ${h.medalla}</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('nota-final-display').textContent = `Final Score: ${nota} / 10`;
+            
+            let veredicto = "";
+            if (nota === 10) {
+                veredicto = (lang === 'es') ? "🏆 ¡Impecable! 5 medallas de oro consecutivas. Estás listo para arrasar en la televisión." : "🏆 Flawless! 5 consecutive gold medals. Ready to conquer television.";
+            } else if (nota >= 7) {
+                veredicto = (lang === 'es') ? "📺 ¡Muy buen trabajo, pero se te escapó algún oro! Tienes gran intuición." : "📺 Very good job, but missed some gold!";
+            } else if (nota >= 4) {
+                veredicto = (lang === 'es') ? "🛋️ Regular... Demasiados intentos para conseguir las medallas máximas." : "🛋️ Mediocre... Too many attempts for top medals.";
+            } else {
+                veredicto = (lang === 'es') ? "💩 Una auténtica caca desde el sofá. ¡Necesitas entrenar mucho más!" : "💩 Total disaster from the sofa. Train harder!";
+            }
+
+            document.getElementById('veredicto-final-texto').textContent = veredicto;
+            document.getElementById('resumen-final-container').classList.remove('hidden');
+        }
+
+        function reiniciarJuego() {
+            document.getElementById('header-juego').classList.remove('hidden');
+            document.getElementById('panel-marcadores').classList.remove('hidden');
+            document.getElementById('contenedor-imagen').classList.remove('hidden');
+            document.getElementById('producto-nombre').classList.remove('hidden');
+            document.getElementById('panel-apuesta').classList.remove('hidden');
+            document.getElementById('resumen-final-container').classList.add('hidden');
+            iniciarNuevaPartida();
+        }
+
+        window.onload = () => {
+            const langGuardado = localStorage.getItem('whenwastimeline_idioma') || 'en';
+            aplicarTextosUI(langGuardado);
+            iniciarNuevaPartida();
+        };
+    </script>
+</body>
+</html>

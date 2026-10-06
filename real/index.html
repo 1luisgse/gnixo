@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RCN3CB1RMZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-RCN3CB1RMZ');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Verificacion google -->
+    <meta name="google-site-verification" content="YvlBoqkR35-GFkVl5UpkPOl77Dy7S_0K268ER0zwgZE" />
+    <!-- seguridad -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta property="og:title" content="Real - Fake or True">
+    <meta property="og:description" content="Test your knowledge by identifying what is real and what is fake.">
+    <meta property="og:url" content="https://realgame.vercel.app">
+    <meta name="description" content="Real is a daily trivia game where you must distinguish between real facts and fake fabrications.">
+    <meta property="og:site_name" content="Real">
+    <link rel="canonical" href="https://realgame.vercel.app/">
+    <title>REAL | Trivia Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Real",
+        "url": "https://realgame.vercel.app"
+    }
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1627189663364841" crossorigin="anonymous"></script>
+    <script>
+        if (!localStorage.getItem('real_idioma')) {
+            localStorage.setItem('real_idioma', 'en');
+        }
+    </script>
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .game-card {
+            background-color: #dc2626;
+            border: 2px solid #b91c1c;
+        }
+        .game-item {
+            background-color: #991b1b;
+            border: 1px solid #b91c1c;
+            transition: all 0.2s ease;
+        }
+        .game-item:hover {
+            border-color: #ffffff;
+            background-color: #991b1b;
+        }
+        .game-title-anton {
+            font-family: 'Anton', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between py-6 px-4 select-none relative">
+
+    <!-- CABECERA -->
+    <header class="w-full max-w-md flex justify-between items-center relative z-10 mb-2">
+        <a href="../" class="bg-[#1a1a1a] text-white text-xs font-semibold py-1.5 px-3 rounded-lg border border-[#333333] flex items-center justify-center hover:border-white transition">
+            ← Back
+        </a>
+        
+        <div class="flex items-center gap-2">
+            <div class="bg-[#1a1a1a] text-red-400 text-xs font-bold py-1.5 px-3 rounded-lg border border-[#333333] flex items-center gap-1">
+                🔥 <span id="current-streak-num">0</span>
+            </div>
+            <select id="select-idioma" onchange="cambiarIdioma(this.value)" class="bg-[#1a1a1a] text-white text-xs font-semibold py-1.5 px-3 rounded-lg border border-[#333333] focus:outline-none cursor-pointer">
+                <option value="en" class="bg-[#1a1a1a]">🇬🇧 EN</option>
+                <option value="es" class="bg-[#1a1a1a]">🇪🇸 ES</option>
+                <option value="fr" class="bg-[#1a1a1a]">🇫🇷 FR</option>
+                <option value="de" class="bg-[#1a1a1a]">🇩🇪 DE</option>
+            </select>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="max-w-md w-full game-card rounded-2xl p-6 relative z-10 my-auto text-white shadow-2xl">
+        
+        <!-- TÍTULO CENTRAL -->
+        <div class="text-center mb-5">
+            <h1 class="text-4xl font-extrabold tracking-wider text-white game-title-anton m-0">REAL</h1>
+        </div>
+
+        <!-- CRONÓMETRO, ACIERTOS Y MODO -->
+        <div class="flex justify-between items-center mb-4 text-xs text-white/90 font-semibold">
+            <span id="txt-badge-modo" class="tracking-wider uppercase text-[10px] text-white font-bold">Survival Mode</span>
+            <div class="flex items-center gap-2">
+                <div class="bg-[#991b1b] text-white py-1 px-2.5 rounded border border-[#b91c1c] text-[11px] font-bold">
+                    🎯 <span id="puntuacion-actual">0</span>
+                </div>
+                <div id="cronometro-display" class="font-mono bg-[#991b1b] text-white py-1 px-2.5 rounded border border-[#b91c1c] flex items-center gap-1">
+                    ⏱️ <span id="tiempo-transcurrido">00:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- INSTRUCCIÓN -->
+        <div class="bg-[#991b1b] border border-[#b91c1c] rounded-xl p-3.5 mb-4 text-center">
+            <p id="instruccion-ronda" class="text-xs text-white font-semibold leading-relaxed">Find the ONLY REAL fact among these 3 options:</p>
+        </div>
+
+        <!-- OPCIONES -->
+        <div id="opciones-container" class="space-y-3 mb-5"></div>
+
+        <!-- PANTALLA DE GAME OVER (REDISEÑADA Y LLAMATIVA) -->
+        <div id="gameover-container" class="hidden text-center py-1">
+            <div class="bg-[#7f1d1d] border-2 border-red-400 rounded-2xl p-5 mb-5 text-white shadow-2xl">
+                <!-- Título Impactante -->
+                <h2 class="text-3xl font-anton tracking-wider text-yellow-300 drop-shadow-md mb-1" id="txt-gameover-titulo">GAME OVER</h2>
+                <p id="txt-gameover-sub" class="text-xs text-red-200 font-medium mb-4">Te has quedado sin intentos. ¡Buen combate!</p>
+                
+                <!-- Tarjetas de Estadísticas Detalladas -->
+                <div class="space-y-2.5">
+                    <div class="bg-[#991b1b] border border-red-500/60 rounded-xl p-3 flex items-center justify-between shadow-inner">
+                        <span class="text-xs font-bold text-red-200 uppercase tracking-wide flex items-center gap-1.5">🎯 Aciertos Totales</span>
+                        <span id="res-aciertos" class="text-xl font-anton text-white">0</span>
+                    </div>
+
+                    <div class="bg-[#991b1b] border border-red-500/60 rounded-xl p-3 flex items-center justify-between shadow-inner">
+                        <span class="text-xs font-bold text-red-200 uppercase tracking-wide flex items-center gap-1.5">⏱️ Tiempo Activo</span>
+                        <span id="res-tiempo" class="text-xl font-anton font-mono text-white">00:00</span>
+                    </div>
+
+                    <div class="bg-[#991b1b] border border-red-500/60 rounded-xl p-3.5 flex flex-col gap-1 shadow-inner text-center">
+                        <span class="text-[11px] font-bold text-red-200 uppercase tracking-widest">🏆 Nota Final</span>
+                        <span id="res-nota" class="text-base font-extrabold text-yellow-300 game-title-anton tracking-wide">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="reiniciarPartidaCompleta()" class="w-full bg-white hover:bg-neutral-200 text-red-600 font-bold py-3.5 px-4 rounded-xl transition duration-200 text-xs cursor-pointer border border-white mb-2.5 flex items-center justify-center gap-2 shadow-xl tracking-wider uppercase">
+                🔄 <span id="txt-btn-reintentar" class="font-anton text-sm">Play Again</span>
+            </button>
+            <button onclick="compartirResultado()" class="w-full bg-[#991b1b] hover:bg-[#7f1d1d] text-white font-semibold py-3 px-4 rounded-xl transition duration-200 text-xs cursor-pointer border border-red-500 flex items-center justify-center gap-2 shadow-md">
+                📋 <span id="txt-btn-compartir">Copy result for social media</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="mt-4 text-center text-[11px] text-neutral-500 flex gap-4 justify-center relative z-10 font-semibold">
+        <a href="../aviso-legal.html" class="hover:text-white transition">Legal Notice</a>
+        <span>•</span>
+        <a href="../privacidad.html" class="hover:text-white transition">Privacy Policy</a>
+    </footer>
+
+    <script>
+        const i18n = {
+            en: {
+                instruccion: "Find the ONLY REAL fact among these 3 options:",
+                reintentar: "Play Again",
+                compartir: "Copy score for social media",
+                copiadoExito: "✅ Copied score to clipboard!",
+                modo: "Survival Mode",
+                gameOverTitulo: "GAME OVER",
+                gameOverSub: "You failed a statement. Here are your stats:",
+                notas: {
+                    s: "🧠 GENIUS TIER (MASTERMIND)",
+                    a: "🔥 EXPERT INTUITION",
+                    b: "👍 SOLID KNOWLEDGE",
+                    c: "💡 CASUAL PLAYER",
+                    d: "🌱 ROOKIE EXPLORER"
+                }
+            },
+            es: {
+                instruccion: "Encuentra el ÚNICO dato REAL entre estas 3 opciones:",
+                reintentar: "Jugar de nuevo",
+                compartir: "Copiar puntuación para redes",
+                copiadoExito: "✅ ¡Puntuación copiada al portapapeles!",
+                modo: "Modo Supervivencia",
+                gameOverTitulo: "¡FIN DEL JUEGO!",
+                gameOverSub: "Fallaste un enunciado. Este es tu balance:",
+                notas: {
+                    s: "🧠 NIVEL GENIO (MENTE SUPREMA)",
+                    a: "🔥 INTUICIÓN EXPERTA",
+                    b: "👍 CONOCIMIENTO SÓLIDO",
+                    c: "💡 JUGADOR CASUAL",
+                    d: "🌱 EXPLORADOR NOVATO"
+                }
+            },
+            fr: {
+                instruccion: "Trouvez le SEUL fait VRAI parmi ces 3 propositions :",
+                reintentar: "Rejouer",
+                compartir: "Copier le score",
+                copiadoExito: "✅ Score copié !",
+                modo: "Mode Survie",
+                gameOverTitulo: "PARTIE TERMINÉE",
+                gameOverSub: "Vous avez échoué. Vos statistiques :",
+                notas: {
+                    s: "🧠 NIVEAU GÉNIE",
+                    a: "🔥 EXPERT",
+                    b: "👍 SOLIDE",
+                    c: "💡 JOUEUR OCCASIONNEL",
+                    d: "🌱 DÉBUTANT"
+                }
+            },
+            de: {
+                instruccion: "Finde die EINZIGE ECHTE Tatsache unter diesen 3 Optionen:",
+                reintentar: "Nochmal spielen",
+                compartir: "Ergebnis kopieren",
+                copiadoExito: "✅ Punktestand kopiert!",
+                modo: "Überlebensmodus",
+                gameOverTitulo: "SPIEL VORBEI",
+                gameOverSub: "Du hast einen Fehler gemacht. Deine Statistiken:",
+                notas: {
+                    s: "🧠 GENIE-STUFE",
+                    a: "🔥 EXPERTE",
+                    b: "👍 SOLIDES WISSEN",
+                    c: "💡 GELEGENHEITSSPIELER",
+                    d: "🌱 ANFÄNGER"
+                }
+            }
+        };
+
+        const bancoMasivoGlobal = {
+            reales: [
+                { es: "Los plátanos son naturalmente radiactivos debido a su alto contenido de potasio.", en: "Bananas are naturally radioactive due to their high potassium content.", fr: "Les bananes sont naturellement radioactives en raison de leur teneur en potassium.", de: "Bananen sind aufgrund ihres Kaliumgehalts von Natur aus radioaktiv." },
+                { es: "El agua puede hervir y congelarse simultáneamente bajo condiciones de presión específicas (punto triple).", en: "Water can boil and freeze simultaneously under specific pressure conditions (triple point).", fr: "L'eau peut bouillir et geler simultanément dans des conditions de pression spécifiques.", de: "Wasser kann unter bestimmten Druckbedingungen gleichzeitig kochen und gefrieren." },
+                { es: "Las nubes cúmulos comunes pueden llegar a pesar fácilmente más de 500.000 kilogramos.", en: "Common cumulus clouds can easily weigh more than 500,000 kilograms.", fr: "Les nuages cumulus pèsent facilement plus de 500 000 kilogrammes.", de: "Gewöhnliche Kumuluswolken können leicht über 500.000 Kilogramm wiegen." },
+                { es: "Los tiburones llevan habitando la Tierra más tiempo que los árboles y los anillos de Saturno.", en: "Sharks have inhabited Earth longer than trees and Saturn's rings.", fr: "Les requins habitent la Terre plus longtemps que les arbres et les anneaux de Saturne.", de: "Haie bewohnen die Erde länger als Bäume und die Saturnringe." },
+                { es: "Cleopatra vivió cronológicamente más cerca de la llegada del hombre a la Luna que de la construcción de las pirámides de Guiza.", en: "Cleopatra lived chronologically closer to the Moon landing than to the construction of the Great Pyramids of Giza.", fr: "Cléopâtre a vécu plus près des premiers pas sur la Lune que de la construction des pyramides.", de: "Kleopatra lebte zeitlich näher an der Mondlandung als am Bau der Pyramiden von Gizeh." },
+                { es: "Oxford University es una institución educativa más antigua que el Imperio Azteca.", en: "Oxford University is an educational institution older than the Aztec Empire.", fr: "L'Université d'Oxford est une institution plus ancienne que l'Empire aztèque.", de: "Die Universität Oxford ist eine Bildungseinrichtung, die älter ist als das aztekische Reich." },
+                { es: "Nintendo fue fundada originalmente como una empresa artesanal fabricante de naipes japoneses en 1889.", en: "Nintendo was originally founded as a craft manufacturer of Japanese playing cards in 1889.", fr: "Nintendo a été fondé à l'origine comme fabricant de cartes à jouer en 1889.", de: "Nintendo wurde 1889 ursprünglich als Hersteller von japanischen Spielkarten gegründet." },
+                { es: "El corazón de una ballena azul tiene el tamaño aproximado de un automóvil pequeño tipo utilitario.", en: "A blue whale's heart is roughly the size of a small car.", fr: "Le cœur d'une baleine bleue a la taille d'une petite voiture.", de: "Das Herz eines Blauwals hat etwa die Größe eines Kleinwagens." },
+                { es: "En Saturno y Júpiter llueve carbón puro en forma de diamantes sólidos.", en: "Pure carbon rains down as solid diamonds on Saturn and Jupiter.", fr: "Il pleut des diamants purs sur Saturne et Jupiter.", de: "Auf Saturn und Jupiter regnet es reinen Kohlenstoff in Form von Diamanten." },
+                { es: "El servicio postal de Estados Unidos (USPS) es más antiguo que el propio país como nación independiente.", en: "The United States Postal Service is older than the country itself as an independent nation.", fr: "Le service postal américain est plus ancien que le pays lui-même.", de: "Der US-Postdienst ist älter als das Land selbst als unabhängige Nation." },
+                { es: "Las abejas pueden reconocer rostros humanos y recordarlos durante largos períodos.", en: "Honeybees can recognize human faces and remember them for long periods.", fr: "Les abeilles peuvent reconnaître les visages humains.", de: "Honigbienen können menschliche Gesichter erkennen." },
+                { es: "Una sola gota de petróleo puede contaminar hasta 25 litros de agua potable.", en: "A single drop of oil can contaminate up to 25 liters of drinking water.", fr: "Une seule goutte de pétrole peut polluer 25 litres d'eau.", de: "Ein einziger Tropfen Öl kann 25 Liter Trinkwasser kontaminieren." },
+                { es: "El Everest no es la montaña más alta del mundo si se mide desde su base submarina; ese título es para el Mauna Kea.", en: "Mount Everest is not the tallest mountain from base to peak; Mauna Kea is.", fr: "L'Everest n'est pas la plus haute montagne depuis sa base ; c'est le Mauna Kea.", de: "Der Mount Everest ist nicht der höchste Berg von der Basis aus gemessen; das ist der Mauna Kea." },
+                { es: "Las torres de alta tensión pueden cantar o emitir zumbidos audibles debido al fenómeno físico de la corona eléctrica.", en: "Power lines can hum audibly due to a physical phenomenon called electrical corona.", fr: "Les lignes électriques peuvent émettre des bourdonnements dus à la couronne électrique.", de: "Stromleitungen können aufgrund der elektrischen Korona summen." }
+            ],
+            falsos: [
+                { es: "Los seres humanos solo utilizamos el 10% de la capacidad total de nuestro cerebro.", en: "Human beings only use 10% of their total brain capacity.", fr: "Les êtres humains n'utilisent que 10 % de leur cerveau.", de: "Menschen nutzen nur 10 % ihrer Gesamtkapazität des Gehirns." },
+                { es: "La Gran Muralla China es la única estructura artificial visible a simple vista desde la órbita espacial.", en: "The Great Wall of China is the only man-made structure visible from space with the naked eye.", fr: "La Grande Muraille de Chine est la seule structure visible depuis l'espace.", de: "Die Chinesische Mauer ist das einzige von Menschen gemachte Bauwerk, das aus dem Weltraum sichtbar ist." },
+                { es: "Un centavo lanzado desde lo alto del Empire State Building puede matar a un transeúnte al impactar.", en: "A penny dropped from the top of the Empire State Building can kill a pedestrian upon impact.", fr: "Une pièce jetée du haut de l'Empire State Building peut tuer un piéton.", de: "Eine von der Spitze des Empire State Buildings geworfene Münze kann einen Fußgänger töten." },
+                { es: "Napoleón Bonaparte era un hombre excepcionalmente bajo de estatura para los estándares de su época.", en: "Napoleon Bonaparte was an exceptionally short man for the standards of his era.", fr: "Napoléon Bonaparte était un homme exceptionnellement petit pour son époque.", de: "Napoleon Bonaparte war für die Standards seiner Zeit ein außergewöhnlich kleiner Mann." },
+                { es: "Los vikingos usaban cascos ornamentados con cuernos prominentes durante sus incursiones bélicas.", en: "Vikings wore helmets adorned with prominent horns during their military raids.", fr: "Les Vikings portaient des casques ornés de cornes proéminentes.", de: "Wikinger trugen Helme, die mit prominenten Hörnern verziert waren." },
+                { es: "Albert Einstein reprobaba sistemáticamente la asignatura de matemáticas durante sus años escolares básicos.", en: "Albert Einstein systematically failed his mathematics subjects during his basic school years.", fr: "Albert Einstein échouait systématiquement en mathématiques à l'école.", de: "Albert Einstein fiel in seiner Schulzeit systematisch im Fach Mathematik durch." },
+                { es: "Un oso parduzco adulto es totalmente incapaz de correr rápido cuesta abajo debido a su morfología.", en: "An adult grizzly bear is completely incapable of running fast downhill due to its morphology.", fr: "Un ours brun adulte est incapable de courir vite en descente.", de: "Ein ausgewachsener Grizzlybär ist aufgrund seiner Morphologie völlig unfähig, bergab schnell zu laufen." },
+                { es: "La Gran Muralla China se construyó utilizando arroz glutinoso mezclado con argamasa de cal.", en: "The Great Wall of China was built using sticky rice mixed with lime mortar.", fr: "La Grande Muraille a été construite en utilisant du riz gluant.", de: "Die Chinesische Mauer wurde unter Verwendung von Klebreis gebaut." },
+                { es: "Los camellos almacenan agua pura dentro de sus jorobas para sobrevivir largos trayectos desérticos.", en: "Camels store pure water inside their humps to survive long desert journeys.", fr: "Les chameaux stockent de l'eau pure dans leurs bosses.", de: "Kamele speichern reines Wasser in ihren Höckern." },
+                { es: "La Estatua de la Libertad fue diseñada originariamente como un faro funcional para guiar barcos en el mar.", en: "The Statue of Liberty was originally designed to serve as a functional lighthouse for ships.", fr: "La Statue de la Liberté a été conçue à l'origine comme un phare fonctionnel.", de: "Die Freiheitsstatue wurde ursprünglich als funktionsfähiger Leuchtturm entworfen." },
+                { es: "Los peces dorados tienen una memoria estrictamente limitada a tan solo tres segundos de duración.", en: "Goldfish have a memory span limited to only three seconds.", fr: "Les poissons rouges ont une mémoire de trois secondes.", de: "Goldfische haben ein Gedächtnis von nur drei Sekunden." },
+                { es: "Los rayos nunca caen dos veces seguidas en un mismo lugar o estructura geográfica.", en: "Lightning never strikes the same place twice.", fr: "La foudre ne tombe jamais deux fois au même endroit.", de: "Der Blitz schlägt nie zweimal an denselben Ort ein." },
+                { es: "El cabello y las uñas de los seres humanos continúan creciendo tras el fallecimiento.", en: "Human hair and fingernails continue to grow after death.", fr: "Les cheveux et les ongles continuent de pousser après la mort.", de: "Haare und Fingernägel wachsen nach dem Tod weiter." },
+                { es: "La Gran Muralla China se puede ver claramente desde la superficie de la Luna sin telescopio.", en: "The Great Wall of China is clearly visible from the surface of the Moon.", fr: "La Grande Muraille est visible depuis la Lune.", de: "Die Chinesische Mauer ist von der Mondoberfläche aus sichtbar." }
+            ]
+        };
+
+        let partidaActual = {
+            opcionesOriginales: null,
+            indiceReal: -1
+        };
+
+        let puntuacionAciertos = 0;
+        let tiempoSegundos = 0;
+        let intervaloCronometro = null;
+        let juegoTerminado = false;
+
+        function obtenerIdiomaActual() {
+            return localStorage.getItem('real_idioma') || 'en';
+        }
+
+        function cambiarIdioma(lang) {
+            localStorage.setItem('real_idioma', lang);
+            actualizarTextosUI();
+        }
+
+        function actualizarTextosUI() {
+            const lang = obtenerIdiomaActual();
+            const t = i18n[lang];
+
+            document.getElementById('select-idioma').value = lang;
+            document.getElementById('instruccion-ronda').textContent = t.instruccion;
+            document.getElementById('txt-badge-modo').textContent = t.modo;
+            document.getElementById('txt-btn-reintentar').textContent = t.reintentar;
+            document.getElementById('txt-btn-compartir').textContent = t.compartir;
+            document.getElementById('txt-gameover-titulo').textContent = t.gameOverTitulo;
+            document.getElementById('txt-gameover-sub').textContent = t.gameOverSub;
+
+            if (partidaActual.opcionesOriginales) {
+                partidaActual.opcionesOriginales.items.forEach((item, i) => {
+                    const textoSpan = document.getElementById(`texto-opcion-${i}`);
+                    if (textoSpan) {
+                        textoSpan.textContent = item.obj[lang] || item.obj.en;
+                    }
+                });
+            }
+
+            if (!document.getElementById('gameover-container').classList.contains('hidden')) {
+                actualizarNotaUI(puntuacionAciertos, t);
+            }
+        }
+
+        function reiniciarPartidaCompleta() {
+            puntuacionAciertos = 0;
+            document.getElementById('puntuacion-actual').textContent = puntuacionAciertos;
+            document.getElementById('gameover-container').classList.add('hidden');
+            document.getElementById('opciones-container').classList.remove('hidden');
+            
+            iniciarCronometro();
+            iniciarNuevaRonda();
+        }
+
+        function iniciarNuevaRonda() {
+            juegoTerminado = false;
+            const realesCopia = [...bancoMasivoGlobal.reales].sort(() => Math.random() - 0.5);
+            const falsosCopia = [...bancoMasivoGlobal.falsos].sort(() => Math.random() - 0.5);
+
+            const realItem = realesCopia[0];
+            const falso1 = falsosCopia[0];
+            const falso2 = falsosCopia[1];
+
+            let itemsConstruidos = [
+                { obj: realItem, real: true },
+                { obj: falso1, real: false },
+                { obj: falso2, real: false }
+            ];
+
+            itemsConstruidos.sort(() => Math.random() - 0.5);
+
+            partidaActual.opcionesOriginales = { items: itemsConstruidos };
+            partidaActual.indiceReal = itemsConstruidos.findIndex(o => o.real);
+
+            renderizarOpciones();
+        }
+
+        function renderizarOpciones() {
+            const lang = obtenerIdiomaActual();
+            const container = document.getElementById('opciones-container');
+            container.innerHTML = '';
+
+            partidaActual.opcionesOriginales.items.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.id = `btn-opcion-${index}`;
+                btn.className = `w-full text-left p-4 rounded-xl game-item text-xs font-semibold leading-relaxed cursor-pointer flex items-start gap-3 text-white`;
+                btn.innerHTML = `
+                    <span class="font-bold text-white text-sm shrink-0 font-mono opacity-80">0${index + 1}</span> 
+                    <span id="texto-opcion-${index}" class="text-white">${item.obj[lang] || item.obj.en}</span>
+                `;
+                btn.onclick = () => seleccionarOpcion(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function seleccionarOpcion(index) {
+            if (juegoTerminado) return;
+            juegoTerminado = true;
+
+            const esCorrecto = (index === partidaActual.indiceReal);
+
+            for (let i = 0; i < 3; i++) {
+                const botonEl = document.getElementById(`btn-opcion-${i}`);
+                botonEl.style.pointerEvents = 'none';
+                
+                if (i === partidaActual.indiceReal) {
+                    botonEl.style.borderColor = '#ffffff';
+                    botonEl.style.backgroundColor = '#065f46';
+                } else if (i === index && !esCorrecto) {
+                    botonEl.style.borderColor = '#ffffff';
+                    botonEl.style.backgroundColor = '#450a0a';
+                    botonEl.classList.add('animate-shake');
+                } else {
+                    botonEl.style.opacity = '0.3';
+                }
+            }
+
+            if (esCorrecto) {
+                puntuacionAciertos++;
+                document.getElementById('puntuacion-actual').textContent = puntuacionAciertos;
+                actualizarRacha(true);
+
+                setTimeout(() => {
+                    iniciarNuevaRonda();
+                }, 900);
+            } else {
+                actualizarRacha(false);
+                detenerCronometro();
+
+                setTimeout(() => {
+                    mostrarPantallaGameOver();
+                }, 1100);
+            }
+        }
+
+        function actualizarNotaUI(aciertos, t) {
+            let notaKey = 'd';
+            if (aciertos >= 15) notaKey = 's';
+            else if (aciertos >= 10) notaKey = 'a';
+            else if (aciertos >= 6) notaKey = 'b';
+            else if (aciertos >= 3) notaKey = 'c';
+
+            document.getElementById('res-nota').textContent = t.notas[notaKey];
+        }
+
+        function mostrarPantallaGameOver() {
+            const lang = obtenerIdiomaActual();
+            const t = i18n[lang];
+
+            document.getElementById('opciones-container').classList.add('hidden');
+            document.getElementById('gameover-container').classList.remove('hidden');
+
+            document.getElementById('txt-gameover-titulo').textContent = t.gameOverTitulo;
+            document.getElementById('txt-gameover-sub').textContent = t.gameOverSub;
+            document.getElementById('res-aciertos').textContent = puntuacionAciertos;
+            document.getElementById('res-tiempo').textContent = document.getElementById('tiempo-transcurrido').textContent;
+
+            actualizarNotaUI(puntuacionAciertos, t);
+        }
+
+        function actualizarRacha(ganado) {
+            let racha = parseInt(localStorage.getItem('real_racha') || '0', 10);
+            if (ganado) {
+                racha++;
+            } else {
+                racha = 0;
+            }
+            localStorage.setItem('real_racha', racha);
+            document.getElementById('current-streak-num').textContent = racha;
+        }
+
+        function iniciarCronometro() {
+            tiempoSegundos = 0;
+            document.getElementById('tiempo-transcurrido').textContent = "00:00";
+            if (intervaloCronometro) clearInterval(intervaloCronometro);
+            
+            intervaloCronometro = setInterval(() => {
+                tiempoSegundos++;
+                const mins = String(Math.floor(tiempoSegundos / 60)).padStart(2, '0');
+                const secs = String(tiempoSegundos % 60).padStart(2, '0');
+                document.getElementById('tiempo-transcurrido').textContent = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function detenerCronometro() {
+            if (intervaloCronometro) clearInterval(intervaloCronometro);
+        }
+
+        function compartirResultado() {
+            const lang = obtenerIdiomaActual();
+            const textoCompartir = `REAL Game - Survival Mode\n🔥 I survived and got ${puntuacionAciertos} correct facts in ${document.getElementById('tiempo-transcurrido').textContent}!\nCan you beat my score?`;
+            navigator.clipboard.writeText(textoCompartir).then(() => {
+                alert(i18n[lang].copiadoExito);
+            });
+        }
+
+        window.onload = () => {
+            document.getElementById('current-streak-num').textContent = localStorage.getItem('real_racha') || '0';
+            reiniciarPartidaCompleta();
+        };
+    </script>
+</body>
+</html>

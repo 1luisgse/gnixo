@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RCN3CB1RMZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-RCN3CB1RMZ');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Verificacion google -->
+    <meta name="google-site-verification" content="YvlBoqkR35-GFkVl5UpkPOl77Dy7S_0K268ER0zwgZE" />
+    <!-- seguridad -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta property="og:title" content="WhenWasTimeLine">
+    <meta property="og:description" content="Play and test your historical and technological knowledge.">
+    <meta property="og:url" content="https://whenwastimeline.vercel.app">
+    <meta name="description" content="WhenWasTimeLine is a history and technology game where you must order events chronologically.">
+    <meta property="og:site_name" content="WhenWasTimeLine">
+    <link rel="canonical" href="https://whenwastimeline.vercel.app/">
+    <title>WhenWasTimeLine | GNIXO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "WhenWasTimeLine",
+        "url": "https://whenwastimeline.vercel.app"
+    }
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1627189663364841" crossorigin="anonymous"></script>
+    <script>
+        // Establecer inglés por defecto si no hay idioma guardado
+        if (!localStorage.getItem('whenwastimeline_idioma')) {
+            localStorage.setItem('whenwastimeline_idioma', 'en');
+        }
+    </script>
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+        .dragging {
+            opacity: 0.4;
+            background: #ff4d4d !important;
+        }
+        .drag-over {
+            border-color: #ffffff !important;
+            border-width: 3px !important;
+            transform: scale(1.02);
+        }
+        /* Estilo para la tarjeta flotante en móvil */
+        .mobile-dragging-clone {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.95;
+            transform: scale(1.05) rotate(1deg);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            border-color: #ffffff !important;
+            border-width: 2px !important;
+            background: #ff0000 !important;
+            color: #ffffff !important;
+            transition: none !important;
+        }
+        body {
+            background-color: #1c1c1c;
+            color: #ff0000;
+            font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+        }
+        .classic-card-container {
+            background: #ff0000;
+            border: 2px solid #ff0000;
+            box-shadow: 0 10px 30px -10px rgba(255, 0, 0, 0.3);
+        }
+        .classic-item {
+            background: #ff0000;
+            border: 2px solid #ffffff;
+            transition: all 0.2s ease;
+        }
+        .classic-item:hover {
+            border-color: #ffffff;
+            background: #cc0000;
+        }
+        .classic-badge {
+            background-color: #ffffff;
+            color: #ff0000;
+            border: 1px solid #ffffff;
+        }
+        .game-title-anton {
+            font-family: 'Anton', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .category-title-anton {
+            font-family: 'Anton', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 1.35rem;
+            line-height: 1.1;
+        }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center py-6 p-3 select-none relative overflow-y-auto">
+
+    <div class="max-w-md w-full classic-card-container rounded-3xl p-5 relative z-10 my-auto text-white">
+        
+        <!-- VISTA: MENÚ PRINCIPAL -->
+        <div id="vista-menu">
+            <header class="text-center mb-4 relative pt-1">
+                <!-- Enlace de vuelta con una simple flecha -->
+                <div class="absolute top-0 left-0">
+                    <a href="../" class="bg-[#ffffff] text-[#ff0000] text-xs font-semibold py-1 px-2.5 rounded-xl border border-[#ffffff] flex items-center justify-center shadow-sm hover:bg-[#fff0f0] transition">
+                        ←
+                    </a>
+                </div>
+
+                <!-- Contador de Racha -->
+                <div class="absolute top-0 left-[42px] bg-[#ffffff] text-[#ff0000] text-[11px] font-semibold py-1 px-2 rounded-xl border border-[#ffffff] flex items-center gap-1 shadow-sm">
+                    <img src="racha.jpg" alt="Racha" class="w-3.5 h-3.5 object-contain" /> <span id="current-streak-num">0</span>
+                </div>
+
+                <!-- Selector de Idioma (Arriba a la derecha) -->
+                <div class="absolute top-0 right-0">
+                    <select id="select-idioma" onchange="cambiarIdioma(this.value)" class="bg-[#ff0000] text-[#ffffff] text-[11px] font-semibold py-1 px-2 rounded-xl border border-[#ffffff] focus:outline-none cursor-pointer">
+                        <option value="en">🇬🇧 EN</option>
+                        <option value="es">🇪🇸 ES</option>
+                        <option value="fr">🇫🇷 FR</option>
+                        <option value="de">🇩🇪 DE</option>
+                    </select>
+                </div>
+
+                <h1 class="text-2xl font-bold tracking-wide text-[#ffffff] pt-8 game-title-anton">WhenWasTimeLine</h1>
+                <p id="txt-subtitulo" class="text-xs text-[#ffffff] mt-1 font-serif">The daily challenge of ordering history. One category, one challenge a day.</p>
+                <div id="fecha-diaria" class="mt-2.5 text-[11px] classic-badge py-1 px-3.5 rounded-full inline-flex items-center gap-1.5 font-sans font-medium shadow-sm"></div>
+            </header>
+
+            <!-- BOTÓN MODO ALEATORIO ILIMITADO -->
+            <div class="mb-3">
+                <button onclick="iniciarPartidaAleatoria()" class="w-full bg-[#ffffff] hover:bg-[#fff0f0] text-[#ff0000] font-semibold py-2.5 px-4 rounded-2xl border border-[#ffffff] transition duration-200 text-xs cursor-pointer flex items-center justify-center gap-2 shadow-md font-sans">
+                    <img src="aleatorio.jpg" alt="Aleatorio" class="w-4 h-4 object-contain" /> <span id="txt-modo-aleatorio">Unlimited Random Mode</span>
+                </button>
+            </div>
+
+            <div id="categorias-container" class="space-y-3 mb-4 font-sans"></div>
+
+            <!-- BOTÓN VER TUTORIAL -->
+            <div class="text-center mb-2 font-sans">
+                <button onclick="abrirTutorial()" class="text-[11px] text-[#ffffff] hover:underline cursor-pointer">
+                    <span id="txt-ver-tutorial">How to play? (View tutorial)</span>
+                </button>
+            </div>
+
+            <footer id="txt-footer" class="text-center text-[10px] text-[#ffffff] font-sans font-medium mt-2 opacity-80">
+                Updates daily at 00:00 UTC
+            </footer>
+        </div>
+
+        <!-- VISTA: JUEGO -->
+        <div id="vista-juego" class="hidden font-sans">
+            <header class="flex justify-between items-start mb-4">
+                <div class="max-w-[55%]">
+                    <button id="txt-volver" onclick="volverAlMenu()" class="text-xs text-[#ffffff] hover:underline font-semibold mb-1 flex items-center gap-1 cursor-pointer transition">
+                        ← Back to menu
+                    </button>
+                    <div id="titulo-categoria-juego" class="font-bold tracking-wide text-[#ffffff] category-title-anton flex items-center gap-1.5 flex-wrap"></div>
+                </div>
+                <div class="flex items-center space-x-2 shrink-0 pt-1">
+                    <div id="cronometro-display" class="text-xs font-mono font-bold bg-[#ffffff] text-[#ff0000] py-1 px-2.5 rounded-xl border border-[#ffffff] flex items-center gap-1.5 shadow-sm">
+                        <img src="cronometro.jpg" alt="Cronómetro" class="w-3.5 h-3.5 object-contain" /> <span>00:00</span>
+                    </div>
+                    <div id="vidas-container" class="flex space-x-1">
+                        <span class="vida font-bold text-base transition duration-300">✕</span>
+                        <span class="vida font-bold text-base transition duration-300">✕</span>
+                        <span class="vida font-bold text-base transition duration-300">✕</span>
+                        <span class="vida font-bold text-base transition duration-300">✕</span>
+                        <span class="vida font-bold text-base transition duration-300">✕</span>
+                    </div>
+                </div>
+            </header>
+
+            <div id="cards-container" class="space-y-2 mb-4"></div>
+
+            <button id="btn-comprobar" onclick="verificarOrden()" class="w-full bg-[#ffffff] hover:bg-[#fff0f0] text-[#ff0000] font-semibold py-2.5 px-4 rounded-2xl transition duration-200 shadow-md cursor-pointer text-xs uppercase tracking-wider">
+                Check order
+            </button>
+
+            <div id="resultado-container" class="mt-3 hidden text-center">
+                <p id="resultado-texto" class="font-medium text-xs mb-2.5 text-[#ffffff]"></p>
+                <button id="btn-compartir" onclick="compartirResultado()" class="hidden w-full bg-[#ffffff] hover:bg-[#fff0f0] text-[#ff0000] font-semibold py-2.5 px-4 rounded-2xl transition duration-200 text-xs cursor-pointer mb-2 border border-[#ffffff] shadow-md flex items-center justify-center gap-2">
+                    <img src="copiar.jpg" alt="Copiar" class="w-4 h-4 object-contain" /> <span id="txt-btn-compartir">Copy result for social media</span>
+                </button>
+                <button id="txt-volver-menu" onclick="volverAlMenu()" class="w-full bg-[#ffffff] hover:bg-[#fff0f0] text-[#ff0000] font-semibold py-2.5 px-4 rounded-2xl transition duration-200 text-xs cursor-pointer border border-[#ffffff] shadow-md flex items-center justify-center gap-2">
+                    <img src="casa.jpg" alt="Menú" class="w-4 h-4 object-contain" /> <span>Back to main menu</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PIE DE PÁGINA / ENLACES LEGALES -->
+    <footer class="mt-6 text-center text-xs text-[#ffffff] flex gap-4 justify-center relative z-10 font-sans">
+        <a href="../" class="hover:text-[#ff4d4d] underline transition">Legal Notice</a>
+        <span class="text-[#ff4d4d]">•</span>
+        <a href="../" class="hover:text-[#ff4d4d] underline transition">Privacy Policy</a>
+    </footer>
+
+    <!-- MODAL DE TUTORIAL -->
+    <div id="modal-tutorial" class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4 hidden font-sans">
+        <div class="bg-[#ff0000] border-2 border-[#ff0000] rounded-3xl max-w-sm w-full p-5 shadow-2xl text-center relative text-white">
+            <h3 id="tut-titulo" class="text-lg font-bold text-[#ffffff] mb-3 game-title-anton">🌍 How to play WhenWasTimeLine?</h3>
+            <div class="space-y-3 text-xs text-[#ffffff] text-left mb-5">
+                <div class="flex items-start gap-2.5 bg-[#cc0000] p-2.5 rounded-xl border border-[#ff4d4d]">
+                    <span class="text-base">👆</span>
+                    <p id="tut-p1"><strong class="text-[#ffffff]">Order the cards:</strong> Drag and drop historical milestones from oldest (top) to newest (bottom).</p>
+                </div>
+                <div class="flex items-start gap-2.5 bg-[#cc0000] p-2.5 rounded-xl border border-[#ff4d4d]">
+                    <span class="text-base">🔍</span>
+                    <p id="tut-p2"><strong class="text-[#ffffff]">Check order:</strong> Press check. Correct ones turn green, close ones yellow, errors red.</p>
+                </div>
+                <div class="flex items-start gap-2.5 bg-[#cc0000] p-2.5 rounded-xl border border-[#ff4d4d]">
+                    <span class="text-base">❤️</span>
+                    <p id="tut-p3"><strong class="text-[#ffffff]">Limited lives:</strong> You have 5 overall attempts to sort the entire timeline correctly.</p>
+                </div>
+            </div>
+            <button onclick="cerrarTutorial()" id="tut-btn" class="w-full bg-[#ffffff] hover:bg-[#fff0f0] text-[#ff0000] font-semibold py-2.5 px-4 rounded-2xl transition duration-200 text-xs cursor-pointer shadow-md uppercase tracking-wider">
+                Got it, let's play!
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // TRADUCCIONES DE LA INTERFAZ
+        const i18n = {
+            en: {
+                subtitulo: "The daily challenge of ordering history. One category, one challenge a day.",
+                modoAleatorio: "Unlimited Random Mode",
+                footer: "Updates daily at 00:00 UTC",
+                verTutorial: "How to play? (View tutorial)",
+                volver: "← Back to menu",
+                comprobar: "Check order",
+                compartir: "Copy result for social media",
+                volverMenu: "Back to main menu",
+                jugarBtn: "Play →",
+                ordenarSub: "Order 8 historical milestones",
+                modoRevision: "Challenge finished (Review mode)",
+                falladoRevision: "Failed (View)",
+                copiadoExito: "✅ Copied to clipboard!",
+                resultadoExito: (t, v) => `🎉 Challenge completed in ${t} with ${v} lives left!`,
+                resultadoFallo: "❌ Out of attempts! Here is the correct chronological order.",
+                revisionExito: (t) => `🎉 Challenge previously completed in ${t}! (Review mode)`,
+                revisionFallo: "❌ Previous attempt failed. (Review mode)",
+                compartirTexto: (fecha, cat, mins, secs, vidas) => `WhenWasTimeLine 🌍⏱️ (${fecha}) - ${cat}\n✨ Challenge completed in ${mins}:${secs} with ${vidas}/5 lives!\n#GNIXO #WhenWasTimeLine #History`,
+                tutTitulo: "🌍 How to play WhenWasTimeLine?",
+                tutP1: "Order the cards: Drag and drop historical milestones from oldest (top) to newest (bottom).",
+                tutP2: "Check order: Press check. Correct ones turn green, close ones yellow, errors red.",
+                tutP3: "Limited lives: You have 5 overall attempts to sort the entire timeline correctly.",
+                tutBtn: "Got it, let's play!"
+            },
+            es: {
+                subtitulo: "El reto diario de ordenar la historia. Una categoría, un reto al día.",
+                modoAleatorio: "Modo Aleatorio Ilimitado",
+                footer: "Se actualiza cada día a las 00:00 UTC",
+                verTutorial: "¿Cómo se juega? (Ver tutorial)",
+                volver: "← Volver al menú",
+                comprobar: "Comprobar orden",
+                compartir: "Copiar resultado para redes",
+                volverMenu: "Volver al menú principal",
+                jugarBtn: "Jugar →",
+                ordenarSub: "Ordenar 8 hitos históricos",
+                modoRevision: "Reto finalizado (Modo revisión)",
+                falladoRevision: "Fallado (Ver)",
+                copiadoExito: "✅ ¡Copiado al portapapeles!",
+                resultadoExito: (t, v) => `🎉 ¡Reto superado en ${t} con ${v} vidas restantes!`,
+                resultadoFallo: "❌ ¡Se acabaron los intentos! Aquí tienes el orden cronológico correcto.",
+                revisionExito: (t) => `🎉 ¡Reto superado previamente en ${t}! (Modo revisión)`,
+                revisionFallo: "❌ Intento anterior finalizado sin superar. (Modo revisión)",
+                compartirTexto: (fecha, cat, mins, secs, vidas) => `WhenWasTimeLine 🌍⏱️ (${fecha}) - ${cat}\n✨ ¡Reto completado en ${mins}:${secs} con ${vidas}/5 vidas!\n#GNIXO #WhenWasTimeLine #Historia`,
+                tutTitulo: "🌍 ¿Cómo jugar a WhenWasTimeLine?",
+                tutP1: "Ordena las tarjetas: Arrastra y suelta los hitos históricos para colocarlos desde el más antiguo (arriba) hasta el más moderno (abajo).",
+                tutP2: "Comprueba: Pulsa el botón de comprobar. Se marcarán en verde los correctos, amarillo si estás a 1 posición de error, o rojo si fallas.",
+                tutP3: "Vidas limitadas: Tienes 5 intentos generales para conseguir ordenar toda la cronología correctamente.",
+                tutBtn: "¡Entendido, a jugar!"
+            },
+            fr: {
+                subtitulo: "Le défi quotidien de classer l'histoire. Une catégorie, un défi par jour.",
+                modoAleatorio: "Mode Aléatoire Illimité",
+                footer: "Mis à jour chaque jour à 00:00 UTC",
+                verTutorial: "Comment jouer ? (Voir le tutoriel)",
+                volver: "← Retour au menu",
+                comprobar: "Vérifier l'ordre",
+                compartir: "Copier le résultat",
+                volverMenu: "Retour au menu principal",
+                jugarBtn: "Jouer →",
+                ordenarSub: "Classer 8 jalons historiques",
+                modoRevision: "Défi terminé (Mode révision)",
+                falladoRevision: "Échoué (Voir)",
+                copiadoExito: "✅ Copié dans le presse-papiers !",
+                resultadoExito: (t, v) => `🎉 Défi réussi en ${t} avec ${v} vies restantes !`,
+                resultadoFallo: "❌ Plus d'essais ! Voici l'ordre chronologique correct.",
+                revisionExito: (t) => `🎉 Défi déjà réussi en ${t} ! (Mode révision)`,
+                revisionFallo: "❌ Tentative précédente échouée. (Mode révision)",
+                compartirTexto: (fecha, cat, mins, secs, vidas) => `WhenWasTimeLine 🌍⏱️ (${fecha}) - ${cat}\n✨ Défi réussi en ${mins}:${secs} avec ${vidas}/5 vies !\n#GNIXO #WhenWasTimeLine #Histoire`,
+                tutTitulo: "🌍 Comment jouer à WhenWasTimeLine?",
+                tutP1: "Classez les cartes : Glissez-déposez les jalons du plus ancien (haut) au plus récent (bas).",
+                tutP2: "Vérifiez : Appuyez sur vérifier. Vert = correct, jaune = proche, rouge = faux.",
+                tutP3: "Vies limitées : Vous avez 5 essais pour trier toute la chronologie.",
+                tutBtn: "C'est parti !"
+            },
+            de: {
+                subtitulo: "Die tägliche Herausforderung, die Geschichte zu ordnen. Eine Kategorie, ein Rätsel täglich.",
+                modoAleatorio: "Unbegrenzter Zufallsmodus",
+                footer: "Aktualisiert täglich um 00:00 UTC",
+                verTutorial: "Spielanleitung (Tutorial ansehen)",
+                volver: "← Zurück zum Menü",
+                comprobar: "Reihenfolge prüfen",
+                compartir: "Ergebnis kopieren",
+                volverMenu: "Zurück zum Hauptmenü",
+                jugarBtn: "Spielen →",
+                ordenarSub: "Ordne 8 historische Meilensteine",
+                modoRevision: "Herausforderung beendet (Ansichtsmodus)",
+                falladoRevision: "Fehlgeschlagen (Ansehen)",
+                copiadoExito: "✅ In die Zwischenablage kopiert!",
+                resultadoExito: (t, v) => `🎉 Herausforderung in ${t} mit ${v} Leben bestanden!`,
+                resultadoFallo: "❌ Keine Versuche mehr! Hier ist die korrekte Reihenfolge.",
+                revisionExito: (t) => `🎉 Bereits früher in ${t} gelöst! (Ansichtsmodus)`,
+                revisionFallo: "❌ Vorheriger Versuch nicht bestanden. (Ansichtsmodus)",
+                compartirTexto: (fecha, cat, mins, secs, vidas) => `WhenWasTimeLine 🌍⏱️ (${fecha}) - ${cat}\n✨ Herausforderung gelöst in ${mins}:${secs} mit ${vidas}/5 Leben!\n#GNIXO #WhenWasTimeLine #Geschichte`,
+                tutTitulo: "🌍 Wie spiele ich WhenWasTimeLine?",
+                tutP1: "Karten ordnen: Ziehe Meilensteine vom ältesten (oben) zum neuesten (unten).",
+                tutP2: "Prüfen: Drücke Prüfen. Grün = richtig, Gelb = nah dran, Rot = falsch.",
+                tutP3: "Begrenzte Leben: Du hast 5 Versuche, die Zeitleiste zu sortieren.",
+                tutBtn: "Verstanden, los geht's!"
+            }
+        };
+
+        function obtenerIdiomaActual() {
+            return localStorage.getItem('whenwastimeline_idioma') || 'en';
+        }
+
+        function cambiarIdioma(lang) {
+            localStorage.setItem('whenwastimeline_idioma', lang);
+            actualizarTextosUI();
+            inicializarMenu();
+        }
+
+        function actualizarTextosUI() {
+            const lang = obtenerIdiomaActual();
+            const t = i18n[lang];
+
+            document.getElementById('select-idioma').value = lang;
+            document.getElementById('txt-subtitulo').textContent = t.subtitulo;
+            document.getElementById('txt-modo-aleatorio').textContent = t.modoAleatorio;
+            document.getElementById('txt-ver-tutorial').textContent = t.verTutorial;
+            document.getElementById('txt-footer').textContent = t.footer;
+            document.getElementById('txt-volver').textContent = t.volver;
+            document.getElementById('btn-comprobar').textContent = t.comprobar;
+            document.getElementById('txt-btn-compartir').textContent = t.compartir;
+            
+            // Actualizar texto del botón de volver al menú manteniendo su estructura con imagen
+            const btnVolverMenu = document.getElementById('txt-volver-menu');
+            btnVolverMenu.innerHTML = `<img src="casa.jpg" alt="Menú" class="w-4 h-4 object-contain" /> <span>${t.volverMenu}</span>`;
+
+            document.getElementById('tut-titulo').textContent = t.tutTitulo;
+            document.getElementById('tut-p1').innerHTML = `<strong class="text-[#ffffff]">${t.tutP1.split(':')[0]}:</strong>${t.tutP1.split(':')[1]}`;
+            document.getElementById('tut-p2').innerHTML = `<strong class="text-[#ffffff]">${t.tutP2.split(':')[0]}:</strong>${t.tutP2.split(':')[1]}`;
+            document.getElementById('tut-p3').innerHTML = `<strong class="text-[#ffffff]">${t.tutP3.split(':')[0]}:</strong>${t.tutP3.split(':')[1]}`;
+            document.getElementById('tut-btn').textContent = t.tutBtn;
+        }
+
+        const bancosDatos = {
+            tecnologia: [
+                { id: "t1", texto: { es: "Invención de la imprenta moderna", en: "Invention of the modern printing press", fr: "Invention de la presse à imprimer moderne", de: "Erfindung des modernen Buchdrucks" }, anio: 1440 },
+                { id: "t2", texto: { es: "Creación de la máquina de escribir", en: "Creation of the typewriter", fr: "Création de la machine à écrire", de: "Erfindung der Schreibmaschine" }, anio: 1868 },
+                { id: "t3", texto: { es: "Invención del teléfono por Bell", en: "Invention of the telephone by Bell", fr: "Invention du téléphone par Bell", de: "Erfindung des Telefons durch Bell" }, anio: 1876 },
+                { id: "t4", texto: { es: "Primer vuelo controlado a motor", en: "First powered controlled flight", fr: "Premier vol motorisé contrôlé", de: "Erster motorisierter Kontrollflug" }, anio: 1903 },
+                { id: "t5", texto: { es: "Invención de la televisión", en: "Invention of television", fr: "Invention de la télévision", de: "Erfindung des Fernsehens" }, anio: 1926 },
+                { id: "t6", texto: { es: "Presentación de la primera computadora ENIAC", en: "Presentation of the first ENIAC computer", fr: "Présentation du premier ordinateur ENIAC", de: "Präsentation des ersten ENIAC-Computers" }, anio: 1946 },
+                { id: "t7", texto: { es: "Invención del transistor", en: "Invention of the transistor", fr: "Invention du transistor", de: "Erfindung des Transistors" }, anio: 1947 },
+                { id: "t8", texto: { es: "Lanzamiento del Sputnik 1", en: "Launch of Sputnik 1", fr: "Lancement de Spoutnik 1", de: "Start von Sputnik 1" }, anio: 1957 },
+                { id: "t9", texto: { es: "Creación de ARPANET", en: "Creation of ARPANET", fr: "Création d'ARPANET", de: "Erstellung von ARPANET" }, anio: 1969 },
+                { id: "t10", texto: { es: "Lanzamiento del primer correo electrónico", en: "Launch of the first email", fr: "Lancement du premier e-mail", de: "Versand der ersten E-Mail" }, anio: 1971 },
+                { id: "t11", texto: { es: "Lanzamiento del ordenador personal IBM PC", en: "Launch of the IBM PC personal computer", fr: "Lancement de l'ordinateur personnel IBM PC", de: "Einführung des IBM PC" }, anio: 1981 },
+                { id: "t12", texto: { es: "Creación de la World Wide Web", en: "Creation of the World Wide Web", fr: "Création du World Wide Web", de: "Erfindung des World Wide Web" }, anio: 1991 },
+                { id: "t13", texto: { es: "Fundación de Google", en: "Founding of Google", fr: "Fondation de Google", de: "Gründung von Google" }, anio: 1998 },
+                { id: "t14", texto: { es: "Lanzamiento de Wikipedia", en: "Launch of Wikipedia", fr: "Lancement de Wikipédia", de: "Start von Wikipedia" }, anio: 2001 },
+                { id: "t15", texto: { es: "Lanzamiento de Facebook", en: "Launch of Facebook", fr: "Lancement de Facebook", de: "Start von Facebook" }, anio: 2004 },
+                { id: "t16", texto: { es: "Lanzamiento del primer iPhone", en: "Launch of the first iPhone", fr: "Lancement du premier iPhone", de: "Einführung des ersten iPhones" }, anio: 2007 },
+                { id: "t17", texto: { es: "Creación de Bitcoin", en: "Creation of Bitcoin", fr: "Création du Bitcoin", de: "Erschaffung von Bitcoin" }, anio: 2009 },
+                { id: "t18", texto: { es: "Lanzamiento oficial de TikTok", en: "Official launch of TikTok", fr: "Lancement officiel de TikTok", de: "Offizieller Start von TikTok" }, anio: 2016 },
+                { id: "t19", texto: { es: "Lanzamiento público de ChatGPT", en: "Public launch of ChatGPT", fr: "Lancement public de ChatGPT", de: "Öffentliche Veröffentlichung von ChatGPT" }, anio: 2022 },
+                { id: "t20", texto: { es: "Lanzamiento de las primeras gafas Apple Vision", en: "Launch of the first Apple Vision headset", fr: "Lancement du premier casque Apple Vision", de: "Einführung der ersten Apple Vision Brille" }, anio: 2024 },
+                { id: "t21", texto: { es: "Invención de la bombilla incandescente", en: "Invention of the incandescent light bulb", fr: "Invention de l'ampoule à incandescence", de: "Erfindung der Glühlampe" }, anio: 1879 },
+                { id: "t22", texto: { es: "Patente de la radio por Marconi", en: "Patent of the radio by Marconi", fr: "Brevet de la radio par Marconi", de: "Patentierung des Radios durch Marconi" }, anio: 1896 },
+                { id: "t23", texto: { es: "Creación del primer lenguaje de programación (Plankalkül)", en: "Creation of the first programming language (Plankalkül)", fr: "Création du premier langage de programmation (Plankalkül)", de: "Entwicklung der ersten Programmiersprache (Plankalkül)" }, anio: 1945 },
+                { id: "t24", texto: { es: "Invención del láser", en: "Invention of the laser", fr: "Invention du laser", de: "Erfindung des Lasers" }, anio: 1960 },
+                { id: "t25", texto: { es: "Primer mensaje de texto SMS enviado", en: "First SMS text message sent", fr: "Premier message texte SMS envoyé", de: "Erste verschickte SMS-Textnachricht" }, anio: 1992 },
+                { id: "t26", texto: { es: "Lanzamiento de Netflix como streaming", en: "Launch of Netflix as streaming", fr: "Lancement de Netflix en streaming", de: "Start von Netflix als Streamingdienst" }, anio: 2007 },
+                { id: "t27", texto: { es: "Fundación de Twitter (X)", en: "Founding of Twitter (X)", fr: "Fondation de Twitter (X)", de: "Gründung von Twitter (X)" }, anio: 2006 },
+                { id: "t28", texto: { es: "Lanzamiento de Instagram", en: "Launch of Instagram", fr: "Lancement d'Instagram", de: "Start von Instagram" }, anio: 2010 },
+                { id: "t29", texto: { es: "Lanzamiento de WhatsApp", en: "Launch of WhatsApp", fr: "Lancement de WhatsApp", de: "Start von WhatsApp" }, anio: 2009 },
+                { id: "t30", texto: { es: "Lanzamiento de la consola PlayStation", en: "Launch of the PlayStation console", fr: "Lancement de la console PlayStation", de: "Einführung der PlayStation-Konsole" }, anio: 1994 },
+                { id: "t31", texto: { es: "Lanzamiento de la consola Nintendo 64", en: "Launch of the Nintendo 64 console", fr: "Lancement de la console Nintendo 64", de: "Einführung der Nintendo 64-Konsole" }, anio: 1996 },
+                { id: "t32", texto: { es: "Lanzamiento de la consola Xbox original", en: "Launch of the original Xbox console", fr: "Lancement de la console Xbox originale", de: "Einführung der originalen Xbox-Konsole" }, anio: 2001 },
+                { id: "t33", texto: { es: "Lanzamiento del buscador Bing", en: "Launch of the Bing search engine", fr: "Lancement du moteur de recherche Bing", de: "Start der Suchmaschine Bing" }, anio: 2009 },
+                { id: "t34", texto: { es: "Lanzamiento de Spotify", en: "Launch of Spotify", fr: "Lancement de Spotify", de: "Start von Spotify" }, anio: 2008 },
+                { id: "t35", texto: { es: "Invención del código Morse", en: "Invention of Morse code", fr: "Invention du code Morse", de: "Erfindung des Morsealphabets" }, anio: 1838 },
+                { id: "t36", texto: { es: "Creación del disco compacto (CD)", en: "Creation of the Compact Disc (CD)", fr: "Création du disque compact (CD)", de: "Erfindung der Compact Disc (CD)" }, anio: 1982 },
+                { id: "t37", texto: { es: "Invención de la fotografía digital", en: "Invention of digital photography", fr: "Invention de la photographie numérique", de: "Erfindung der Digitalfotografie" }, anio: 1975 },
+                { id: "t38", texto: { es: "Lanzamiento del primer disco duro comercial", en: "Launch of the first commercial hard drive", fr: "Lancement du premier disque dur commercial", de: "Einführung der ersten kommerziellen Festplatte" }, anio: 1956 },
+                { id: "t39", texto: { es: "Creación del lenguaje Java", en: "Creation of the Java language", fr: "Création du langage Java", de: "Erschaffung der Programmiersprache Java" }, anio: 1995 },
+                { id: "t40", texto: { es: "Creación del lenguaje JavaScript", en: "Creation of the JavaScript language", fr: "Création du langage JavaScript", de: "Erschaffung der Programmiersprache JavaScript" }, anio: 1995 },
+                { id: "t41", texto: { es: "Lanzamiento de Amazon como tienda online", en: "Launch of Amazon as an online store", fr: "Lancement d'Amazon en tant que boutique en ligne", de: "Start von Amazon als Online-Shop" }, anio: 1995 },
+                { id: "t42", texto: { es: "Lanzamiento de Windows 95", en: "Launch of Windows 95", fr: "Lancement de Windows 95", de: "Einführung von Windows 95" }, anio: 1995 },
+                { id: "t43", texto: { es: "Creación de Linux", en: "Creation of Linux", fr: "Création de Linux", de: "Entwicklung von Linux" }, anio: 1991 },
+                { id: "t44", texto: { es: "Lanzamiento del procesador Intel 4004", en: "Launch of the Intel 4004 processor", fr: "Lancement du processeur Intel 4004", de: "Einführung des Intel 4004 Prozessors" }, anio: 1971 },
+                { id: "t45", texto: { es: "Invención del cajero automático (ATM)", en: "Invention of the ATM", fr: "Invention du distributeur automatique de billets (DAB)", de: "Erfindung des Geldautomaten (ATM)" }, anio: 1967 },
+                { id: "t46", texto: { es: "Lanzamiento del servicio Uber", en: "Launch of the Uber service", fr: "Lancement du service Uber", de: "Start des Fahrdienstes Uber" }, anio: 2009 },
+                { id: "t47", texto: { es: "Lanzamiento de la red social LinkedIn", en: "Launch of the LinkedIn social network", fr: "Lancement du réseau social LinkedIn", de: "Start des sozialen Netzwerks LinkedIn" }, anio: 2003 },
+                { id: "t48", texto: { es: "Lanzamiento de la red social Reddit", en: "Launch of the Reddit social network", fr: "Lancement du réseau social Reddit", de: "Start des sozialen Netzwerks Reddit" }, anio: 2005 },
+                { id: "t49", texto: { es: "Lanzamiento del sistema operativo Android", en: "Launch of the Android operating system", fr: "Lancement du système d'exploitation Android", de: "Einführung des Android-Betriebssystems" }, anio: 2008 },
+                { id: "t50", texto: { es: "Creación de la primera página web de la historia", en: "Creation of the first website in history", fr: "Création de la première page Web de l'histoire", de: "Erstellung der ersten Website der Geschichte" }, anio: 1991 }
+            ],
+            historia: [
+                { id: "h1", texto: { es: "Construcción de la Gran Pirámide de Giza", en: "Construction of the Great Pyramid of Giza", fr: "Construction de la Grande Pyramide de Gizeh", de: "Bau der Großen Pyramide von Gizeh" }, anio: -2560 },
+                { id: "h2", texto: { es: "Fundación de Roma", en: "Founding of Rome", fr: "Fondation de Rome", de: "Gründung Roms" }, anio: -753 },
+                { id: "h3", texto: { es: "Asesinato de Julio César", en: "Assassination of Julius Caesar", fr: "Assassinat de Jules César", de: "Ermordung von Cäsar" }, anio: -44 },
+                { id: "h4", texto: { es: "Caída del Imperio Romano de Occidente", en: "Fall of the Western Roman Empire", fr: "Chute de l'Empire romain d'Occident", de: "Untergang des Weströmischen Reiches" }, anio: 476 },
+                { id: "h5", texto: { es: "Coronación de Carlomagno como emperador", en: "Coronation of Charlemagne as emperor", fr: "Couronnement de Charlemagne comme empereur", de: "Krönung Karls des Großen zum Kaiser" }, anio: 800 },
+                { id: "h6", texto: { es: "Gran Cisma de la Iglesia Católica", en: "Great Schism of the Catholic Church", fr: "Grand schisme d'Orient", de: "Morgenländisches Schisma" }, anio: 1054 },
+                { id: "h7", texto: { es: "Firma de la Carta Magna en Inglaterra", en: "Signing of Magna Carta in England", fr: "Signature de la Magna Carta en Angleterre", de: "Unterzeichnung der Magna Carta in England" }, anio: 1215 },
+                { id: "h8", texto: { es: "Caída de Constantinopla", en: "Fall of Constantinople", fr: "Chute de Constantinople", de: "Fall von Konstantinopel" }, anio: 1453 },
+                { id: "h9", texto: { es: "Llegada de Cristóbal Colón a América", en: "Christopher Columbus's arrival in the Americas", fr: "Arrivée de Christophe Colomb en Amérique", de: "Ankunft von Kolumbus in Amerika" }, anio: 1492 },
+                { id: "h10", texto: { es: "Inicio de la Reforma Protestante por Lutero", en: "Start of the Protestant Reformation by Luther", fr: "Début de la Réforme protestante par Luther", de: "Beginn der Reformation durch Luther" }, anio: 1517 },
+                { id: "h11", texto: { es: "Derrota de la Armada Invencible española", en: "Defeat of the Spanish Armada", fr: "Défaite de l'Invincible Armada espagnole", de: "Niederlage der spanischen Armada" }, anio: 1588 },
+                { id: "h12", texto: { es: "Inicio de la Guerra de los Treinta Años", en: "Start of the Thirty Years' War", fr: "Début de la guerre de Trente Ans", de: "Beginn des Dreißigjährigen Krieges" }, anio: 1618 },
+                { id: "h13", texto: { es: "Revolución Gloriosa en Inglaterra", en: "Glorious Revolution in England", fr: "Glorieuse Révolution en Angleterre", de: "Glorious Revolution in England" }, anio: 1688 },
+                { id: "h14", texto: { es: "Declaración de Independencia de los EE. UU.", en: "Declaration of Independence of the USA", fr: "Déclaration d'indépendance des États-Unis", de: "Unabhängigkeitserklärung der USA" }, anio: 1776 },
+                { id: "h15", texto: { es: "Estallido de la Revolución Francesa", en: "Outbreak of the French Revolution", fr: "Déclenchement de la Révolution française", de: "Ausbruch der Französischen Revolution" }, anio: 1789 },
+                { id: "h16", texto: { es: "Batalla de Waterloo y caída de Napoleón", en: "Battle of Waterloo and fall of Napoleon", fr: "Bataille de Waterloo et chute de Napoléon", de: "Schlacht bei Waterloo und Sturz Napoleons" }, anio: 1815 },
+                { id: "h17", texto: { es: "Abolición de la esclavitud en el Imperio británico", en: "Abolition of slavery in the British Empire", fr: "Abolition de l'esclavage dans l'Empire britannique", de: "Abschaffung der Sklaverei im Britischen Weltreich" }, anio: 1833 },
+                { id: "h18", texto: { es: "Publicación del Manifiesto Comunista", en: "Publication of the Communist Manifesto", fr: "Publication du Manifeste du parti communiste", de: "Veröffentlichung des Kommunistischen Manifests" }, anio: 1848 },
+                { id: "h19", texto: { es: "Inicio de la Guerra Civil Estadounidense", en: "Start of the American Civil War", fr: "Début de la guerre de Sécession", de: "Beginn des Amerikanischen Bürgerkriegs" }, anio: 1861 },
+                { id: "h20", texto: { es: "Estallido de la Primera Guerra Mundial", en: "Outbreak of World War I", fr: "Déclenchement de la Première Guerre mondiale", de: "Ausbruch des Ersten Weltkriegs" }, anio: 1914 },
+                { id: "h21", texto: { es: "Revolución Rusa", en: "Russian Revolution", fr: "Révolution russe", de: "Russische Revolution" }, anio: 1917 },
+                { id: "h22", texto: { es: "Crack de la bolsa de Nueva York (Gran Depresión)", en: "Wall Street Crash (Great Depression)", fr: "Krach boursier de 1929 (Grande Dépression)", de: "Börsenkrach in New York (Weltwirtschaftskrise)" }, anio: 1929 },
+                { id: "h23", texto: { es: "Inicio de la Segunda Guerra Mundial", en: "Start of World War II", fr: "Début de la Seconde Guerre mondiale", de: "Beginn des Zweiten Weltkriegs" }, anio: 1939 },
+                { id: "h24", texto: { es: "Fundación de la Organización de las Naciones Unidas (ONU)", en: "Founding of the United Nations (UN)", fr: "Création de l'Organisation des Nations unies (ONU)", de: "Gründung der Vereinten Nationen (UNO)" }, anio: 1945 },
+                { id: "h25", texto: { es: "Independencia de la India liderada por Gandhi", en: "Independence of India led by Gandhi", fr: "Indépendance de l'Inde menée par Gandhi", de: "Unabhängigkeit Indiens unter Gandhi" }, anio: 1947 },
+                { id: "h26", texto: { es: "Construcción del Muro de Berlín", en: "Construction of the Berlin Wall", fr: "Construction du mur de Berlin", de: "Bau der Berliner Mauer" }, anio: 1961 },
+                { id: "h27", texto: { es: "Llegada del hombre a la Luna (Apolo 11)", en: "Man lands on the Moon (Apollo 11)", fr: "Premier pas de l'homme sur la Lune (Apollo 11)", de: "Mondlandung (Apollo 11)" }, anio: 1969 },
+                { id: "h28", texto: { es: "Caída del Muro de Berlín", en: "Fall of the Berlin Wall", fr: "Chute du mur de Berlin", de: "Fall der Berliner Mauer" }, anio: 1989 },
+                { id: "h29", texto: { es: "Disolución de la Unión Soviética (URSS)", en: "Dissolution of the Soviet Union (USSR)", fr: "Dissolution de l'Union soviétique (URSS)", de: "Auflösung der Sowjetunion (UdSSR)" }, anio: 1991 },
+                { id: "h30", texto: { es: "Atentados del 11 de septiembre en EE. UU.", en: "September 11 attacks in the USA", fr: "Attentats du 11 septembre aux États-Unis", de: "Terroranschläge am 11. September in den USA" }, anio: 2001 },
+                { id: "h31", texto: { es: "Código de Hammurabi redactado en Babilonia", en: "Code of Hammurabi written in Babylon", fr: "Code de Hammurabi rédigé à Babylone", de: "Kodex Hammurabi in Babylon verfasst" }, anio: -1750 },
+                { id: "h32", texto: { es: "Batalla de las Termópilas", en: "Battle of Thermopylae", fr: "Bataille des Thermopyles", de: "Schlacht bei den Thermopylen" }, anio: -480 },
+                { id: "h33", texto: { es: "Alejandro Magno conquista el Imperio Persa", en: "Alexander the Great conquers the Persian Empire", fr: "Alexandre le Grand conquiert l'Empire perse", de: "Alexander der Große erobert das Perserreich" }, anio: -330 },
+                { id: "h34", texto: { es: "Erupción del Vesubio sepulta Pompeya", en: "Eruption of Vesuvius buries Pompeii", fr: "L'éruption du Vésuve ensevelit Pompéi", de: "Ausbruch des Vesuvs verschüttet Pompeji" }, anio: 79 },
+                { id: "h35", texto: { es: "Batalla de Poitiers frena el avance musulmán en Europa", en: "Battle of Tours halts Muslim advance in Europe", fr: "Bataille de Poitiers arrête l'avancée musulmane en Europe", de: "Schlacht von Tours und Poitiers stoppt islamischen Vormarsch" }, anio: 732 },
+                { id: "h36", texto: { es: "Batalla de Hastings en Inglaterra", en: "Battle of Hastings in England", fr: "Bataille de Hastings en Angleterre", de: "Schlacht bei Hastings in England" }, anio: 1066 },
+                { id: "h37", texto: { es: "Primera Cruzada convocada por el Papa Urbano II", en: "First Crusade called by Pope Urban II", fr: "Première croisade proclamée par le pape Urbain II", de: "Erster Kreuzzug ausgerufen von Papst Urban II." }, anio: 1096 },
+                { id: "h38", texto: { es: "Peste Negra asola Europa", en: "Black Death ravages Europe", fr: "La peste noire ravage l'Europe", de: "Der Schwarze Tod wütet in Europa" }, anio: 1347 },
+                { id: "h39", texto: { es: "Independencia de México", en: "Independence of Mexico", fr: "Indépendance du Mexique", de: "Unabhängigkeit Mexikos" }, anio: 1810 },
+                { id: "h40", texto: { es: "Unificación de Italia", en: "Unification of Italy", fr: "Unification de l'Italie", de: "Einigung Italiens" }, anio: 1861 },
+                { id: "h41", texto: { es: "Fundación de la Cruz Roja", en: "Founding of the Red Cross", fr: "Fondation de la Croix-Rouge", de: "Gründung des Roten Kreuzes" }, anio: 1863 },
+                { id: "h42", texto: { es: "Hundimiento del Titanic", en: "Sinking of the Titanic", fr: "Naufrage du Titanic", de: "Untergang der Titanic" }, anio: 1912 },
+                { id: "h43", texto: { es: "Derecho al voto de las mujeres en EE. UU. (19ª Enmienda)", en: "Women's suffrage in the USA (19th Amendment)", fr: "Droit de vote des femmes aux États-Unis (19e amendement)", de: "Frauenwahlrecht in den USA (19. Verfassungszusatz)" }, anio: 1920 },
+                { id: "h44", texto: { es: "Final de la Guerra Civil Española", en: "End of the Spanish Civil War", fr: "Fin de la guerre d'Espagne", de: "Ende des Spanischen Bürgerkriegs" }, anio: 1939 },
+                { id: "h45", texto: { es: "Creación de la Unión Europea (Tratado de Maastricht)", en: "Creation of the European Union (Maastricht Treaty)", fr: "Création de l'Union européenne (Traité de Maastricht)", de: "Gründung der Europäischen Union (Maastricht-Vertrag)" }, anio: 1992 },
+                { id: "h46", texto: { es: "Introducción del euro físico", en: "Introduction of physical euro banknotes and coins", fr: "Introduction de l'euro fiduciaire", de: "Einführung des Euro-Bargelds" }, anio: 2002 },
+                { id: "h47", texto: { es: "Elección de Barack Obama como presidente de EE. UU.", en: "Election of Barack Obama as US President", fr: "Élection de Barack Obama comme président des États-Unis", de: "Wahl von Barack Obama zum US-Präsidenten" }, anio: 2008 },
+                { id: "h48", texto: { es: "Firma del Acuerdo de París sobre el clima", en: "Signing of the Paris Climate Agreement", fr: "Signature de l'Accord de Paris sur le climat", de: "Unterzeichnung des Pariser Klimaschutzabkommens" }, anio: 2015 },
+                { id: "h49", texto: { es: "Pandemia global de COVID-19 declarada por la OMS", en: "Global COVID-19 pandemic declared by WHO", fr: "Pandémie mondiale de COVID-19 déclarée par l'OMS", de: "Globale COVID-19-Pandemie von der WHO ausgerufen" }, anio: 2020 },
+                { id: "h50", texto: { es: "Fallecimiento de la Reina Isabel II del Reino Unido", en: "Death of Queen Elizabeth II of the United Kingdom", fr: "Décès de la reine Elizabeth II du Royaume-Uni", de: "Tod von Königin Elisabeth II. des Vereinigten Königreichs" }, anio: 2022 }
+            ],
+            videojuegos: [
+                { id: "v1", texto: { es: "Lanzamiento del arcade Pong por Atari", en: "Launch of the arcade game Pong by Atari", fr: "Lancement du jeu d'arcade Pong par Atari", de: "Veröffentlichung des Arcade-Spiels Pong von Atari" }, anio: 1972 },
+                { id: "v2", texto: { es: "Lanzamiento de la consola Atari 2600", en: "Launch of the Atari 2600 console", fr: "Lancement de la console Atari 2600", de: "Einführung der Atari 2600 Konsole" }, anio: 1977 },
+                { id: "v3", texto: { es: "Lanzamiento del clásico arcade Pac-Man", en: "Launch of the classic arcade game Pac-Man", fr: "Lancement du jeu d'arcade classique Pac-Man", de: "Einführung des Arcade-Klassikers Pac-Man" }, anio: 1980 },
+                { id: "v4", texto: { es: "Lanzamiento de Super Mario Bros. en NES", en: "Launch of Super Mario Bros. on NES", fr: "Lancement de Super Mario Bros. sur NES", de: "Veröffentlichung von Super Mario Bros. für das NES" }, anio: 1985 },
+                { id: "v5", texto: { es: "Lanzamiento de la consola portátil Game Boy", en: "Launch of the Game Boy handheld console", fr: "Lancement de la console portable Game Boy", de: "Einführung des Handhelds Game Boy" }, anio: 1989 },
+                { id: "v6", texto: { es: "Lanzamiento de la consola Super Nintendo (SNES)", en: "Launch of the Super Nintendo (SNES) console", fr: "Lancement de la console Super Nintendo (SNES)", de: "Einführung des Super Nintendo (SNES)" }, anio: 1990 },
+                { id: "v7", texto: { es: "Lanzamiento de la primera consola PlayStation", en: "Launch of the first PlayStation console", fr: "Lancement de la première console PlayStation", de: "Einführung der ersten PlayStation-Konsole" }, anio: 1994 },
+                { id: "v8", texto: { es: "Lanzamiento de Pokémon Rojo y Azul", en: "Launch of Pokémon Red and Blue", fr: "Lancement de Pokémon Rouge et Bleu", de: "Veröffentlichung von Pokémon Rot und Blau" }, anio: 1996 },
+                { id: "v9", texto: { es: "Lanzamiento de Nintendo 64", en: "Launch of the Nintendo 64 console", fr: "Lancement de la Nintendo 64", de: "Einführung der Nintendo 64" }, anio: 1996 },
+                { id: "v10", texto: { es: "Lanzamiento de Half-Life", en: "Launch of Half-Life", fr: "Lancement de Half-Life", de: "Veröffentlichung von Half-Life" }, anio: 1998 },
+                { id: "v11", texto: { es: "Lanzamiento de Los Sims", en: "Launch of The Sims", fr: "Lancement des Sims", de: "Veröffentlichung von Die Sims" }, anio: 2000 },
+                { id: "v12", texto: { es: "Lanzamiento de la consola Xbox original", en: "Launch of the original Xbox console", fr: "Lancement de la console Xbox originale", de: "Einführung der originalen Xbox-Konsole" }, anio: 2001 },
+                { id: "v13", texto: { es: "Lanzamiento de World of Warcraft", en: "Launch of World of Warcraft", fr: "Lancement de World of Warcraft", de: "Veröffentlichung von World of Warcraft" }, anio: 2004 },
+                { id: "v14", texto: { es: "Lanzamiento de la consola Xbox 360", en: "Launch of the Xbox 360 console", fr: "Lancement de la console Xbox 360", de: "Einführung der Xbox 360" }, anio: 2005 },
+                { id: "v15", texto: { es: "Lanzamiento de la consola PlayStation 3", en: "Launch of the PlayStation 3 console", fr: "Lancement de la console PlayStation 3", de: "Einführung der PlayStation 3" }, anio: 2006 },
+                { id: "v16", texto: { es: "Lanzamiento de la consola Nintendo Wii", en: "Launch of the Nintendo Wii console", fr: "Lancement de la console Nintendo Wii", de: "Einführung der Nintendo Wii" }, anio: 2006 },
+                { id: "v17", texto: { es: "Lanzamiento oficial de Minecraft", en: "Official launch of Minecraft", fr: "Lancement officiel de Minecraft", de: "Offizielle Veröffentlichung von Minecraft" }, anio: 2011 },
+                { id: "v18", texto: { es: "Lanzamiento de la consola Nintendo Switch", en: "Launch of the Nintendo Switch console", fr: "Lancement de la console Nintendo Switch", de: "Einführung der Nintendo Switch" }, anio: 2017 },
+                { id: "v19", texto: { es: "Lanzamiento de Elden Ring", en: "Launch of Elden Ring", fr: "Lancement d'Elden Ring", de: "Veröffentlichung von Elden Ring" }, anio: 2022 },
+                { id: "v20", texto: { es: "Lanzamiento de Grand Theft Auto VI (Previsto/Histórico)", en: "Launch of Grand Theft Auto VI (Historical/Scheduled)", fr: "Lancement de Grand Theft Auto VI (Prévu/Historique)", de: "Veröffentlichung von Grand Theft Auto VI (Geplant)" }, anio: 2025 },
+                { id: "v21", texto: { es: "Lanzamiento del primer videojuego de la historia (Tennis for Two)", en: "Launch of the first video game in history (Tennis for Two)", fr: "Lancement du premier jeu vidéo de l'histoire (Tennis for Two)", de: "Veröffentlichung des ersten Videospiels der Geschichte (Tennis for Two)" }, anio: 1958 },
+                { id: "v22", texto: { es: "Creación de Space Invaders", en: "Creation of Space Invaders", fr: "Création de Space Invaders", de: "Entwicklung von Space Invaders" }, anio: 1978 },
+                { id: "v23", texto: { es: "Lanzamiento de Tetris", en: "Launch of Tetris", fr: "Lancement de Tetris", de: "Veröffentlichung von Tetris" }, anio: 1984 },
+                { id: "v24", texto: { es: "Lanzamiento de la consola Sega Mega Drive / Genesis", en: "Launch of the Sega Mega Drive / Genesis console", fr: "Lancement de la console Sega Mega Drive / Genesis", de: "Einführung der Sega Mega Drive / Genesis Konsole" }, anio: 1988 },
+                { id: "v25", texto: { es: "Lanzamiento de Sonic the Hedgehog", en: "Launch of Sonic the Hedgehog", fr: "Lancement de Sonic the Hedgehog", de: "Veröffentlichung von Sonic the Hedgehog" }, anio: 1991 },
+                { id: "v26", texto: { es: "Lanzamiento de Doom", en: "Launch of Doom", fr: "Lancement de Doom", de: "Veröffentlichung von Doom" }, anio: 1993 },
+                { id: "v27", texto: { es: "Lanzamiento de Metal Gear Solid", en: "Launch of Metal Gear Solid", fr: "Lancement de Metal Gear Solid", de: "Veröffentlichung von Metal Gear Solid" }, anio: 1998 },
+                { id: "v28", texto: { es: "Lanzamiento de Grand Theft Auto III", en: "Launch of Grand Theft Auto III", fr: "Lancement de Grand Theft Auto III", de: "Veröffentlichung von Grand Theft Auto III" }, anio: 2001 },
+                { id: "v29", texto: { es: "Lanzamiento de Halo: Combat Evolved", en: "Launch of Halo: Combat Evolved", fr: "Lancement de Halo: Combat Evolved", de: "Veröffentlichung von Halo: Combat Evolved" }, anio: 2001 },
+                { id: "v30", texto: { es: "Lanzamiento de Steam por Valve", en: "Launch of Steam by Valve", fr: "Lancement de Steam par Valve", de: "Start von Steam durch Valve" }, anio: 2003 },
+                { id: "v31", texto: { es: "Lanzamiento de Portal", en: "Launch of Portal", fr: "Lancement de Portal", de: "Veröffentlichung von Portal" }, anio: 2007 },
+                { id: "v32", texto: { es: "Lanzamiento de Assassin's Creed", en: "Launch of Assassin's Creed", fr: "Lancement d'Assassin's Creed", de: "Veröffentlichung von Assassin's Creed" }, anio: 2007 },
+                { id: "v33", texto: { es: "Lanzamiento de League of Legends", en: "Launch of League of Legends", fr: "Lancement de League of Legends", de: "Veröffentlichung von League of Legends" }, anio: 2009 },
+                { id: "v34", texto: { es: "Lanzamiento de The Last of Us", en: "Launch of The Last of Us", fr: "Lancement de The Last of Us", de: "Veröffentlichung von The Last of Us" }, anio: 2013 },
+                { id: "v35", texto: { es: "Lanzamiento de Grand Theft Auto V", en: "Launch of Grand Theft Auto V", fr: "Lancement de Grand Theft Auto V", de: "Veröffentlichung von Grand Theft Auto V" }, anio: 2013 },
+                { id: "v36", texto: { es: "Lanzamiento de la consola PlayStation 4", en: "Launch of the PlayStation 4 console", fr: "Lancement de la console PlayStation 4", de: "Einführung der PlayStation 4" }, anio: 2013 },
+                { id: "v37", texto: { es: "Lanzamiento de Fortnite Battle Royale", en: "Launch of Fortnite Battle Royale", fr: "Lancement de Fortnite Battle Royale", de: "Veröffentlichung von Fortnite Battle Royale" }, anio: 2017 },
+                { id: "v38", texto: { es: "Lanzamiento de Cyberpunk 2077", en: "Launch of Cyberpunk 2077", fr: "Lancement de Cyberpunk 2077", de: "Veröffentlichung von Cyberpunk 2077" }, anio: 2020 },
+                { id: "v39", texto: { es: "Lanzamiento de la consola PlayStation 5", en: "Launch of the PlayStation 5 console", fr: "Lancement de la console PlayStation 5", de: "Einführung der PlayStation 5" }, anio: 2020 },
+                { id: "v40", texto: { es: "Lanzamiento de Baldur's Gate 3", en: "Launch of Baldur's Gate 3", fr: "Lancement de Baldur's Gate 3", de: "Veröffentlichung von Baldur's Gate 3" }, anio: 2023 },
+                { id: "v41", texto: { es: "Lanzamiento de la consola Nintendo GameCube", en: "Launch of the Nintendo GameCube console", fr: "Lancement de la console Nintendo GameCube", de: "Einführung des Nintendo GameCube" }, anio: 2001 },
+                { id: "v42", texto: { es: "Lanzamiento de la consola portátil PlayStation Portable (PSP)", en: "Launch of the PlayStation Portable (PSP) handheld console", fr: "Lancement de la console portable PlayStation Portable (PSP)", de: "Einführung der PlayStation Portable (PSP)" }, anio: 2004 },
+                { id: "v43", texto: { es: "Lanzamiento de la consola Nintendo DS", en: "Launch of the Nintendo DS console", fr: "Lancement de la console Nintendo DS", de: "Einführung des Nintendo DS" }, anio: 2004 },
+                { id: "v44", texto: { es: "Lanzamiento del primer juego de The Legend of Zelda", en: "Launch of the first The Legend of Zelda game", fr: "Lancement du premier jeu The Legend of Zelda", de: "Veröffentlichung des ersten The Legend of Zelda Spiels" }, anio: 1986 },
+                { id: "v45", texto: { es: "Lanzamiento de Metroid", en: "Launch of Metroid", fr: "Lancement de Metroid", de: "Veröffentlichung von Metroid" }, anio: 1986 },
+                { id: "v46", texto: { es: "Lanzamiento de Resident Evil", en: "Launch of Resident Evil", fr: "Lancement de Resident Evil", de: "Veröffentlichung von Resident Evil" }, anio: 1996 },
+                { id: "v47", texto: { es: "Lanzamiento de God of War (primer juego)", en: "Launch of God of War (first game)", fr: "Lancement de God of War (premier jeu)", de: "Veröffentlichung von God of War (erster Teil)" }, anio: 2005 },
+                { id: "v48", texto: { es: "Lanzamiento de Skyrim", en: "Launch of Skyrim", fr: "Lancement de Skyrim", de: "Veröffentlichung von Skyrim" }, anio: 2011 },
+                { id: "v49", texto: { es: "Lanzamiento de Pokémon GO", en: "Launch of Pokémon GO", fr: "Lancement de Pokémon GO", de: "Veröffentlichung von Pokémon GO" }, anio: 2016 },
+                { id: "v50", texto: { es: "Lanzamiento de Hollow Knight", en: "Launch of Hollow Knight", fr: "Lancement de Hollow Knight", de: "Veröffentlichung von Hollow Knight" }, anio: 2017 }
+            ],
+            series: [
+                { id: "s1", texto: { es: "Estreno de la serie animada Los Simpson", en: "Premiere of the animated series The Simpsons", fr: "Première de la série animée Les Simpson", de: "Premiere der Zeichentrickserie Die Simpsons" }, anio: 1989 },
+                { id: "s2", texto: { es: "Estreno de Friends", en: "Premiere of Friends", fr: "Première de Friends", de: "Premiere von Friends" }, anio: 1994 },
+                { id: "s3", texto: { es: "Estreno de Los Soprano", en: "Premiere of The Sopranos", fr: "Première des Soprano", de: "Premiere von Die Sopranos" }, anio: 1999 },
+                { id: "s4", texto: { es: "Estreno de Perdidos (Lost)", en: "Premiere of Lost", fr: "Première de Lost : Les Disparus", de: "Premiere von Lost" }, anio: 2004 },
+                { id: "s5", texto: { es: "Estreno de Anatomía de Grey", en: "Premiere of Grey's Anatomy", fr: "Première de Grey's Anatomy", de: "Premiere von Grey’s Anatomy" }, anio: 2005 },
+                { id: "s6", texto: { es: "Estreno de Breaking Bad", en: "Premiere of Breaking Bad", fr: "Première de Breaking Bad", de: "Premiere von Breaking Bad" }, anio: 2008 },
+                { id: "s7", texto: { es: "Estreno de Juego de Tronos", en: "Premiere of Game of Thrones", fr: "Première de Game of Thrones", de: "Premiere von Game of Thrones" }, anio: 2011 },
+                { id: "s8", texto: { es: "Estreno de Stranger Things", en: "Premiere of Stranger Things", fr: "Première de Stranger Things", de: "Premiere von Stranger Things" }, anio: 2016 },
+                { id: "s9", texto: { es: "Estreno de Succession", en: "Premiere of Succession", fr: "Première de Succession", de: "Premiere von Succession" }, anio: 2018 },
+                { id: "s10", texto: { es: "Estreno de The Last of Us (serie)", en: "Premiere of The Last of Us (series)", fr: "Première de The Last of Us (série)", de: "Premiere von The Last of Us (Serie)" }, anio: 2023 },
+                { id: "s11", texto: { es: "Estreno de The Twilight Zone (serie original)", en: "Premiere of The Twilight Zone (original series)", fr: "Première de La Quatrième Dimension (série originale)", de: "Premiere von Twilight Zone (Originalserie)" }, anio: 1959 },
+                { id: "s12", texto: { es: "Estreno de Star Trek (serie clásica)", en: "Premiere of Star Trek (classic series)", fr: "Première de Star Trek (série classique)", de: "Premiere von Raumschiff Enterprise (Classic-Serie)" }, anio: 1966 },
+                { id: "s13", texto: { es: "Estreno de Barrio Sésamo (Sesame Street)", en: "Premiere of Sesame Street", fr: "Première de 1, rue Sésame (Sesame Street)", de: "Premiere der Sesamstraße" }, anio: 1969 },
+                { id: "s14", texto: { es: "Estreno de Cheers", en: "Premiere of Cheers", fr: "Première de Cheers", de: "Premiere von Cheers" }, anio: 1982 },
+                { id: "s15", texto: { es: "Estreno de Seinfeld", en: "Premiere of Seinfeld", fr: "Première de Seinfeld", de: "Premiere von Seinfeld" }, anio: 1989 },
+                { id: "s16", texto: { es: "Estreno de Expediente X", en: "Premiere of The X-Files", fr: "Première de X-Files : Aux frontières du réel", de: "Premiere von Akte X" }, anio: 1993 },
+                { id: "s17", texto: { es: "Estreno de Urgencias (ER)", en: "Premiere of ER", fr: "Première d'Urgences", de: "Premiere von Emergency Room – Die Notaufnahme" }, anio: 1994 },
+                { id: "s18", texto: { es: "Estreno de Padre de familia", en: "Premiere of Family Guy", fr: "Première des Griffin", de: "Premiere von Family Guy" }, anio: 1999 },
+                { id: "s19", texto: { es: "Estreno de The Wire", en: "Premiere of The Wire", fr: "Première de Sur écoute", de: "Premiere von The Wire" }, anio: 2002 },
+                { id: "s20", texto: { es: "Estreno de Battlestar Galactica (reinicio)", en: "Premiere of Battlestar Galactica (reboot)", fr: "Première de Battlestar Galactica (reboot)", de: "Premiere von Battlestar Galactica (Neuauflage)" }, anio: 2004 },
+                { id: "s21", texto: { es: "Estreno de Doctor Who (serie moderna)", en: "Premiere of Doctor Who (modern series)", fr: "Première de Doctor Who (série moderne)", de: "Premiere von Doctor Who (moderne Serie)" }, anio: 2005 },
+                { id: "s22", texto: { es: "Estreno de The Office (versión EE. UU.)", en: "Premiere of The Office (US version)", fr: "Première de The Office (version US)", de: "Premiere von The Office (US-Version)" }, anio: 2005 },
+                { id: "s23", texto: { es: "Estreno de Cómo conocí a vuestra madre", en: "Premiere of How I Met Your Mother", fr: "Première de How I Met Your Mother", de: "Premiere von How I Met Your Mother" }, anio: 2005 },
+                { id: "s24", texto: { es: "Estreno de Dexter", en: "Premiere of Dexter", fr: "Première de Dexter", de: "Premiere von Dexter" }, anio: 2006 },
+                { id: "s25", texto: { es: "Estreno de Mad Men", en: "Premiere of Mad Men", fr: "Première de Mad Men", de: "Premiere von Mad Men" }, anio: 2007 },
+                { id: "s26", texto: { es: "Estreno de The Big Bang Theory", en: "Premiere of The Big Bang Theory", fr: "Première de The Big Bang Theory", de: "Premiere von The Big Bang Theory" }, anio: 2007 },
+                { id: "s27", texto: { es: "Estreno de The Walking Dead", en: "Premiere of The Walking Dead", fr: "Première de The Walking Dead", de: "Premiere von The Walking Dead" }, anio: 2010 },
+                { id: "s28", texto: { es: "Estreno de Sherlock", en: "Premiere of Sherlock", fr: "Première de Sherlock", de: "Premiere von Sherlock" }, anio: 2010 },
+                { id: "s29", texto: { es: "Estreno de House of Cards (Netflix)", en: "Premiere of House of Cards (Netflix)", fr: "Première de House of Cards (Netflix)", de: "Premiere von House of Cards" }, anio: 2013 },
+                { id: "s30", texto: { es: "Estreno de Peaky Blinders", en: "Premiere of Peaky Blinders", fr: "Première de Peaky Blinders", de: "Premiere von Peaky Blinders" }, anio: 2013 },
+                { id: "s31", texto: { es: "Estreno de Rick y Morty", en: "Premiere of Rick and Morty", fr: "Première de Rick et Morty", de: "Premiere von Rick und Morty" }, anio: 2013 },
+                { id: "s32", texto: { es: "Estreno de Fargo", en: "Premiere of Fargo", fr: "Première de Fargo", de: "Premiere von Fargo" }, anio: 2014 },
+                { id: "s33", texto: { es: "Estreno de Better Call Saul", en: "Premiere of Better Call Saul", fr: "Première de Better Call Saul", de: "Premiere von Better Call Saul" }, anio: 2015 },
+                { id: "s34", texto: { es: "Estreno de The Crown", en: "Premiere of The Crown", fr: "Première de The Crown", de: "Premiere von The Crown" }, anio: 2016 },
+                { id: "s35", texto: { es: "Estreno de El cuento de la criada", en: "Premiere of The Handmaid's Tale", fr: "Première de The Handmaid's Tale : La Servante écarlate", de: "Premiere von The Handmaid’s Tale – Der Report der Magd" }, anio: 2017 },
+                { id: "s36", texto: { es: "Estreno de La Casa de Papel", en: "Premiere of Money Heist (La Casa de Papel)", fr: "Première de La Casa de Papel", de: "Premiere von Haus des Geldes (La Casa de Papel)" }, anio: 2017 },
+                { id: "s37", texto: { es: "Estreno de Chernobyl", en: "Premiere of Chernobyl", fr: "Première de Chernobyl", de: "Premiere von Chernobyl" }, anio: 2019 },
+                { id: "s38", texto: { es: "Estreno de Euphoria", en: "Premiere of Euphoria", fr: "Première d'Euphoria", de: "Premiere von Euphoria" }, anio: 2019 },
+                { id: "s39", texto: { es: "Estreno de El juego del calamar", en: "Premiere of Squid Game", fr: "Première de Squid Game", de: "Premiere von Squid Game" }, anio: 2021 },
+                { id: "s40", texto: { es: "Estreno de Miércoles (Wednesday)", en: "Premiere of Wednesday", fr: "Première de Mercredi", de: "Premiere von Wednesday" }, anio: 2022 },
+                { id: "s41", texto: { es: "Estreno de Doctor Who (serie original británica)", en: "Premiere of Doctor Who (original British series)", fr: "Première de Doctor Who (série originale britannique)", de: "Premiere von Doctor Who (britische Originalserie)" }, anio: 1963 },
+                { id: "s42", texto: { es: "Estreno de Batman (serie de televisión con Adam West)", en: "Premiere of Batman (TV series with Adam West)", fr: "Première de Batman (série télévisée avec Adam West)", de: "Premiere von Batman (Fernsehserie mit Adam West)" }, anio: 1966 },
+                { id: "s43", texto: { es: "Estreno de Columbo", en: "Premiere of Columbo", fr: "Première de Columbo", de: "Premiere von Columbo" }, anio: 1968 },
+                { id: "s44", texto: { es: "Estreno de Magnum P.I.", en: "Premiere of Magnum P.I.", fr: "Première de Magnum", de: "Premiere von Magnum" }, anio: 1980 },
+                { id: "s45", texto: { es: "Estreno de Corrupción en Miami (Miami Vice)", en: "Premiere of Miami Vice", fr: "Première de Deux Flics à Miami", de: "Premiere von Miami Vice" }, anio: 1984 },
+                { id: "s46", texto: { es: "Estreno de Twin Peaks", en: "Premiere of Twin Peaks", fr: "Première de Twin Peaks", de: "Premiere von Twin Peaks" }, anio: 1990 },
+                { id: "s47", texto: { es: "Estreno de Buffy, cazavampiros", en: "Premiere of Buffy the Vampire Slayer", fr: "Première de Buffy contre les vampires", de: "Premiere von Buffy – Im Bann der Dämonen" }, anio: 1997 },
+                { id: "s48", texto: { es: "Estreno de South Park", en: "Premiere of South Park", fr: "Première de South Park", de: "Premiere von South Park" }, anio: 1997 },
+                { id: "s49", texto: { es: "Estreno de Futurama", en: "Premiere of Futurama", fr: "Première de Futurama", de: "Premiere von Futurama" }, anio: 1999 },
+                { id: "s50", texto: { es: "Estreno de Arrested Development", en: "Premiere of Arrested Development", fr: "Première d'Arrested Development", de: "Premiere von Arrested Development" }, anio: 2003 }
+            ],
+            arte: [
+                { id: "a1", texto: { es: "Creación de las pinturas rupestres de Altamira", en: "Creation of the Altamira cave paintings", fr: "Création des peintures rupestres d'Altamira", de: "Entstehung der Höhlenmalereien von Altamira" }, anio: -15000 },
+                { id: "a2", texto: { es: "Escultura de la Venus de Milo", en: "Sculpture of the Venus de Milo", fr: "Sculpture de la Vénus de Milo", de: "Skulptur der Venus von Milo" }, anio: -130 },
+                { id: "a3", texto: { es: "Construcción del Coliseo de Roma", en: "Construction of the Colosseum in Rome", fr: "Construction du Colisée de Rome", de: "Bau des Kolosseums in Rom" }, anio: 80 },
+                { id: "a4", texto: { es: "Finalización de la construcción de Notre-Dame de París", en: "Completion of the construction of Notre-Dame de Paris", fr: "Fin de la construction de Notre-Dame de Paris", de: "Fertigstellung des Baus von Notre-Dame in Paris" }, anio: 1345 },
+                { id: "a5", texto: { es: "Pintura del cuadro La Mona Lisa por Da Vinci", en: "Painting of the Mona Lisa by Da Vinci", fr: "Peinture de La Joconde par Léonard de Vinci", de: "Gemälde der Mona Lisa von Da Vinci" }, anio: 1503 },
+                { id: "a6", texto: { es: "Escultura del David por Miguel Ángel", en: "Sculpture of David by Michelangelo", fr: "Sculpture du David par Michel-Ange", de: "Skulptur des David von Michelangelo" }, anio: 1504 },
+                { id: "a7", texto: { es: "Pintura de El nacimiento de Venus por Botticelli", en: "Painting of The Birth of Venus by Botticelli", fr: "Peinture de La Naissance de Vénus par Botticelli", de: "Gemälde Die Geburt der Venus von Botticelli" }, anio: 1485 },
+                { id: "a8", texto: { es: "Publicación de Don Quijote de la Mancha", en: "Publication of Don Quixote", fr: "Publication de Don Quichotte", de: "Veröffentlichung von Don Quixote" }, anio: 1605 },
+                { id: "a9", texto: { es: "Pintura de Las Meninas por Velázquez", en: "Painting of Las Meninas by Velázquez", fr: "Peinture de Les Ménines par Velázquez", de: "Gemälde Las Meninas von Velázquez" }, anio: 1656 },
+                { id: "a10", texto: { es: "Estreno de la Quinta Sinfonía de Beethoven", en: "Premiere of Beethoven's Fifth Symphony", fr: "Première de la Cinquième Symphonie de Beethoven", de: "Uraufführung von Beethovens 5. Sinfonie" }, anio: 1808 },
+                { id: "a11", texto: { es: "Pintura de La libertad guiando al pueblo por Delacroix", en: "Painting of Liberty Leading the People by Delacroix", fr: "Peinture de La Liberté guidant le peuple par Delacroix", de: "Gemälde Die Freiheit führt das Volk von Delacroix" }, anio: 1830 },
+                { id: "a12", texto: { es: "Pintura de La noche estrellada por Van Gogh", en: "Painting of The Starry Night by Van Gogh", fr: "Peinture de La Nuit étoilée par Van Gogh", de: "Gemälde Sternennacht von Van Gogh" }, anio: 1889 },
+                { id: "a13", texto: { es: "Pintura de El grito por Edvard Munch", en: "Painting of The Scream by Edvard Munch", fr: "Peinture de Le Cri par Edvard Munch", de: "Gemälde Der Schrei von Edvard Munch" }, anio: 1893 },
+                { id: "a14", texto: { es: "Estreno de la obra de ballet El lago de los cisnes", en: "Premiere of the ballet Swan Lake", fr: "Première du ballet Le Lac des cygnes", de: "Uraufführung des Balletts Schwanensee" }, anio: 1877 },
+                { id: "a15", texto: { es: "Publicación de En busca del tiempo perdido por Proust", en: "Publication of In Search of Lost Time by Proust", fr: "Publication d'À la recherche du temps perdu de Proust", de: "Veröffentlichung von Auf der Suche nach der verlorenen Zeit von Proust" }, anio: 1913 },
+                { id: "a16", texto: { es: "Pintura de Guernica por Pablo Picasso", en: "Painting of Guernica by Pablo Picasso", fr: "Peinture de Guernica par Pablo Picasso", de: "Gemälde Guernica von Pablo Picasso" }, anio: 1937 },
+                { id: "a17", texto: { es: "Publicación de Cien años de soledad", en: "Publication of One Hundred Years of Solitude", fr: "Publication de Cent ans de solitude", de: "Veröffentlichung von Hundert Jahre Einsamkeit" }, anio: 1967 },
+                { id: "a18", texto: { es: "Lanzamiento del álbum Thriller de Michael Jackson", en: "Release of Michael Jackson's album Thriller", fr: "Sortie de l'album Thriller de Michael Jackson", de: "Veröffentlichung des Albums Thriller von Michael Jackson" }, anio: 1982 },
+                { id: "a19", texto: { es: "Inauguración del Museo Guggenheim Bilbao", en: "Inauguration of the Guggenheim Museum Bilbao", fr: "Inauguration du musée Guggenheim de Bilbao", de: "Eröffnung des Guggenheim-Museums Bilbao" }, anio: 1997 },
+                { id: "a20", texto: { es: "Publicación del primer libro de Harry Potter", en: "Publication of the first Harry Potter book", fr: "Publication du premier livre Harry Potter", de: "Veröffentlichung des ersten Harry-Potter-Buches" }, anio: 1997 },
+                { id: "a21", texto: { es: "Construcción del Partenón en Atenas", en: "Construction of the Parthenon in Athens", fr: "Construction du Parténon à Athènes", de: "Bau des Parthenon in Athen" }, anio: -432 },
+                { id: "a22", texto: { es: "Composición de la Divina Comedia por Dante", en: "Composition of the Divine Comedy by Dante", fr: "Composition de la Divine Comédie par Dante", de: "Verfassung der Göttlichen Komödie durch Dante" }, anio: 1320 },
+                { id: "a23", texto: { es: "Construcción del Taj Mahal", en: "Construction of the Taj Mahal", fr: "Construction du Taj Mahal", de: "Bau des Taj Mahal" }, anio: 1653 },
+                { id: "a24", texto: { es: "Pintura de La última cena por Leonardo da Vinci", en: "Painting of The Last Supper by Leonardo da Vinci", fr: "Peinture de La Cène par Léonard de Vinci", de: "Gemälde Das Abendmahl von Leonardo da Vinci" }, anio: 1498 },
+                { id: "a25", texto: { es: "Estreno de la ópera Las bodas de Fígaro de Mozart", en: "Premiere of Mozart's opera The Marriage of Figaro", fr: "Première de l'opéra Les Noces de Figaro de Mozart", de: "Uraufführung der Oper Le nozze di Figaro von Mozart" }, anio: 1786 },
+                { id: "a26", texto: { es: "Publicación de Frankenstein por Mary Shelley", en: "Publication of Frankenstein by Mary Shelley", fr: "Publication de Frankenstein par Mary Shelley", de: "Veröffentlichung von Frankenstein von Mary Shelley" }, anio: 1818 },
+                { id: "a27", texto: { es: "Publicación de Los miserables por Victor Hugo", en: "Publication of Les Misérables by Victor Hugo", fr: "Publication de Les Misérables par Victor Hugo", de: "Veröffentlichung von Les Misérables von Victor Hugo" }, anio: 1862 },
+                { id: "a28", texto: { es: "Pintura de Impresión, sol naciente por Monet", en: "Painting of Impression, Sunrise by Monet", fr: "Peinture de Impression, soleil levant par Monet", de: "Gemälde Impression, Sonnenaufgang von Monet" }, anio: 1874 },
+                { id: "a29", texto: { es: "Escultura de El pensador por Auguste Rodin", en: "Sculpture of The Thinker by Auguste Rodin", fr: "Sculpture de Le Penseur par Auguste Rodin", de: "Skulptur Der Denker von Auguste Rodin" }, anio: 1904 },
+                { id: "a30", texto: { es: "Publicación de Ulises por James Joyce", en: "Publication of Ulysses by James Joyce", fr: "Publication d'Ulysse par James Joyce", de: "Veröffentlichung von Ulysses von James Joyce" }, anio: 1922 },
+                { id: "a31", texto: { es: "Estreno de la película Metrópolis de Fritz Lang", en: "Premiere of Fritz Lang's film Metropolis", fr: "Première du film Metropolis de Fritz Lang", de: "Uraufführung des Films Metropolis von Fritz Lang" }, anio: 1927 },
+                { id: "a32", texto: { es: "Publicación de El Principito", en: "Publication of The Little Prince", fr: "Publication du Petit Prince", de: "Veröffentlichung von Der kleine Prinz" }, anio: 1943 },
+                { id: "a33", texto: { es: "Estreno de la película Ciudadano Kane", en: "Premiere of the film Citizen Kane", fr: "Première du film Citizen Kane", de: "Uraufführung des Films Citizen Kane" }, anio: 1941 },
+                { id: "a34", texto: { es: "Estreno de la película El Padrino", en: "Premiere of the film The Godfather", fr: "Première du film Le Parrain", de: "Uraufführung des Films Der Pate" }, anio: 1972 },
+                { id: "a35", texto: { es: "Lanzamiento del álbum The Dark Side of the Moon de Pink Floyd", en: "Release of Pink Floyd's album The Dark Side of the Moon", fr: "Sortie de l'album The Dark Side of the Moon de Pink Floyd", de: "Veröffentlichung des Albums The Dark Side of the Moon von Pink Floyd" }, anio: 1973 },
+                { id: "a36", texto: { es: "Estreno de la película Star Wars: Episodio IV", en: "Premiere of the film Star Wars: Episode IV", fr: "Première du film Star Wars : Épisode IV", de: "Uraufführung des Films Star Wars: Episode IV" }, anio: 1977 },
+                { id: "a37", texto: { es: "Estreno de la película Titanic", en: "Premiere of the film Titanic", fr: "Première du film Titanic", de: "Uraufführung des Films Titanic" }, anio: 1997 },
+                { id: "a38", texto: { es: "Publicación de El Señor de los Anillos", en: "Publication of The Lord of the Rings", fr: "Publication du Seigneur des anneaux", de: "Veröffentlichung von Der Herr der Ringe" }, anio: 1954 },
+                { id: "a39", texto: { es: "Estreno de la película 2001: Una odisea del espacio", en: "Premiere of the film 2001: A Space Odyssey", fr: "Première du film 2001 : L'Odyssée de l'espace", de: "Uraufführung des Films 2001: Odyssee im Weltraum" }, anio: 1968 },
+                { id: "a40", texto: { es: "Pintura de La joven de la perla por Vermeer", en: "Painting of Girl with a Pearl Earring by Vermeer", fr: "Peinture de La Jeune Fille à la perle par Vermeer", de: "Gemälde Das Mädchen mit dem Perlenohrgehänge von Vermeer" }, anio: 1665 },
+                { id: "a41", texto: { es: "Creación de la Capilla Sixtina (frescos de Miguel Ángel terminados)", en: "Creation of the Sistine Chapel (Michelangelo's frescoes completed)", fr: "Création de la chapelle Sixtine (fresques de Michel-Ange achevées)", de: "Fertigstellung der Fresken der Sixtinischen Kapelle durch Michelangelo" }, anio: 1512 },
+                { id: "a42", texto: { es: "Publicación de Orgullo y prejuicio", en: "Publication of Pride and Prejudice", fr: "Publication d'Orgueil et Préjugés", de: "Veröffentlichung von Stolz und Vorurteil" }, anio: 1813 },
+                { id: "a43", texto: { es: "Estreno de la película El mago de Oz", en: "Premiere of the film The Wizard of Oz", fr: "Première du film Le Magicien d'Oz", de: "Uraufführung des Films Der Zauberer von Oz" }, anio: 1939 },
+                { id: "a44", texto: { es: "Estreno de la película Casablanca", en: "Premiere of the film Casablanca", fr: "Première du film Casablanca", de: "Uraufführung des Films Casablanca" }, anio: 1942 },
+                { id: "a45", texto: { es: "Estreno de la película Psicosis de Hitchcock", en: "Premiere of Hitchcock's film Psycho", fr: "Première du film Psychose d'Hitchcock", de: "Uraufführung von Hitchcocks Film Psycho" }, anio: 1960 },
+                { id: "a46", texto: { es: "Estreno de la película Pulp Fiction", en: "Premiere of the film Pulp Fiction", fr: "Première du film Pulp Fiction", de: "Uraufführung des Films Pulp Fiction" }, anio: 1994 },
+                { id: "a47", texto: { es: "Pintura de Las señoritas de Aviñón por Picasso", en: "Painting of Les Demoiselles d'Avignon by Picasso", fr: "Peinture de Les Demoiselles d'Avignon par Picasso", de: "Gemälde Les Demoiselles d’Avignon von Picasso" }, anio: 1907 },
+                { id: "a48", texto: { es: "Estreno de la película El viaje de Chihiro", en: "Premiere of the film Spirited Away", fr: "Première du film Le Voyage de Chihiro", de: "Uraufführung des Films Chihiros Reise ins Zauberland" }, anio: 2001 },
+                { id: "a49", texto: { es: "Inauguración de la Torre Eiffel", en: "Inauguration of the Eiffel Tower", fr: "Inauguration de la tour Eiffel", de: "Eröffnung des Eiffelturms" }, anio: 1889 },
+                { id: "a50", texto: { es: "Creación de la estatua Moái en la Isla de Pascua", en: "Creation of the Moai statues on Easter Island", fr: "Création des statues Moaï sur l'île de Pâques", de: "Entstehung der Moai-Statuen auf der Osterinsel" }, anio: 1250 }
+            ]
+        };
+
+        const metadataCategorias = {
+            tecnologia: { 
+                nombre: { es: "Tecnología e Invenciones", en: "Technology & Inventions", fr: "Technologie et Inventions", de: "Technologie & Erfindungen" }, 
+                imagen: "tecnologia.jpg" 
+            },
+            historia: { 
+                nombre: { es: "Historia Mundial", en: "World History", fr: "Histoire du Monde", de: "Weltgeschichte" }, 
+                imagen: "historia.jpg" 
+            },
+            videojuegos: { 
+                nombre: { es: "Videojuegos", en: "Video Games", fr: "Jeux Vidéo", de: "Videospiele" }, 
+                imagen: "videojuegos.jpg" 
+            },
+            series: { 
+                nombre: { es: "Series y TV", en: "Series & TV", fr: "Séries et TV", de: "Serien & TV" }, 
+                imagen: "series.jpg" 
+            },
+            arte: { 
+                nombre: { es: "Arte y Cultura", en: "Art & Culture", fr: "Art et Culture", de: "Kunst & Kultur" }, 
+                imagen: "arte.jpg" 
+            }
+        };
+
+        function obtenerFechaSemilla() {
+            const ahora = new Date();
+            const anio = ahora.getUTCFullYear();
+            const mes = String(ahora.getUTCMonth() + 1).padStart(2, '0');
+            const dia = String(ahora.getUTCDate()).padStart(2, '0');
+            return `${anio}-${mes}-${dia}`;
+        }
+
+        function crearGeneradorSemilla(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = (hash << 5) - hash + str.charCodeAt(i);
+                hash |= 0;
+            }
+            let s = Math.abs(hash);
+            return function() {
+                s = (s * 9301 + 49297) % 233280;
+                return s / 233280;
+            };
+        }
+
+        function obtenerRetoDiario(categoriaKey) {
+            const fechaStr = obtenerFechaSemilla();
+            const semillaCompleta = fechaStr + "_" + categoriaKey;
+            const randomFn = crearGeneradorSemilla(semillaCompleta);
+
+            const pool = [...bancosDatos[categoriaKey]];
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(randomFn() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+
+            const seleccionados = pool.slice(0, 8);
+            const mezcladosJugador = [...seleccionados];
+            for (let i = mezcladosJugador.length - 1; i > 0; i--) {
+                const j = Math.floor(randomFn() * (i + 1));
+                [mezcladosJugador[i], mezcladosJugador[j]] = [mezcladosJugador[j], mezcladosJugador[i]];
+            }
+
+            const ordenadosPrueba = [...mezcladosJugador].sort((a, b) => a.anio - b.anio);
+            let esIgual = true;
+            for (let i = 0; i < seleccionados.length; i++) {
+                if (mezcladosJugador[i].id !== ordenadosPrueba[i].id) {
+                    esIgual = false;
+                    break;
+                }
+            }
+            if (esIgual && mezcladosJugador.length > 1) {
+                const temp = mezcladosJugador[0];
+                mezcladosJugador[0] = mezcladosJugador[1];
+                mezcladosJugador[1] = temp;
+            }
+
+            return {
+                originales: seleccionados,
+                mezclados: mezcladosJugador.map(e => ({ ...e, estadoVisual: null }))
+            };
+        }
+
+        function obtenerRetoAleatorio(categoriaKey) {
+            const pool = [...bancosDatos[categoriaKey]];
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+
+            const seleccionados = pool.slice(0, 8);
+            const mezcladosJugador = [...seleccionados];
+            for (let i = mezcladosJugador.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [mezcladosJugador[i], mezcladosJugador[j]] = [mezcladosJugador[j], mezcladosJugador[i]];
+            }
+
+            return {
+                originales: seleccionados,
+                mezclados: mezcladosJugador.map(e => ({ ...e, estadoVisual: null }))
+            };
+        }
+
+        function obtenerProgresoLocalStorage() {
+            const fecha = obtenerFechaSemilla();
+            const guardado = localStorage.getItem('whenwastimeline_progreso');
+            if (guardado) {
+                try {
+                    const datos = JSON.parse(guardado);
+                    if (datos.fecha === fecha) {
+                        return datos.estados; 
+                    }
+                } catch (e) {}
+            }
+            return {};
+        }
+
+        function guardarProgresoLocalStorage(categoriaKey, estadoObj) {
+            const fecha = obtenerFechaSemilla();
+            const guardado = localStorage.getItem('whenwastimeline_progreso');
+            let datosGlobales = { fecha: fecha, estados: {} };
+            if (guardado) {
+                try {
+                    const parsed = JSON.parse(guardado);
+                    if (parsed.fecha === fecha) {
+                        datosGlobales = parsed;
+                    }
+                } catch(e) {}
+            }
+            datosGlobales.estados[categoriaKey] = estadoObj;
+            localStorage.setItem('whenwastimeline_progreso', JSON.stringify(datosGlobales));
+            
+            if (estadoObj.ganado) {
+                actualizarRacha(fecha);
+            }
+        }
+
+        function actualizarRacha(fechaActual) {
+            let rachaData = JSON.parse(localStorage.getItem('whenwastimeline_racha') || '{"racha": 0, "ultimaFecha": ""}');
+            if (rachaData.ultimaFecha === fechaActual) return;
+
+            const fechaHoyObj = new Date(fechaActual);
+            if (rachaData.ultimaFecha) {
+                const ultimaFechaObj = new Date(rachaData.ultimaFecha);
+                const diferenciaDias = Math.round((fechaHoyObj - ultimaFechaObj) / (1000 * 60 * 60 * 24));
+
+                if (diferenciaDias === 1) {
+                    rachaData.racha += 1;
+                } else if (diferenciaDias > 1) {
+                    rachaData.racha = 1;
+                }
+            } else {
+                rachaData.racha = 1;
+            }
+
+            rachaData.ultimaFecha = fechaActual;
+            localStorage.setItem('whenwastimeline_racha', JSON.stringify(rachaData));
+            renderizarRachaUI();
+        }
+
+        function renderizarRachaUI() {
+            const rachaData = JSON.parse(localStorage.getItem('whenwastimeline_racha') || '{"racha": 0, "ultimaFecha": ""}');
+            document.getElementById('current-streak-num').textContent = rachaData.racha;
+        }
+
+        function comprobarRachaExpirada() {
+            const fechaActual = obtenerFechaSemilla();
+            let rachaData = JSON.parse(localStorage.getItem('whenwastimeline_racha') || '{"racha": 0, "ultimaFecha": ""}');
+            if (rachaData.ultimaFecha) {
+                const fechaHoyObj = new Date(fechaActual);
+                const ultimaFechaObj = new Date(rachaData.ultimaFecha);
+                const diferenciaDias = Math.round((fechaHoyObj - ultimaFechaObj) / (1000 * 60 * 60 * 24));
+                if (diferenciaDias > 1) {
+                    rachaData.racha = 0;
+                    localStorage.setItem('whenwastimeline_racha', JSON.stringify(rachaData));
+                }
+            }
+            renderizarRachaUI();
+        }
+
+        let categoriaActual = null;
+        let esModoAleatorio = false;
+        let eventosOriginales = [];
+        let eventosJuego = [];
+        let intentosRestantes = 5;
+        let cronometroInterval = null;
+        let segundosTranscurridos = 0;
+        let juegoTerminado = false;
+
+        function inicializarMenu() {
+            actualizarTextosUI();
+            comprobarRachaExpirada();
+            const lang = obtenerIdiomaActual();
+            const t = i18n[lang];
+
+            const fechaEl = document.getElementById('fecha-diaria');
+            const localesFecha = { en: 'en-US', fr: 'fr-FR', de: 'de-DE', es: 'es-ES' };
+            const opcionesFecha = { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' };
+            const fechaTextoFormateada = new Date(obtenerFechaSemilla() + 'T00:00:00Z').toLocaleDateString(localesFecha[lang] || 'en-US', opcionesFecha);
+            fechaEl.innerHTML = `<img src="fecha.jpg" alt="Fecha" class="w-3.5 h-3.5 object-contain" /> ${fechaTextoFormateada}`;
+
+            const container = document.getElementById('categorias-container');
+            container.innerHTML = '';
+            const progreso = obtenerProgresoLocalStorage();
+
+            Object.keys(metadataCategorias).forEach(key => {
+                const cat = metadataCategorias[key];
+                const estadoCat = progreso[key];
+                const yaCompletado = estadoCat && estadoCat.completado;
+
+                let badgeHTML = `<span class="text-xs bg-[#ffffff] text-[#ff0000] py-1 px-2.5 rounded-xl border border-[#ffffff] font-semibold">${t.jugarBtn}</span>`;
+                if (yaCompletado) {
+                    if (estadoCat.ganado) {
+                        badgeHTML = `<span class="text-xs bg-[#ffffff] text-[#15803d] py-1 px-2.5 rounded-xl border border-[#ffffff] font-semibold">⏱️ (${estadoCat.tiempoTexto}) →</span>`;
+                    } else {
+                        badgeHTML = `<span class="text-xs bg-[#ffffff] text-[#b91c1c] py-1 px-2.5 rounded-xl border border-[#ffffff] font-semibold">${t.falladoRevision} →</span>`;
+                    }
+                }
+
+                const btn = document.createElement('button');
+                btn.className = `w-full flex items-center justify-between p-3 rounded-2xl classic-item cursor-pointer group`;
+                btn.onclick = () => iniciarJuego(key, false);
+
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <img src="${cat.imagen}" alt="${cat.nombre[lang]}" class="w-10 h-10 object-contain p-1.5 bg-[#ffffff] rounded-xl border border-[#ffffff]" />
+                        <div class="text-left">
+                            <h2 class="text-base font-bold text-[#ffffff] tracking-wide category-title-anton">${cat.nombre[lang]}</h2>
+                            <p class="text-[10px] text-[#ffffff] opacity-90">${yaCompletado ? t.modoRevision : t.ordenarSub}</p>
+                        </div>
+                    </div>
+                    ${badgeHTML}
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function iniciarPartidaAleatoria() {
+            const llavesCategorias = Object.keys(metadataCategorias);
+            const categoriaAleatoria = llavesCategorias[Math.floor(Math.random() * llavesCategorias.length)];
+            iniciarJuego(categoriaAleatoria, true);
+        }
+
+        function iniciarJuego(key, aleatorio = false) {
+            categoriaActual = key;
+            esModoAleatorio = aleatorio;
+
+            let reto;
+            if (esModoAleatorio) {
+                reto = obtenerRetoAleatorio(key);
+                eventosOriginales = reto.originales;
+                eventosJuego = reto.mezclados;
+            } else {
+                reto = obtenerRetoDiario(key);
+                eventosOriginales = reto.originales;
+                eventosJuego = reto.mezclados;
+            }
+            
+            const progreso = obtenerProgresoLocalStorage();
+            const estadoCat = !esModoAleatorio ? progreso[key] : null;
+            const lang = obtenerIdiomaActual();
+            const t = i18n[lang];
+
+            document.getElementById('vista-menu').classList.add('hidden');
+            document.getElementById('vista-juego').classList.remove('hidden');
+            
+            const tituloContainer = document.getElementById('titulo-categoria-juego');
+            let contenidoTitulo = metadataCategorias[key].nombre[lang];
+            tituloContainer.innerHTML = contenidoTitulo;
+
+            const resultadoContainer = document.getElementById('resultado-container');
+            const btnComprobar = document.getElementById('btn-comprobar');
+            const btnCompartir = document.getElementById('btn-compartir');
+            const resultadoTexto = document.getElementById('resultado-texto');
+
+            if (!esModoAleatorio && estadoCat && estadoCat.completado) {
+                juegoTerminado = true;
+                intentosRestantes = estadoCat.vidasRestantes !== undefined ? estadoCat.vidasRestantes : 0;
+                segundosTranscurridos = estadoCat.segundos || 0;
+                
+                if (estadoCat.eventosGuardados) {
+                    eventosJuego = estadoCat.eventosGuardados;
+                } else {
+                    eventosJuego = reto.mezclados.map(e => ({ ...e, estadoVisual: 'correcto' }));
+                }
+
+                document.getElementById('cronometro-display').innerHTML = `<img src="cronometro.jpg" alt="Cronómetro" class="w-3.5 h-3.5 object-contain" /> <span>${estadoCat.tiempoTexto}</span>`;
+                btnComprobar.classList.add('hidden');
+                resultadoContainer.classList.remove('hidden');
+
+                if (estadoCat.ganado) {
+                    resultadoTexto.className = "font-medium text-xs mb-2.5 text-[#ffffff]";
+                    resultadoTexto.textContent = t.revisionExito(estadoCat.tiempoTexto);
+                    btnCompartir.classList.remove('hidden');
+                } else {
+                    resultadoTexto.className = "font-medium text-xs mb-2.5 text-[#ffffff]";
+                    resultadoTexto.textContent = t.revisionFallo;
+                    btnCompartir.classList.add('hidden');
+                }
+            } else {
+                intentosRestantes = 5;
+                juegoTerminado = false;
+                segundosTranscurridos = 0;
+
+                resultadoContainer.classList.add('hidden');
+                btnComprobar.classList.remove('hidden');
+                iniciarCronometro();
+
+                verificarPrimeraVezTutorial();
+            }
+
+            actualizarVidasUI();
+            renderizarTarjetas();
+        }
+
+        function verificarPrimeraVezTutorial() {
+            const visto = localStorage.getItem('whenwastimeline_tutorial_visto');
+            if (!visto) {
+                abrirTutorial();
+                localStorage.setItem('whenwastimeline_tutorial_visto', 'true');
+            }
+        }
+
+        function abrirTutorial() {
+            document.getElementById('modal-tutorial').classList.remove('hidden');
+        }
+
+        function cerrarTutorial() {
+            document.getElementById('modal-tutorial').classList.add('hidden');
+        }
+
+        function volverAlMenu() {
+            detenerCronometro();
+            document.getElementById('vista-juego').classList.add('hidden');
+            document.getElementById('vista-menu').classList.remove('hidden');
+            inicializarMenu();
+        }
+
+        function iniciarCronometro() {
+            detenerCronometro();
+            const display = document.getElementById('cronometro-display');
+            display.innerHTML = `<img src="cronometro.jpg" alt="Cronómetro" class="w-3.5 h-3.5 object-contain" /> <span>00:00</span>`;
+            cronometroInterval = setInterval(() => {
+                segundosTranscurridos++;
+                const mins = String(Math.floor(segundosTranscurridos / 60)).padStart(2, '0');
+                const secs = String(segundosTranscurridos % 60).padStart(2, '0');
+                display.innerHTML = `<img src="cronometro.jpg" alt="Cronómetro" class="w-3.5 h-3.5 object-contain" /> <span>${mins}:${secs}</span>`;
+            }, 1000);
+        }
+
+        function detenerCronometro() {
+            if (cronometroInterval) {
+                clearInterval(cronometroInterval);
+                cronometroInterval = null;
+            }
+        }
+
+        function actualizarVidasUI() {
+            const vidasSpan = document.querySelectorAll('#vidas-container .vida');
+            vidasSpan.forEach((span, index) => {
+                if (index < (5 - intentosRestantes)) {
+                    span.textContent = "✕";
+                    span.className = "vida text-[#990000] font-extrabold text-base transition duration-300 opacity-60";
+                } else {
+                    span.textContent = "✕";
+                    span.className = "vida text-[#ffffff] font-extrabold text-lg drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] transition duration-300";
+                }
+            });
+        }
+
+        function renderizarTarjetas() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            const lang = obtenerIdiomaActual();
+
+            eventosJuego.forEach((evento, index) => {
+                const card = document.createElement('div');
+                const textoHito = evento.texto[lang] || evento.texto.es;
+                
+                let estiloVisualExtra = "bg-[#ff0000] text-[#ffffff] border-[#ffffff]";
+                let badgeDerecha = `<span class="text-xs text-[#ffffff]">☰</span>`;
+
+                if (evento.estadoVisual === 'correcto') {
+                    estiloVisualExtra = "border-[#22c55e] bg-[#1c1c1c] text-[#ffffff] shadow-lg ring-2 ring-[#22c55e]";                    badgeDerecha = `<span class="text-xs font-mono font-bold bg-[#14532d] text-[#ffffff] px-2.5 py-1 rounded-lg border border-[#22c55e]">${evento.anio}</span>`;
+                } else if (evento.estadoVisual === 'cercano') {
+                    estiloVisualExtra = "border-[#ffffff] bg-[#854d0e] text-[#ffffff] shadow-lg ring-2 ring-[#eab308]";
+                } else if (evento.estadoVisual === 'incorrecto') {
+                    estiloVisualExtra = "border-[#ffffff] bg-[#991b1b] text-[#ffffff] shadow-lg ring-2 ring-[#ef4444] animate-shake";
+                }
+
+                if (juegoTerminado) {
+                    card.className = `p-3 rounded-xl border-2 flex items-center justify-between select-none cursor-default ${estiloVisualExtra}`;
+                } else {
+                    card.className = `p-3 rounded-xl border-2 flex items-center justify-between cursor-grab active:cursor-grabbing transition transform duration-150 select-none touch-none ${estiloVisualExtra}`;
+                    card.draggable = true;
+                    card.dataset.index = index;
+
+                    card.addEventListener('dragstart', handleDragStart);
+                    card.addEventListener('dragend', handleDragEnd);
+                    card.addEventListener('dragover', handleDragOver);
+                    card.addEventListener('dragleave', handleDragLeave);
+                    card.addEventListener('drop', handleDrop);
+
+                    card.addEventListener('pointerdown', handlePointerDown);
+                }
+
+                card.innerHTML = `
+                    <span class="font-semibold text-sm pr-2">${textoHito}</span>
+                    <div class="flex items-center shrink-0">${badgeDerecha}</div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        let draggedIndex = null;
+
+        function limpiarColoresVisuales() {
+            let modificado = false;
+            eventosJuego.forEach(ev => {
+                if (ev.estadoVisual !== null) {
+                    ev.estadoVisual = null;
+                    modificado = true;
+                }
+            });
+            if (modificado) {
+                renderizarTarjetas();
+            }
+        }
+
+        function handleDragStart(e) {
+            if (juegoTerminado) return;
+            limpiarColoresVisuales();
+            draggedIndex = parseInt(this.dataset.index);
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('#cards-container > div').forEach(c => c.classList.remove('drag-over'));
+        }
+
+        function handleDragOver(e) {
+            if (juegoTerminado) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            const targetCard = e.target.closest('div[data-index]');
+            if (targetCard) {
+                document.querySelectorAll('#cards-container > div').forEach(c => c.classList.remove('drag-over'));
+                targetCard.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            const targetCard = e.target.closest('div[data-index]');
+            if (targetCard) {
+                targetCard.classList.remove('drag-over');
+            }
+        }
+
+        function handleDrop(e) {
+            if (juegoTerminado) return;
+            e.preventDefault();
+            const targetCard = e.target.closest('div[data-index]');
+            if (!targetCard) return;
+            const targetIndex = parseInt(targetCard.dataset.index);
+
+            if (draggedIndex !== null && draggedIndex !== targetIndex) {
+                limpiarColoresVisuales();
+                const temp = eventosJuego[draggedIndex];
+                eventosJuego[draggedIndex] = eventosJuego[targetIndex];
+                eventosJuego[targetIndex] = temp;
+                renderizarTarjetas();
+            }
+        }
+
+        let activePointerClone = null;
+        let pointerSrcIndex = null;
+        let cloneOffsetX = 0;
+        let cloneOffsetY = 0;
+
+        function handlePointerDown(e) {
+            if (juegoTerminado || e.pointerType === 'mouse') return;
+            limpiarColoresVisuales();
+            
+            pointerSrcIndex = parseInt(this.dataset.index);
+            const rect = this.getBoundingClientRect();
+            const cardWidth = rect.width || this.offsetWidth;
+            
+            cloneOffsetX = e.clientX - rect.left;
+            cloneOffsetY = e.clientY - rect.top;
+
+            this.classList.add('dragging');
+
+            activePointerClone = this.cloneNode(true);
+            activePointerClone.className = `p-3 rounded-xl border-2 border-[#ffffff] bg-[#ff0000] text-[#ffffff] flex items-center justify-between mobile-dragging-clone`;
+            activePointerClone.style.width = `${cardWidth}px`;
+            activePointerClone.style.boxSizing = 'border-box';
+            activePointerClone.style.left = `${rect.left}px`;
+            activePointerClone.style.top = `${rect.top}px`;
+            document.body.appendChild(activePointerClone);
+
+            this.setPointerCapture(e.pointerId);
+
+            this.addEventListener('pointermove', handlePointerMove);
+            this.addEventListener('pointerup', handlePointerUp);
+            this.addEventListener('pointercancel', handlePointerUp);
+        }
+
+        function handlePointerMove(e) {
+            if (!activePointerClone) return;
+            if (e.clientX === 0 && e.clientY === 0) return;
+            e.preventDefault();
+
+            const x = e.clientX - cloneOffsetX;
+            const y = e.clientY - cloneOffsetY;
+            activePointerClone.style.left = `${x}px`;
+            activePointerClone.style.top = `${y}px`;
+
+            activePointerClone.style.display = 'none';
+            const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
+            activePointerClone.style.display = 'flex';
+
+            const targetCard = elementBelow ? elementBelow.closest('div[data-index]') : null;
+            document.querySelectorAll('#cards-container > div').forEach(c => c.classList.remove('drag-over'));
+            if (targetCard) {
+                targetCard.classList.add('drag-over');
+            }
+        }
+
+        function handlePointerUp(e) {
+            if (!activePointerClone) return;
+
+            if (e.clientX !== 0 || e.clientY !== 0) {
+                activePointerClone.style.display = 'none';
+                const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
+                activePointerClone.style.display = 'flex';
+
+                const targetCard = elementBelow ? elementBelow.closest('div[data-index]') : null;
+
+                if (targetCard) {
+                    const targetIndex = parseInt(targetCard.dataset.index);
+                    if (pointerSrcIndex !== null && pointerSrcIndex !== targetIndex) {
+                        limpiarColoresVisuales();
+                        const temp = eventosJuego[pointerSrcIndex];
+                        eventosJuego[pointerSrcIndex] = eventosJuego[targetIndex];
+                        eventosJuego[targetIndex] = temp;
+                    }
+                }
+            }
+
+            if (activePointerClone && activePointerClone.parentNode) {
+                activePointerClone.remove();
+            }
+            activePointerClone = null;
+            pointerSrcIndex = null;
+
+            document.querySelectorAll('#cards-container > div').forEach(c => {
+                c.classList.remove('dragging', 'drag-over');
+            });
+
+            renderizarTarjetas();
+        }
+
+        function verificarOrden() {
+            if (juegoTerminado) return;
+
+            const ordenadosCorrectamente = [...eventosOriginales].sort((a, b) => a.anio - b.anio);
+            let aciertosTotales = true;
+
+            eventosJuego.forEach((ev, idx) => {
+                if (ev.id === ordenadosCorrectamente[idx].id) {
+                    ev.estadoVisual = 'correcto';
+                } else {
+                    const diff = Math.abs(idx - ordenadosCorrectamente.findIndex(item => item.id === ev.id));
+                    if (diff === 1) {
+                        ev.estadoVisual = 'cercano';
+                        aciertosTotales = false;
+                    } else {
+                        ev.estadoVisual = 'incorrecto';
+                        aciertosTotales = false;
+                    }
+                }
+            });
+
+            renderizarTarjetas();
+
+            if (aciertosTotales) {
+                finalizarPartida(true);
+            } else {
+                intentosRestantes--;
+                actualizarVidasUI();
+
+                if (intentosRestantes <= 0) {
+                    juegoTerminado = true;
+                    eventosJuego = [...ordenadosCorrectamente].map(e => ({ ...e, estadoVisual: 'correcto' }));
+                    renderizarTarjetas();
+                    finalizarPartida(false);
+                }
+            }
+        }
+
+        function finalizarPartida(ganado) {
+            juegoTerminado = true;
+            detenerCronometro();
+
+            document.getElementById('btn-comprobar').classList.add('hidden');
+            const resultadoContainer = document.getElementById('resultado-container');
+            const resultadoTexto = document.getElementById('resultado-texto');
+            const btnCompartir = document.getElementById('btn-compartir');
+
+            resultadoContainer.classList.remove('hidden');
+
+            const mins = String(Math.floor(segundosTranscurridos / 60)).padStart(2, '0');
+            const secs = String(segundosTranscurridos % 60).padStart(2, '0');
+            const tiempoStr = `${mins}:${secs}`;
+            const lang = obtenerIdiomaActual();
+            const t = i18n[lang];
+
+            let eventosAGuardar = eventosJuego;
+            if (ganado) {
+                eventosAGuardar = eventosJuego.map(e => ({ ...e, estadoVisual: 'correcto' }));
+            } else {
+                const ordenadosCorrectamente = [...eventosOriginales].sort((a, b) => a.anio - b.anio);
+                eventosAGuardar = [...ordenadosCorrectamente].map(e => ({ ...e, estadoVisual: 'correcto' }));
+            }
+
+            if (!esModoAleatorio) {
+                guardarProgresoLocalStorage(categoriaActual, { 
+                    completado: true, 
+                    ganado: ganado, 
+                    tiempoTexto: tiempoStr,
+                    segundos: segundosTranscurridos,
+                    vidasRestantes: intentosRestantes,
+                    eventosGuardados: eventosAGuardar
+                });
+            }
+
+            if (ganado) {
+                resultadoTexto.className = "font-medium text-xs mb-2.5 text-[#ffffff]";
+                resultadoTexto.textContent = esModoAleatorio ? `🎉 Random mode completed in ${tiempoStr}!` : t.resultadoExito(tiempoStr, intentosRestantes);
+                btnCompartir.classList.remove('hidden');
+            } else {
+                resultadoTexto.className = "font-medium text-xs mb-2.5 text-[#ffffff]";
+                resultadoTexto.textContent = t.resultadoFallo;
+                btnCompartir.classList.add('hidden');
+            }
+        }
+
+        function compartirResultado() {
+            const lang = obtenerIdiomaActual();
+            const t = i18n[lang];
+            const catNombre = metadataCategorias[categoriaActual].nombre[lang] + (esModoAleatorio ? " (🎲)" : "");
+            const fechaStr = obtenerFechaSemilla();
+            const mins = String(Math.floor(segundosTranscurridos / 60)).padStart(2, '0');
+            const secs = String(segundosTranscurridos % 60).padStart(2, '0');
+            
+            const textoClipboard = t.compartirTexto(fechaStr, catNombre, mins, secs, intentosRestantes);
+
+            navigator.clipboard.writeText(textoClipboard).then(() => {
+                const btnSpan = document.getElementById('txt-btn-compartir');
+                const originalText = btnSpan.textContent;
+                btnSpan.textContent = t.copiadoExito;
+                setTimeout(() => {
+                    btnSpan.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        window.onload = () => {
+            renderizarRachaUI();
+            inicializarMenu();
+        };
+    </script>
+</body>
+</html>
