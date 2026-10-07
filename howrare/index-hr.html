@@ -504,165 +504,408 @@
         };
 
         const eventsDB = [
+            // --- LOS 40 SUCESOS ORIGINALES ---
             { 
                 title: { en: "Winning the Christmas Lottery jackpot (1 in 100,000)", es: "Ganar el gordo de la Lotería de Navidad (1 entre 100.000)", fr: "Gagner le gros lot de la Loterie de Noël", de: "Den Hauptgewinn der Weihnachtswebelotterie gewinnen" }, 
-                real: 0.001, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Money_money.jpg?width=600" 
+                real: 0.001, img: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Being struck by lightning in your lifetime", es: "Que te caiga un rayo a lo largo de tu vida", fr: "Être frappé par la foudre au cours de sa vie", de: "Im Laufe des Lebens vom Blitz getroffen werden" }, 
-                real: 0.0066, img: "https://commons.wikimedia.org/wiki/Special:FilePath/A_Lightning.jpg?width=600" 
+                real: 0.0066, img: "https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Finding a four-leaf clover on the first try", es: "Encontrar un trébol de cuatro hojas a la primera", fr: "Trouver un trèfle à quatre feuilles du premier coup", de: "Auf Anhieb ein vierblättriges Kleeblatt finden" }, 
-                real: 0.01, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Four_leaf_clover.JPG?width=600" 
+                real: 0.01, img: "https://images.unsplash.com/photo-1590005354167-6da97870c757?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Being born with heterochromia (different colored eyes)", es: "Nacer con heterocromía (ojos de diferente color)", fr: "Naître avec de l'hétérochromie (yeux de couleurs différentes)", de: "Mit Heterochromie (unterschiedlich farbigen Augen) geboren werden" }, 
-                real: 0.06, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Heterochromia_iridum_cat.jpg?width=600" 
+                real: 0.06, img: "https://images.unsplash.com/photo-1560807707-8cc77767d783?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Finding two yolks in a single egg", es: "Encontrar dos yemas al romper un huevo", fr: "Trouver deux jaunes dans un seul œuf", de: "Zwei Dotter in einem Ei finden" }, 
-                real: 0.1, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Egg_Cup_and_egg.jpg?width=600" 
+                real: 0.1, img: "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Being attacked by a shark while swimming in the ocean", es: "Ser atacado por un tiburón nadando en el mar", fr: "Être attaqué par un requin en nageant dans l'océan", de: "Beim Schwimmen im Meer von einem Hai angegriffen werden" }, 
-                real: 0.000026, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Great_white_shark_south_africa.jpg?width=600" 
+                real: 0.000026, img: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Being hit by a meteorite", es: "Ser alcanzado por un meteorito", fr: "Être frappé par une météorite", de: "Von einem Meteoriten getroffen werden" }, 
-                real: 0.000003, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Chelyabinsk_Meteor_meteorite_fragment.jpg?width=600" 
+                real: 0.000003, img: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Getting a Royal Flush on the first poker hand", es: "Conseguir una Escalera Real en la primera mano de póker", fr: "Obtenir une Quinte Flush Royale dès la première main de poker", de: "Ein Royal Flush auf der ersten Pokerhand erhalten" }, 
-                real: 0.000154, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Playing_Cards.jpg?width=600" 
+                real: 0.000154, img: "https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Having spontaneous identical twins", es: "Tener un embarazo de gemelos idénticos espontáneo", fr: "Avoir une grossesse spontanée de vrais jumeaux", de: "Spontan identische Zwillinge bekommen" }, 
-                real: 0.4, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Twins.jpg?width=600" 
+                real: 0.4, img: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "A coin landing perfectly on its edge when tossed", es: "Que una moneda caiga perfectamente de canto al lanzarla", fr: "Une pièce qui tombe parfaitement sur la tranche", de: "Eine Münze, die beim Werfen auf dem Rand stehen bleibt" }, 
-                real: 0.016, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Coin_coin.JPG?width=600" 
+                real: 0.016, img: "https://images.unsplash.com/photo-1561414927-6d86591d0c4f?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Being left-handed in the global population", es: "Ser zurdo en la población mundial", fr: "Être gaucher dans la population mondiale", de: "Linkshänder in der Weltbevölkerung sein" }, 
-                real: 10.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Playing_cards.jpg?width=600" 
+                real: 10.0, img: "https://images.unsplash.com/photo-1588072432836-e10032774350?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Having naturally green eyes", es: "Tener los ojos verdes de forma natural", fr: "Avoir naturellement les yeux verts", de: "Natürliche grüne Augen haben" }, 
-                real: 2.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Cat_pic.jpg?width=600" 
+                real: 2.0, img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Having natural red hair", es: "Tener el pelo pelirrojo natural", fr: "Avoir naturellement des cheveux roux", de: "Natürlich rotes Haar haben" }, 
-                real: 1.5, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Butterfly_.jpg?width=600" 
+                real: 1.5, img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Bowling a strike on a random attempt", es: "Conseguir un pleno de un tiro al jugar a los bolos (strike)", fr: "Faire un strike lors d'un lancer de bowling", de: "Einen Strike beim Bowlen erzielen" }, 
-                real: 8.5, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Ball_1.jpg?width=600" 
+                real: 8.5, img: "https://images.unsplash.com/photo-1538388149542-5e24932d11a8?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Suffering a major flight delay on a commercial airline", es: "Sufrir un retraso grave en un vuelo comercial", fr: "Subir un retard majeur sur un vol commercial", de: "Eine schwere Flugverspätung erleben" }, 
-                real: 4.5, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Airplane_in_flight.jpg?width=600" 
+                real: 4.5, img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Finding paper money lying on the street", es: "Encontrar un billete de dinero tirado en la calle", fr: "Trouver un billet de banque par terre dans la rue", de: "Geldscheine auf der Straße finden" }, 
-                real: 2.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Money_Money_-_panoramio.jpg?width=600" 
+                real: 2.0, img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Being born on February 29 in a leap year", es: "Nacer el 29 de febrero en un año bisiesto", fr: "Naître un 29 février une année bissextile", de: "Am 29. Februar in einem Schaltjahr geboren werden" }, 
-                real: 0.068, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Moon_.jpg?width=600" 
+                real: 0.068, img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Getting a flat tire during a year of driving", es: "Sufrir un pinchazo en la rueda del coche durante un año", fr: "Avoir un pneu crevé au cours d'une année de conduite", de: "Einen platten Reifen innerhalb eines Jahres haben" }, 
-                real: 7.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Car_-_%E0%B4%95%E0%B4%BE%E0%B4%BC.JPG?width=600" 
+                real: 7.0, img: "https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Seeing a total solar eclipse from your hometown", es: "Ver un eclipse solar total desde tu ciudad", fr: "Voir une éclipse solaire totale depuis votre ville", de: "Eine totale Sonnenfinsternis in deiner Stadt sehen" }, 
-                real: 0.25, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Solar_eclipse_1999_4_NR.jpg?width=600" 
+                real: 0.25, img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Drawing an Ace as the first card from a deck", es: "Sacar un As al robar la primera carta de una baraja", fr: "Tirer un As comme première carte d'un jeu", de: "Ein Ass als erste Karte aus einem Deck ziehen" }, 
-                real: 7.69, img: "https://commons.wikimedia.org/wiki/Special:FilePath/King_playing_cards.jpg?width=600" 
+                real: 7.69, img: "https://images.unsplash.com/photo-1541278107931-e006523892df?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Rolling a 6 on a standard six-sided die", es: "Sacar un 6 al tirar un dado estándar de seis caras", fr: "Obtenir un 6 en lançant un dé classique à 6 faces", de: "Eine 6 auf einem gewöhnlichen Würfel würfeln" }, 
-                real: 16.67, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Dice.jpg?width=600" 
+                real: 16.67, img: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Having O-negative blood type (universal donor)", es: "Tener sangre del tipo O negativo (donante universal)", fr: "Avoir le groupe sanguin O négatif (donneur universel)", de: "Blutgruppe 0-negativ haben (Universalspender)" }, 
-                real: 7.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Phone_image.png?width=600" 
+                real: 7.0, img: "https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Rain occurring on any random day in London", es: "Que llueva en un día cualquiera en Londres", fr: "Un jour de pluie n'importe quel jour à Londres", de: "Regen an einem beliebigen Tag in London" }, 
-                real: 38.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Cloud.svg?width=600" 
+                real: 38.0, img: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Getting exactly two heads when flipping three coins", es: "Sacar exactamente dos caras al lanzar tres monedas", fr: "Obtenir exactement deux faces en lançant trois pièces", de: "Genau zwei Köpfe beim Werfen von drei Münzen erhalten" }, 
-                real: 37.5, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Coin_flip_outcomes.png?width=600" 
+                real: 37.5, img: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Falling asleep while watching a movie at night", es: "Quedarte dormido viéndote una película por la noche", fr: "S'endormir en regardant un film la nuit", de: "Nachts beim Filmsehen einschlafen" }, 
-                real: 42.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Moon.jpg?width=600" 
+                real: 42.0, img: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Having at least one food or environmental allergy", es: "Tener al menos una alergia alimentaria o ambiental", fr: "Avoir au moins une allergie alimentaire ou environnementale", de: "Mindestens eine Lebensmittel- oder Umweltallergie haben" }, 
-                real: 30.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Flower_.jpg?width=600" 
+                real: 30.0, img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Having cheek dimples when smiling", es: "Tener hoyuelos en las mejillas al sonreír", fr: "Avoir des fossettes sur les joues en souriant", de: "Grübchen auf den Wangen beim Lächeln haben" }, 
-                real: 20.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Cat_cat.jpg?width=600" 
+                real: 20.0, img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Toast landing butter-side down on the floor", es: "Que la tostada caiga al suelo con la mantequilla hacia abajo", fr: "La tartine qui tombe du côté beurre au sol", de: "Der Toast landet mit der Butterseite nach unten auf dem Boden" }, 
-                real: 50.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Coffee_.jpg?width=600" 
+                real: 50.0, img: "https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Receiving a spam telemarketing call during the day", es: "Recibir una llamada Spam o comercial durante el día", fr: "Recevoir un appel publicitaire ou spam pendant la journée", de: "Tagsüber einen Werbe- oder Spam-Anruf erhalten" }, 
-                real: 45.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Phone_.jpg?width=600" 
+                real: 45.0, img: "https://images.unsplash.com/photo-1534536281715-e28d76689b4d?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Landing a relationship from a first Tinder date", es: "Conseguir pareja en una primera cita de Tinder", fr: "Trouver une relation dès un premier rendez-vous Tinder", de: "Eine Beziehung beim ersten Tinder-Date finden" }, 
-                real: 12.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Phone_image.png?width=600" 
+                real: 12.0, img: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Flipping heads on a coin toss", es: "Obtener cara al lanzar una moneda al aire", fr: "Obtenir pile en lançant une pièce", de: "Kopf beim Münzwurf erhalten" }, 
-                real: 50.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Coin_coin.JPG?width=600" 
+                real: 50.0, img: "https://images.unsplash.com/photo-1561414927-6d86591d0c4f?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Rolling an even number on a standard die", es: "Sacar un número par al lanzar un dado estándar", fr: "Obtenir un nombre pair avec un dé classique", de: "Eine gerade Zahl auf einem gewöhnlichen Würfel würfeln" }, 
-                real: 50.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Dice-0.svg?width=600" 
+                real: 50.0, img: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Drawing a red card from a standard poker deck", es: "Robar una carta de color rojo en una baraja de póker", fr: "Tirer une carte rouge d'un jeu de poker", de: "Eine rote Karte aus einem Kartendeck ziehen" }, 
-                real: 50.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Playing_Cards.JPG?width=600" 
+                real: 50.0, img: "https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Having brown eyes in the world population", es: "Tener los ojos de color marrón en el mundo", fr: "Avoir les yeux marron dans la population mondiale", de: "Braune Augen in der Weltbevölkerung haben" }, 
-                real: 75.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Cat_cat.jpg?width=600" 
+                real: 75.0, img: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Being able to roll your tongue into a U-shape", es: "Ser capaz de doblar la lengua en forma de U", fr: "Être capable de rouler sa langue en U", de: "Die Zunge U-förmig rollen können" }, 
-                real: 70.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Cat_cat.jpg?width=600" 
+                real: 70.0, img: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Checking your phone within 10 minutes of waking up", es: "Mirar el móvil en los primeros 10 minutos al despertarte", fr: "Regarder son téléphone dans les 10 min suivant le réveil", de: "In den ersten 10 Minuten nach dem Aufstehen aufs Handy schauen" }, 
-                real: 88.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Phone_.jpg?width=600" 
+                real: 88.0, img: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Seeing at least one dog during a 30-min walk in the city", es: "Ver al menos un perro paseando si caminas 30 min por la ciudad", fr: "Voir au moins un chien lors d'une marche de 30 min en ville", de: "Bei einem 30-minütigen Stadtspaziergang mindestens einen Hund sehen" }, 
-                real: 92.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Dog_dog.jpg?width=600" 
+                real: 92.0, img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "A car starting on the first try when turning the key/button", es: "Que un coche arranque a la primera al girar la llave/botón", fr: "Une voiture qui démarre du premier coup en tournant la clé", de: "Ein Auto, das beim ersten Versuch anspringt" }, 
-                real: 99.5, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Car_-_%E0%B4%95%E0%B4%BE%E0%B4%BC.JPG?width=600" 
+                real: 99.5, img: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Finding an unmatched sock in your laundry load", es: "Encontrar al menos un calcetín desparejado en la colada", fr: "Trouver au moins une chaussette orpheline dans la lessive", de: "Mindestens eine einzelne Socke in der Wäsche finden" }, 
-                real: 65.0, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Book_stock_image.png?width=600" 
+                real: 65.0, img: "https://images.unsplash.com/photo-1582966772680-860e372bb558?w=600&auto=format&fit=crop" 
             },
             { 
                 title: { en: "Getting at least one heads when flipping 5 coins", es: "Que salga al menos una cara si lanzas 5 monedas seguidas", fr: "Obtenir au moins une fois pile en lançant 5 pièces", de: "Mindestens einmal Kopf beim Werfen von 5 Münzen erhalten" }, 
-                real: 96.87, img: "https://commons.wikimedia.org/wiki/Special:FilePath/Coin_Toss_(3635981474).jpg?width=600" 
+                real: 96.87, img: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=600&auto=format&fit=crop" 
+            },
+
+            // --- 60 NUEVOS SUCESOS ---
+            { 
+                title: { en: "Scoring a hole-in-one in golf for an amateur golfer", es: "Hacer un hoyo en uno siendo un jugador de golf aficionado", fr: "Faire un trou en un pour un golfeur amateur", de: "Ein Hole-in-One als Amateurgolfer schlagen" }, 
+                real: 0.008, img: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Being born with an extra finger or toe (Polydactyly)", es: "Nacer con un dedo extra en manos o pies (Polidactilia)", fr: "Naître avec un doigt ou orteil supplémentaire", de: "Mit einem extra Finger oder Zeh geboren werden" }, 
+                real: 0.2, img: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Being ambidextrous (able to use both hands equally)", es: "Ser ambidiestro (usar ambas manos con la misma habilidad)", fr: "Être ambidextre", de: "Beidhändig sein" }, 
+                real: 1.0, img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Having AB-negative blood type (rarest blood group)", es: "Tener sangre de tipo AB negativo (el grupo más raro)", fr: "Avoir le groupe sanguin AB négatif", de: "Blutgruppe AB-negativ haben" }, 
+                real: 0.6, img: "https://images.unsplash.com/photo-1536856136534-bb679c52a9aa?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Having perfect pitch (absolute pitch in music)", es: "Tener oído absoluto para la música", fr: "Avoir l'oreille absolue", de: "Das absolute Gehör haben" }, 
+                real: 0.01, img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Surviving a plane crash when involved in one", es: "Sobrevivir a un accidente de avión comercial", fr: "Survivre à un crash d'avion", de: "Einen Flugzeugabsturz überleben" }, 
+                real: 95.7, img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Being injured by a toilet bowl during your lifetime", es: "Sufrir una lesión causada por un inodoro a lo largo de la vida", fr: "Être blessé par des toilettes au cours de sa vie", de: "Im Laufe des Lebens durch eine Toilette verletzt werden" }, 
+                real: 0.01, img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Sharing a birthday with a random person in a group of 23 people", es: "Coincidir cumpleaños con alguien en un grupo de 23 personas", fr: "Partager son anniversaire dans un groupe de 23 personnes", de: "Geburtstag mit jemandem in einer Gruppe von 23 Personen teilen" }, 
+                real: 50.7, img: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Being bitten by a venomous snake in a developed country", es: "Ser mordido por una serpiente venenosa en un país desarrollado", fr: "Être mordu par un serpent venimeux dans un pays développé", de: "In einem entwickeltem Land von einer Giftschlange gebissen werden" }, 
+                real: 0.002, img: "https://images.unsplash.com/photo-1531386151447-fd76ad50012f?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Unlocking a smartphone with your thumb fingerprint on first try", es: "Desbloquear la huella del móvil a la primera con el pulgar", fr: "Déverrouiller son smartphone avec l'empreinte du premier coup", de: "Das Smartphone auf Anhieb mit dem Daumenabdruck entsperren" }, 
+                real: 98.0, img: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Plugging in a USB Type-A connector correctly on the first attempt", es: "Acertar la posición de un cable USB clásico a la primera", fr: "Brancher un câble USB A du premier coup", de: "Einen USB-A-Stecker beim ersten Versuch richtig einstecken" }, 
+                real: 33.3, img: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A smartphone screen shattering when dropped on concrete from 1 meter", es: "Que la pantalla del móvil se rompa al caer al suelo desde 1 metro", fr: "Un écran de smartphone qui se brise en tombant sur du béton", de: "Ein Display-Schaden beim Sturz aus 1 Meter Höhe auf Beton" }, 
+                real: 40.0, img: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Catching a foul ball at a Major League Baseball game", es: "Atrapar una pelota en las gradas de un partido de béisbol", fr: "Attraper une balle dans les tribunes d'un match de baseball", de: "Einen Foulball bei einem Profi-Baseballspiel fangen" }, 
+                real: 0.17, img: "https://images.unsplash.com/photo-1508802279261-267986957811?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A passenger train arriving exactly on time in Japan", es: "Que un tren en Japón llegue puntual al segundo exacto", fr: "Un train qui arrive exactement à l'heure au Japon", de: "Pünktlicher Zug in Japan auf die Sekunde genau" }, 
+                real: 99.0, img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Receiving a package delivered on the same day it was ordered online", es: "Recibir un pedido online el mismo día en que se compró", fr: "Recevoir un colis commandé le jour même", de: "Eine Lieferung am selben Tag der Bestellung erhalten" }, 
+                real: 15.0, img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Having lactose intolerance as an adult worldwide", es: "Tener intolerancia a la lactosa en la edad adulta en el mundo", fr: "Avoir une intolérance au lactose à l'âge adulte", de: "Laktoseintoleranz im Erwachsenenalter weltweit haben" }, 
+                real: 68.0, img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Experiencing a sneeze caused by looking at bright light (Photic Sneeze)", es: "Estornudar al mirar fijamente a la luz del sol o luz brillante", fr: "Éternuer en regardant une lumière vive", de: "Niesen durch den Anblick von hellem Licht" }, 
+                real: 25.0, img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Being able to wiggle your ears voluntarily", es: "Poder mover las orejas de forma voluntaria", fr: "Être capable de bouger les oreilles volontairement", de: "Die Ohren freiwillig bewegen können" }, 
+                real: 10.0, img: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Having wisdom teeth that never grow in (Agensis)", es: "Nacer sin muelas del juicio (nunca te saldrán)", fr: "N'avoir jamais de dents de sagesse", de: "Keine Weisheitszähne angelegt haben" }, 
+                real: 35.0, img: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Dropping a dropped slice of pizza sauce-side down", es: "Que un trozo de pizza caiga al suelo boca abajo", fr: "Une part de pizza qui tombe du côté sauce", de: "Ein Stück Pizza landet mit der Belagseite nach unten" }, 
+                real: 50.0, img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Finding a pearl inside an edible oyster", es: "Encontrar una perla natural dentro de una ostra para comer", fr: "Trouver une perle dans une huître comestible", de: "Eine Perle in einer Speiseauster finden" }, 
+                real: 0.01, img: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Being killed by a falling coconut", es: "Morir por la caída de un coco de una palmera", fr: "Être tué par la chute d'une noix de coco", de: "Durch eine herabfallende Kokosnuss sterben" }, 
+                real: 0.0000004, img: "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Guessing a random 4-digit PIN code on the first attempt", es: "Adivinar un PIN secreto de 4 dígitos al primer intento", fr: "Deviner un code PIN à 4 chiffres du premier coup", de: "Einen 4-stelligen PIN-Code beim ersten Versuch erraten" }, 
+                real: 0.01, img: "https://images.unsplash.com/photo-1556742049-0a670f4a4591?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Having a dream lucid enough to control what happens", es: "Tener un sueño lúcido donde controlas la acción", fr: "Avoir un rêve lucide et en contrôler le déroulement", de: "Einen Klartraum haben und die Handlung steuern" }, 
+                real: 55.0, img: "https://images.unsplash.com/photo-1511295742362-92c96b124e52?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Winning a game of Rock-Paper-Scissors in 1 round", es: "Ganar a piedra, papel o tijeras en 1 sola ronda", fr: "Gagner à pierre-feuille-ciseaux en un seul coup", de: "Eine Runde Schere-Stein-Papier sofort gewinnen" }, 
+                real: 33.3, img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A cat landing on its feet after a fall from over 1 meter", es: "Que un gato caiga de pie tras una caída de más de 1 metro", fr: "Un chat retombant sur ses pattes après une chute", de: "Eine Katze landet nach einem Sturz auf den Pfoten" }, 
+                real: 90.0, img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Experiencing Deja Vu at least once in a year", es: "Tener una sensación de Déjà Vu al menos una vez al año", fr: "Ressentir une impression de déjà-vu au moins une fois par an", de: "Mindestens einmal im Jahr ein Déjà-vu erleben" }, 
+                real: 70.0, img: "https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Getting a red light when driving up to a traffic signal", es: "Pillar el semáforo en rojo al llegar conduciendo", fr: "Tomber sur un feu rouge en arrivant en voiture", de: "Bei einer Ampel ankommen und Rot haben" }, 
+                real: 48.0, img: "https://images.unsplash.com/photo-1508873696983-2df515122519?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "An adult human being capable of swimming", es: "Que un adulto en el mundo sepa nadar", fr: "Un adulte capable de nager dans le monde", de: "Ein Erwachsener weltweit, der schwimmen kann" }, 
+                real: 55.0, img: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "An earthquake occurring somewhere on Earth every 2 minutes", es: "Que ocurra un terremoto registrado en la Tierra cada 2 min", fr: "Un séisme se produisant sur Terre toutes les 2 minutes", de: "Ein Erdbeben irgendwo auf der Erde alle 2 Minuten" }, 
+                real: 99.9, img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "An adult human having a coffee every morning", es: "Un adulto que bebe café todas las mañanas", fr: "Un adulte buvant du café chaque matin", de: "Ein Erwachsener, der jeden Morgen Kaffee trinkt" }, 
+                real: 65.0, img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Rolling snake eyes (two 1s) with two dice", es: "Sacar dobles unos al tirar dos dados de seis caras", fr: "Obtenir un double 1 en lançant deux dés", de: "Zwei Einser mit zwei Würfeln würfeln" }, 
+                real: 2.78, img: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A modern commercial airplane being hit by lightning in a year", es: "Que un avión comercial sea alcanzado por un rayo en 1 año", fr: "Un avion commercial frappé par la foudre en un an", de: "Ein Verkehrsflugzeug, das im Laufe eines Jahres vom Blitz getroffen wird" }, 
+                real: 99.0, img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Finding a pearl in an edible mussel", es: "Encontrar una perla pequeña al comer un mejillón", fr: "Trouver une perle dans une moule", de: "Eine Perle in einer Miesmuschel finden" }, 
+                real: 0.1, img: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Seeing a shooting star during a clear night in 1 hour of watching", es: "Ver una estrella fugaz en 1 hora observando un cielo despejado", fr: "Voir une étoile filante en 1 heure de nuit claire", de: "Eine Sternschnuppe innerhalb 1 Stunde klarem Nachthimmel sehen" }, 
+                real: 60.0, img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Suffering a vending machine failure that keeps your item/money", es: "Que una máquina expendedora se quede con tu dinero o producto", fr: "Une machine à café/snacks qui garde votre argent", de: "Ein Verkaufsautomat behält Geld oder Produkt ein" }, 
+                real: 15.0, img: "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A human being born a twin globally", es: "Que un ser humano nazca siendo hermano gemelo o mellizo", fr: "Naître jumeau dans le monde", de: "Als Zwilling geboren werden" }, 
+                real: 3.2, img: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Solving a Rubik's Cube on the first blind try without knowing how", es: "Resolver un cubo de Rubik a ciegas sin saber el método", fr: "Résoudre un Rubik's cube au hasard sans connaître la méthode", de: "Einen Zauberwürfel zufällig ohne Anleitung lösen" }, 
+                real: 0.0000000000000000002, img: "https://images.unsplash.com/photo-1563207153-f403bf289096?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Being born on a Sunday", es: "Haber nacido en un día domingo", fr: "Être né un dimanche", de: "An einem Sonntag geboren sein" }, 
+                real: 14.28, img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A person living past the age of 100 years", es: "Que una persona viva más de 100 años", fr: "Vivre plus de 100 ans", de: "Älter als 100 Jahre werden" }, 
+                real: 0.03, img: "https://images.unsplash.com/photo-1581579438747-1dc8d1e377c8?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Having blue eyes in the global human population", es: "Tener ojos azules en la población mundial", fr: "Avoir les yeux bleus dans le monde", de: "Blaue Augen in der Weltbevölkerung haben" }, 
+                real: 8.0, img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A dropped piece of toast landing on a carpeted floor", es: "Que una tostada caiga sobre una alfombra", fr: "Une tartine qui tombe sur un tapis", de: "Ein Toast landet auf einem Teppichboden" }, 
+                real: 80.0, img: "https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A person wearing glasses or contacts globally", es: "Una persona que lleve gafas o lentillas en el mundo", fr: "Une personne portant des lunettes ou lentilles dans le monde", de: "Eine Person, die eine Brille oder Kontaktlinsen trägt" }, 
+                real: 50.0, img: "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "An active volcano erupting somewhere on Earth today", es: "Que un volcán activo entre en erupción en la Tierra hoy", fr: "Un volcan actif entrant en éruption aujourd'hui", de: "Ein aktiver Vulkan bricht heute irgendwo aus" }, 
+                real: 90.0, img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A wild bird pooping on a person in their lifetime", es: "Que un pájaro silvestre te haga caca encima a lo largo de tu vida", fr: "Être victime d'un caca d'oiseau au cours de sa vie", de: "Im Laufe des Lebens von einem Vogelschiss getroffen werden" }, 
+                real: 35.0, img: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Drawing a Flush (5 cards of same suit) in poker on 1st hand", es: "Obtener Color (5 cartas del mismo palo) en 1ª mano de póker", fr: "Obtenir une couleur dès la première main au poker", de: "Ein Flush in der ersten Pokerhand erhalten" }, 
+                real: 0.198, img: "https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Getting a Full House on the first poker hand dealt", es: "Conseguir un Full House en la primera mano de póker", fr: "Obtenir un Full dès la première main de poker", de: "Ein Full House in der ersten Pokerhand erhalten" }, 
+                real: 0.144, img: "https://images.unsplash.com/photo-1541278107931-e006523892df?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Being struck by an object falling from an airplane", es: "Ser golpeado por un objeto que cae de un avión en vuelo", fr: "Être frappé par un objet tombant d'un avion", de: "Von einem herabstürzenden Gegenstand aus einem Flugzeug getroffen werden" }, 
+                real: 0.000001, img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A person having a pet dog or cat in Western countries", es: "Tener un perro o gato como mascota en países occidentales", fr: "Avoir un chien ou un chat comme animal de compagnie", de: "Einen Hund oder eine Katze als Haustier haben" }, 
+                real: 56.0, img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A battery running out of power while using an electronic device", es: "Que un dispositivo se apague por batería agotada durante el día", fr: "Un appareil qui s'éteint par manque de batterie durant la journée", de: "Ein leerer Akku während der Nutzung am Tag" }, 
+                real: 40.0, img: "https://images.unsplash.com/photo-1619483042997-27b92648f8b8?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Having a mosquito bite during summertime in humid regions", es: "Picadura de mosquito durante el verano en zonas húmedas", fr: "Piqûre de moustique pendant l'été en région humide", de: "Ein Mückenstich im Sommer in feuchten Regionen" }, 
+                real: 85.0, img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A person being able to speak more than two languages fluently", es: "Que una persona hable más de dos idiomas con fluidez", fr: "Parler plus de deux langues couramment", de: "Fließend mehr als zwei Sprachen sprechen" }, 
+                real: 13.0, img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Overhearing a song you like on the radio while driving", es: "Escuchar tu canción favorita en la radio mientras conduces", fr: "Entendre sa chanson préférée à la radio en conduisant", de: "Lieblingslied im Radio beim Autofahren hören" }, 
+                real: 12.0, img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A computer crashing/freezing during an important task in a year", es: "Que el ordenador se cuelgue durante una tarea importante en el año", fr: "Un ordinateur qui plante lors d'une tâche importante dans l'année", de: "Ein Computerabsturz bei einer wichtigen Aufgabe im Jahr" }, 
+                real: 62.0, img: "https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A traffic jam delaying a daily commute in major cities", es: "Un atasco de tráfico que retrasa el viaje diario en gran ciudad", fr: "Un embouteillage retardant un trajet quotidien dans une grande ville", de: "Ein Stau, der den täglichen Arbeitsweg verzögert" }, 
+                real: 75.0, img: "https://images.unsplash.com/photo-1508873696983-2df515122519?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Finding a four-leaf clover after searching for 1 hour", es: "Encontrar un trébol de 4 hojas tras buscar durante 1 hora", fr: "Trouver un trèfle à 4 feuilles après 1 heure de recherche", de: "Ein vierblättriges Kleeblatt nach 1 Stunde Suche finden" }, 
+                real: 10.0, img: "https://images.unsplash.com/photo-1590005354167-6da97870c757?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Having a tooth cavity filled by age 30", es: "Tener al menos un empaste dental antes de cumplir 30 años", fr: "Avoir eu au moins une carie soignée avant 30 ans", de: "Mindestens eine Zahnfüllung vor dem 30. Lebensjahr haben" }, 
+                real: 80.0, img: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "An email landing in the Spam folder by mistake", es: "Que un correo importante acabe por error en la carpeta Spam", fr: "Un e-mail important arrivant dans les spams par erreur", de: "Eine wichtige E-Mail landet fälschlicherweise im Spam-Ordner" }, 
+                real: 20.0, img: "https://images.unsplash.com/photo-1557200134-90327ee9fafa?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "Forgetting why you entered a room (Doorway Effect)", es: "Entrar a una habitación y olvidar a qué ibas (Efecto Umbral)", fr: "Entrer dans une pièce et oublier ce qu'on venait faire", de: "Einen Raum betreten und vergessen, was man wollte" }, 
+                real: 85.0, img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&auto=format&fit=crop" 
+            },
+            { 
+                title: { en: "A Wi-Fi connection dropping during a video call", es: "Que la conexión Wi-Fi falle durante una videollamada", fr: "Une déconnexion Wi-Fi lors d'un appel vidéo", de: "WLAN-Absturz während eines Anrufs" }, 
+                real: 35.0, img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop" 
             }
         ];
 

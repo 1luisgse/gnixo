@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4pizzas but Coke Light | GNIXO</title>
+    <!-- Fuente Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        if (!localStorage.getItem('whenwastimeline_idioma')) {
+            localStorage.setItem('whenwastimeline_idioma', 'es');
+        }
+    </script>
+    <style>
+        :root {
+            --bg-color: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --primary-red: #ff2a2a;
+            --primary-red-hover: #e02424;
+            --success-green: #2ecc71;
+            --error-red: #e74c3c;
+            --text-white: #ffffff;
+            --text-gray: #b0b0b0;
+            --border-color: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* BARRA SUPERIOR */
+        .top-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-volver {
+            background-color: #ffffff;
+            color: var(--primary-red);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .btn-volver:hover {
+            background-color: #fff0f0;
+        }
+
+        .select-idioma {
+            background-color: var(--primary-red);
+            color: var(--text-white);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--text-white);
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: var(--text-white);
+        }
+
+        header h1 span {
+            color: var(--primary-red);
+        }
+
+        header p {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+        }
+
+        .game-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            font-weight: 600;
+        }
+
+        .score-board span span {
+            color: var(--text-white);
+        }
+
+        /* OPCIONES DE COMPARACIÓN */
+        .versus-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .option-card {
+            background-color: #222222;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 110px;
+            position: relative;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+            background-color: #282828;
+        }
+
+        .option-emoji {
+            font-size: 2.2rem;
+            margin-bottom: 6px;
+        }
+
+        .option-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-white);
+            line-height: 1.3;
+        }
+
+        .option-weight {
+            margin-top: 8px;
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: var(--primary-red);
+            display: none;
+        }
+
+        .vs-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--primary-red);
+            color: var(--text-white);
+            font-weight: 900;
+            font-size: 0.85rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--card-bg);
+            box-shadow: 0 0 10px rgba(255, 42, 42, 0.6);
+            z-index: 5;
+        }
+
+        /* FEEDBACK DE RESPUESTA */
+        .feedback-box {
+            display: none;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 16px;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .feedback-correct {
+            background: rgba(46, 204, 113, 0.15);
+            color: var(--success-green);
+            border: 1px solid var(--success-green);
+        }
+
+        .feedback-incorrect {
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--error-red);
+            border: 1px solid var(--error-red);
+        }
+
+        .btn {
+            background-color: var(--primary-red);
+            color: var(--text-white);
+            border: none;
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 15px rgba(255, 42, 42, 0.4);
+            display: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-red-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* PANTALLA FINAL */
+        .final-screen-badge {
+            background: linear-gradient(135deg, rgba(255, 42, 42, 0.15), rgba(255, 42, 42, 0.05));
+            border: 2px solid var(--primary-red);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 25px rgba(255, 42, 42, 0.2);
+            text-align: center;
+            width: 100%;
+        }
+
+        .final-screen-badge i {
+            font-size: 2.5rem;
+            color: var(--primary-red);
+            margin-bottom: 10px;
+        }
+
+        .final-score-big {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--primary-red);
+            text-shadow: 0 0 15px rgba(255, 42, 42, 0.4);
+            margin-bottom: 5px;
+        }
+
+        .final-subtitle {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="top-bar">
+            <a href="../" id="txt-volver" class="btn-volver">← Volver al Menú</a>
+            <select id="select-idioma" onchange="cambiarIdioma(this.value)" class="select-idioma">
+                <option value="es">🇪🇸 ES</option>
+                <option value="en">🇬🇧 EN</option>
+            </select>
+        </div>
+
+        <header>
+            <h1>4pizzas <span>but Coke Light</span></h1>
+            <p id="txt-subtitulo">¿Cuál de las dos opciones pesa más en kg?</p>
+        </header>
+
+        <div class="game-card">
+            <!-- INTERFAZ DE JUEGO -->
+            <div id="game-interface" style="width: 100%;">
+                <div class="score-board">
+                    <span id="lbl-ronda">Ronda: <span id="round-num">1</span> / 5</span>
+                    <span id="lbl-puntuacion">Aciertos: <span id="total-score">0</span></span>
+                </div>
+
+                <div class="versus-container">
+                    <div class="option-card" id="card-0" onclick="selectOption(0)">
+                        <div class="option-emoji" id="emoji-0">⚖️</div>
+                        <div class="option-title" id="title-0">Cargando...</div>
+                        <div class="option-weight" id="weight-0">0 kg</div>
+                    </div>
+
+                    <div class="vs-badge">VS</div>
+
+                    <div class="option-card" id="card-1" onclick="selectOption(1)">
+                        <div class="option-emoji" id="emoji-1">⚖️</div>
+                        <div class="option-title" id="title-1">Cargando...</div>
+                        <div class="option-weight" id="weight-1">0 kg</div>
+                    </div>
+                </div>
+
+                <div class="feedback-box" id="feedback-box"></div>
+
+                <button class="btn" id="next-btn" onclick="nextRound()">SIGUIENTE RONDA</button>
+            </div>
+
+            <!-- INTERFAZ FINAL -->
+            <div id="result-interface" style="display: none; width: 100%;">
+                <div class="final-screen-badge">
+                    <i class="fa-solid fa-weight-hanging"></i>
+                    <h3 style="color: var(--text-gray); font-size: 1.1rem; margin-bottom: 5px;">PUNTUACIÓN FINAL</h3>
+                    <div class="final-score-big" id="final-score">0 / 5</div>
+                    <div class="player-tier" id="final-rank" style="font-size: 1.3rem; font-weight: 800; color: #fff;">-</div>
+                </div>
+                <p class="final-subtitle" id="final-desc">¡Has completado el reto de 4pizzas button Coke Light!</p>
+                <button class="btn" id="restart-btn" style="display: block;" onclick="initGame()">JUGAR OTRA VEZ 🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const i18nHH = {
+            es: {
+                volver: "← Volver al Menú",
+                subtitulo: "¿Cuál de las dos opciones pesa más en kg?",
+                ronda: "Ronda:",
+                aciertos: "Aciertos:",
+                correcto: "¡CORRECTO! 🎯",
+                incorrecto: "¡INCORRECTO! ❌",
+                siguiente: "SIGUIENTE RONDA",
+                jugarOtraVez: "JUGAR OTRA VEZ 🔄",
+                completado: "¡Has completado el reto de 4pizzas button Coke Light!",
+                ranks: [
+                    "0/5 — ¡Pluma de pavo real! 🪶",
+                    "1/5 — ¡Peso pluma total! 🎈",
+                    "2/5 — Intuición ligera ⚖️",
+                    "3/5 — ¡Buen ojo báscula! 📦",
+                    "4/5 — ¡Experto en peso pesado! 🏋️",
+                    "5/5 — ¡Báscula humana legendaria! 🐘"
+                ]
+            },
+            en: {
+                volver: "← Back to Menu",
+                subtitulo: "Which of the two options weighs more in kg?",
+                ronda: "Round:",
+                aciertos: "Score:",
+                correcto: "CORRECT! 🎯",
+                incorrecto: "INCORRECT! ❌",
+                siguiente: "NEXT ROUND",
+                jugarOtraVez: "PLAY AGAIN 🔄",
+                completado: "You completed the 4pizzas button Coke Light challenge!",
+                ranks: [
+                    "0/5 — Peacock feather! 🪶",
+                    "1/5 — Total featherweight! 🎈",
+                    "2/5 — Light intuition ⚖️",
+                    "3/5 — Great scale eye! 📦",
+                    "4/5 — Heavyweight expert! 🏋️",
+                    "5/5 — Legendary human scale! 🐘"
+                ]
+            }
+        };
+
+        const itemsDB = [
+            // --- PERSONAS Y FAMOSOS ---
+            { name: { es: "Alberto Chicote", en: "Alberto Chicote" }, weight: 100, emoji: "👨‍🍳" },
+            { name: { es: "Ibai Llanos", en: "Ibai Llanos" }, weight: 150, emoji: "🎙️" },
+            { name: { es: "MrBeast", en: "MrBeast" }, weight: 110, emoji: "💵" },
+            { name: { es: "The Rock (Dwayne Johnson)", en: "The Rock" }, weight: 120, emoji: "🤨" },
+            { name: { es: "Arnold Schwarzenegger", en: "Arnold Schwarzenegger" }, weight: 110, emoji: "🤖" },
+            { name: { es: "Shaquille O'Neal", en: "Shaquille O'Neal" }, weight: 150, emoji: "🏀" },
+            { name: { es: "Leo Messi", en: "Leo Messi" }, weight: 72, emoji: "🐐" },
+            { name: { es: "Cristiano Ronaldo", en: "Cristiano Ronaldo" }, weight: 83, emoji: "🇵🇹" },
+            { name: { es: "Mike Tyson", en: "Mike Tyson" }, weight: 100, emoji: "🥊" },
+            { name: { es: "Conor McGregor", en: "Conor McGregor" }, weight: 77, emoji: "☘️" },
+            { name: { es: "Elon Musk", en: "Elon Musk" }, weight: 100, emoji: "🚀" },
+            { name: { es: "Mark Zuckerberg", en: "Mark Zuckerberg" }, weight: 75, emoji: "🦎" },
+            { name: { es: "Jeff Bezos", en: "Jeff Bezos" }, weight: 80, emoji: "📦" },
+            { name: { es: "Donald Trump", en: "Donald Trump" }, weight: 110, emoji: "👱‍♂️" },
+            { name: { es: "Pedro Sánchez", en: "Pedro Sánchez" }, weight: 90, emoji: "👔" },
+            { name: { es: "AuronPlay", en: "AuronPlay" }, weight: 80, emoji: "😎" },
+            { name: { es: "Jordi Wild", en: "Jordi Wild" }, weight: 90, emoji: "🎙️" },
+            { name: { es: "David Broncano", en: "David Broncano" }, weight: 80, emoji: "🛋️" },
+            { name: { es: "Karlos Arguiñano", en: "Karlos Arguiñano" }, weight: 85, emoji: "👨‍🍳" },
+            { name: { es: "Fernando Alonso", en: "Fernando Alonso" }, weight: 70, emoji: "🏎️" },
+            { name: { es: "Carlos Sainz", en: "Carlos Sainz" }, weight: 70, emoji: "🌶️" },
+            { name: { es: "José Mourinho", en: "José Mourinho" }, weight: 85, emoji: "⚽" },
+            { name: { es: "Un Mr. Olympia profesional", en: "A Mr. Olympia pro" }, weight: 120, emoji: "🏋️‍♂️" },
+            { name: { es: "Un culturista random de gimnasio", en: "A random gym bodybuilder" }, weight: 100, emoji: "💪" },
+            { name: { es: "Tu profesor de matemáticas", en: "Your math teacher" }, weight: 85, emoji: "📐" },
+            { name: { es: "El Rubius", en: "El Rubius" }, weight: 73, emoji: "🎮" },
+            { name: { es: "Hasbulla", en: "Hasbulla" }, weight: 18, emoji: "🥊" },
+            { name: { es: "Gordon Ramsay encendido", en: "Angry Gordon Ramsay" }, weight: 82, emoji: "🔥" },
+            { name: { es: "Kanye West con botas gigantes", en: "Kanye West in giant boots" }, weight: 85, emoji: "👟" },
+
+            // --- POKÉMON ---
+            { name: { es: "Pikachu", en: "Pikachu" }, weight: 6, emoji: "⚡" },
+            { name: { es: "Eevee", en: "Eevee" }, weight: 6.5, emoji: "🦊" },
+            { name: { es: "Charmander", en: "Charmander" }, weight: 8.5, emoji: "🔥" },
+            { name: { es: "Squirtle", en: "Squirtle" }, weight: 9, emoji: "🐢" },
+            { name: { es: "Bulbasaur", en: "Bulbasaur" }, weight: 6.9, emoji: "🍃" },
+            { name: { es: "Psyduck", en: "Psyduck" }, weight: 19.6, emoji: "🦆" },
+            { name: { es: "Meowth", en: "Meowth" }, weight: 4.2, emoji: "🐱" },
+            { name: { es: "Jigglypuff", en: "Jigglypuff" }, weight: 5.5, emoji: "🎤" },
+            { name: { es: "Gengar", en: "Gengar" }, weight: 40.5, emoji: "👻" },
+            { name: { es: "Charizard", en: "Charizard" }, weight: 90.5, emoji: "🐉" },
+            { name: { es: "Blastoise", en: "Blastoise" }, weight: 85.5, emoji: "🌊" },
+            { name: { es: "Venusaur", en: "Venusaur" }, weight: 100, emoji: "🌺" },
+            { name: { es: "Machamp", en: "Machamp" }, weight: 130, emoji: "🥊" },
+            { name: { es: "Snorlax", en: "Snorlax" }, weight: 460, emoji: "💤" },
+            { name: { es: "Gyarados", en: "Gyarados" }, weight: 235, emoji: "🐉" },
+            { name: { es: "Wailord", en: "Wailord" }, weight: 398, emoji: "🐳" },
+            { name: { es: "Steelix", en: "Steelix" }, weight: 400, emoji: "⛓️" },
+            { name: { es: "Metagross", en: "Metagross" }, weight: 550, emoji: "🤖" },
+            { name: { es: "Groudon", en: "Groudon" }, weight: 950, emoji: "🌋" },
+            { name: { es: "Kyogre", en: "Kyogre" }, weight: 352, emoji: "🌧️" },
+            { name: { es: "Arceus", en: "Arceus" }, weight: 320, emoji: "✨" },
+            { name: { es: "Celesteela", en: "Celesteela" }, weight: 999.9, emoji: "🚀" },
+            { name: { es: "Cosmoem", en: "Cosmoem" }, weight: 999.9, emoji: "🌌" },
+
+            // --- PERSONAJES DE FICCIÓN ---
+            { name: { es: "Bob Esponja (tamaño real de esponja)", en: "SpongeBob (real sponge size)" }, weight: 0.03, emoji: "🧽" },
+            { name: { es: "Bob Esponja (si fuera un humano)", en: "SpongeBob (human sized)" }, weight: 45, emoji: "👔" },
+            { name: { es: "Patricio Estrella (estrella real)", en: "Patrick Star (real starfish)" }, weight: 1, emoji: "⭐" },
+            { name: { es: "Gary el caracol", en: "Gary the snail" }, weight: 0.03, emoji: "🐌" },
+            { name: { es: "Homer Simpson", en: "Homer Simpson" }, weight: 120, emoji: "🍩" },
+            { name: { es: "Peter Griffin", en: "Peter Griffin" }, weight: 140, emoji: "👓" },
+            { name: { es: "Stewie Griffin", en: "Stewie Griffin" }, weight: 10, emoji: "👶" },
+            { name: { es: "Rick Sánchez", en: "Rick Sanchez" }, weight: 70, emoji: "🧪" },
+            { name: { es: "Morty Smith", en: "Morty Smith" }, weight: 50, emoji: "📻" },
+            { name: { es: "Shrek", en: "Shrek" }, weight: 200, emoji: "👹" },
+            { name: { es: "Fiona (forma ogro)", en: "Fiona (ogre form)" }, weight: 100, emoji: "👸" },
+            { name: { es: "Gru", en: "Gru" }, weight: 100, emoji: "🧣" },
+            { name: { es: "1 Minion", en: "1 Minion" }, weight: 1, emoji: "🍌" },
+            { name: { es: "Mario", en: "Mario" }, weight: 65, emoji: "🍄" },
+            { name: { es: "Luigi", en: "Luigi" }, weight: 65, emoji: "👻" },
+            { name: { es: "Bowser", en: "Bowser" }, weight: 150, emoji: "🔥" },
+            { name: { es: "Kirby", en: "Kirby" }, weight: 6, emoji: "🎀" },
+            { name: { es: "Yoshi", en: "Yoshi" }, weight: 30, emoji: "🦖" },
+            { name: { es: "Donkey Kong", en: "Donkey Kong" }, weight: 120, emoji: "🦧" },
+            { name: { es: "Sonic the Hedgehog", en: "Sonic the Hedgehog" }, weight: 35, emoji: "🦔" },
+            { name: { es: "Tails", en: "Tails" }, weight: 20, emoji: "🦊" },
+            { name: { es: "Knuckles", en: "Knuckles" }, weight: 40, emoji: "🥊" },
+            { name: { es: "Superman", en: "Superman" }, weight: 100, emoji: "🦸‍♂️" },
+            { name: { es: "Batman", en: "Batman" }, weight: 95, emoji: "🦇" },
+            { name: { es: "Hulk", en: "Hulk" }, weight: 470, emoji: "🟢" },
+            { name: { es: "Thanos", en: "Thanos" }, weight: 450, emoji: "🤌" },
+            { name: { es: "Groot", en: "Groot" }, weight: 500, emoji: "🪴" },
+            { name: { es: "Chewbacca", en: "Chewbacca" }, weight: 130, emoji: "🟤" },
+            { name: { es: "Darth Vader", en: "Darth Vader" }, weight: 140, emoji: "🖤" },
+            { name: { es: "Jabba the Hutt", en: "Jabba the Hutt" }, weight: 1300, emoji: "🐛" },
+            { name: { es: "Godzilla", en: "Godzilla" }, weight: 90000000, emoji: "🦖" },
+            { name: { es: "King Kong", en: "King Kong" }, weight: 150000, emoji: "🦍" },
+            { name: { es: "Optimus Prime", en: "Optimus Prime" }, weight: 4000, emoji: "🚛" },
+            { name: { es: "Megatron", en: "Megatron" }, weight: 5000, emoji: "🔫" },
+            { name: { es: "Pac-Man", en: "Pac-Man" }, weight: 500, emoji: "🟡" },
+            { name: { es: "Minecraft Steve", en: "Minecraft Steve" }, weight: 75, emoji: "🧱" },
+            { name: { es: "Un Creeper", en: "A Creeper" }, weight: 70, emoji: "💥" },
+            { name: { es: "Ender Dragon", en: "Ender Dragon" }, weight: 2500, emoji: "🐉" },
+            { name: { es: "Shrek + Fiona juntos", en: "Shrek + Fiona together" }, weight: 300, emoji: "💍" },
+            { name: { es: "Wrek-It Ralph", en: "Wreck-It Ralph" }, weight: 290, emoji: "🧱" },
+
+            // --- ANIMALES ABSURDAMENTE GRANDES (Y COMBOS) ---
+            { name: { es: "Un gato gordo de internet", en: "A fat internet cat" }, weight: 15, emoji: "🐱" },
+            { name: { es: "Un perro gigante Gran Danés", en: "A giant Great Dane dog" }, weight: 90, emoji: "🐕" },
+            { name: { es: "Un gorila de montaña", en: "A mountain gorilla" }, weight: 200, emoji: "🦍" },
+            { name: { es: "Un oso polar", en: "A polar bear" }, weight: 600, emoji: "🐻‍❄️" },
+            { name: { es: "Una morsa marina", en: "A walrus" }, weight: 1500, emoji: "🦭" },
+            { name: { es: "Un hipopótamo", en: "A hippo" }, weight: 1500, emoji: "🦛" },
+            { name: { es: "Un rinoceronte blanco", en: "A white rhino" }, weight: 2300, emoji: "🦏" },
+            { name: { es: "Una jirafa adulta", en: "An adult giraffe" }, weight: 1200, emoji: "🦒" },
+            { name: { es: "Un elefante africano", en: "An African elephant" }, weight: 6000, emoji: "🐘" },
+            { name: { es: "Una orca macho", en: "A male Orca" }, weight: 5500, emoji: "🐋" },
+            { name: { es: "Un tiburón blanco", en: "A great white shark" }, weight: 3300, emoji: "🦈" },
+            { name: { es: "Un tiburón ballena gigante", en: "A giant whale shark" }, weight: 21500, emoji: "🦈" },
+            { name: { es: "Un calamar gigante", en: "A giant squid" }, weight: 500, emoji: "🦑" },
+            { name: { es: "Un cocodrilo del Nilo gigante", en: "A giant Nile crocodile" }, weight: 1000, emoji: "🐊" },
+            { name: { es: "Una ballena jorobada", en: "A humpback whale" }, weight: 29000, emoji: "🐋" },
+            { name: { es: "Un cachalote", en: "A sperm whale" }, weight: 31000, emoji: "🐳" },
+            { name: { es: "Una ballena azul promedio", en: "An average blue whale" }, weight: 110000, emoji: "🐋" },
+            { name: { es: "Una ballena azul + Alberto Chicote", en: "A blue whale + Alberto Chicote" }, weight: 110100, emoji: "🐋" },
+            { name: { es: "Tres hipopótamos + Shaquille O'Neal", en: "3 hippos + Shaquille O'Neal" }, weight: 4650, emoji: "🦛" },
+            { name: { es: "50 Capibaras apelotonados", en: "50 Capybaras stacked" }, weight: 2500, emoji: "🥔" },
+            { name: { es: "Un enjambre de 1 millón de abejas", en: "A swarm of 1 million bees" }, weight: 90, emoji: "🐝" },
+
+            // --- OBJETOS COMPLETAMENTE RANDOM ---
+            { name: { es: "Una PlayStation 5", en: "A PlayStation 5" }, weight: 4.5, emoji: "🎮" },
+            { name: { es: "Una Xbox Series X", en: "An Xbox Series X" }, weight: 4.4, emoji: "🟩" },
+            { name: { es: "Un iPhone 15 Pro", en: "An iPhone 15 Pro" }, weight: 0.2, emoji: "📱" },
+            { name: { es: "Un portátil gaming", en: "A gaming laptop" }, weight: 2.5, emoji: "💻" },
+            { name: { es: "Una torre PC gaming llena de RGB", en: "A gaming PC tower with RGB" }, weight: 15, emoji: "🖥️" },
+            { name: { es: "Una silla gaming barata", en: "A cheap gaming chair" }, weight: 20, emoji: "🪑" },
+            { name: { es: "Una nevera americana llena de comida", en: "A full American fridge" }, weight: 80, emoji: "🧊" },
+            { name: { es: "Una lavadora industrial", en: "A washing machine" }, weight: 70, emoji: "🧺" },
+            { name: { es: "Un microondas", en: "A microwave" }, weight: 15, emoji: "🍲" },
+            { name: { es: "Una bicicleta de montaña", en: "A mountain bike" }, weight: 12, emoji: "🚲" },
+            { name: { es: "Una moto de cross", en: "A dirt bike" }, weight: 150, emoji: "🏍️" },
+            { name: { es: "Una Vespa clásica", en: "A classic Vespa" }, weight: 120, emoji: "🛵" },
+            { name: { es: "Un coche Smart Fortwo", en: "A Smart Fortwo car" }, weight: 1000, emoji: "🚗" },
+            { name: { es: "Un Tesla Model 3", en: "A Tesla Model 3" }, weight: 1800, emoji: "⚡" },
+            { name: { es: "Un autobús urbano articulado", en: "A city bus" }, weight: 12000, emoji: "🚌" },
+            { name: { es: "Un avión comercial vacío", en: "An empty commercial airplane" }, weight: 40000, emoji: "✈️" },
+            { name: { es: "Una excavadora de obras", en: "A construction excavator" }, weight: 20000, emoji: "🚜" },
+            { name: { es: "Un contenedor marítimo vacío", en: "An empty shipping container" }, weight: 4000, emoji: "📦" },
+            { name: { es: "Una estatua de bronce gigante", en: "A giant bronze statue" }, weight: 10000, emoji: "🗿" },
+            { name: { es: "La Torre Eiffel completa", en: "The entire Eiffel Tower" }, weight: 10100000, emoji: "🗼" },
+            { name: { es: "4 Pizzas familiares + 1 Coca-Cola Light", en: "4 Family pizzas + 1 Coke Light" }, weight: 5, emoji: "🍕" },
+            { name: { es: "1 Millón de palillos de dientes", en: "1 Million toothpicks" }, weight: 100, emoji: "🪵" },
+            { name: { es: "Un lingote de oro de banco", en: "A bank gold bar" }, weight: 12.4, emoji: "🧈" },
+            { name: { es: "Una piedra de curling", en: "A curling stone" }, weight: 19.1, emoji: "🥌" },
+            { name: { es: "Un carrito de supermercado lleno de patatas", en: "A supermarket cart full of potatoes" }, weight: 120, emoji: "🛒" },
+            { name: { es: "Un piano de cola de concierto", en: "A concert grand piano" }, weight: 500, emoji: "🎹" },
+            { name: { es: "Un semáforo de calle entero", en: "A full street traffic light" }, weight: 50, emoji: "🚦" },
+            { name: { es: "10.000 Patitos de goma", en: "10,000 Rubber ducks" }, weight: 500, emoji: "🐥" },
+            { name: { es: "Un trozo de queso Parmesano entero", en: "A whole wheel of Parmesan cheese" }, weight: 40, emoji: "🧀" },
+
+            // --- EXTRAS Y OPCIONES FUNABLES Y ABSURDAS ---
+            { name: { es: "Tu historial de navegación de Google", en: "Your Google search history" }, weight: 0.000001, emoji: "🌐" },
+            { name: { es: "El ego de un DJ de discoteca", en: "A club DJ's ego" }, weight: 9999999, emoji: "🎧" },
+            { name: { es: "Una mochila escolar de un niño de primaria", en: "An elementary schooler's backpack" }, weight: 45, emoji: "🎒" },
+            { name: { es: "100 Litros de aceite de oliva virgen extra", en: "100 Liters of extra virgin olive oil" }, weight: 92, emoji: "🫒" },
+            { name: { es: "La deuda pública de un país pequeño", en: "Small country national debt" }, weight: 50000000, emoji: "💸" },
+            { name: { es: "100 Cajas de kebab con salsa de ajo", en: "100 Kebab boxes with garlic sauce" }, weight: 50, emoji: "🥙" },
+            { name: { es: "Una cabina telefónica de Londres", en: "A London phone booth" }, weight: 750, emoji: "☎️" },
+            { name: { es: "Un colchón viscoelástico de matrimonio mojado", en: "A wet double memory foam mattress" }, weight: 85, emoji: "🛏️" },
+            { name: { es: "Un bidón lleno de Nutella", en: "A barrel filled with Nutella" }, weight: 220, emoji: "🍫" },
+            { name: { es: "Una máquina de gimnasio para piernas", en: "A leg press gym machine" }, weight: 250, emoji: "🏋️" },
+            { name: { es: "Una fotocopiadora de oficina gigante", en: "A giant office printer" }, weight: 140, emoji: "printer" },
+            { name: { es: "Un traje completo de Pikachu hinchable", en: "Inflatable Pikachu costume" }, weight: 3, emoji: "⚡" },
+            { name: { es: "10.000 Bolas de piscina de parque infantil", en: "10,000 Ball pit balls" }, weight: 80, emoji: "🔴" },
+            { name: { es: "Un kebab entero vertical en el asador", en: "A whole vertical Kebab skewer" }, weight: 40, emoji: "🥙" },
+            { name: { es: "1.000 Rollos de papel higiénico", en: "1,000 Toilet paper rolls" }, weight: 150, emoji: "🧻" },
+            { name: { es: "La cartera de un padre llena de tickets de 2012", en: "Dad's wallet full of old receipts" }, weight: 2.5, emoji: "👛" },
+            { name: { es: "Un extintor de incendios de garaje", en: "A garage fire extinguisher" }, weight: 12, emoji: "🧯" }
+        ];
+
+        let currentRound = 1;
+        let totalScore = 0;
+        let optionA = null;
+        let optionB = null;
+        let answered = false;
+
+        function cambiarIdioma(lang) {
+            localStorage.setItem('whenwastimeline_idioma', lang);
+            aplicarTextosUI(lang);
+        }
+
+        function aplicarTextosUI(lang) {
+            const t = i18nHH[lang] || i18nHH.es;
+            document.getElementById('select-idioma').value = lang;
+            document.getElementById('txt-volver').textContent = t.volver;
+            document.getElementById('txt-subtitulo').textContent = t.subtitulo;
+            document.getElementById('lbl-ronda').childNodes[0].textContent = t.ronda + " ";
+            document.getElementById('lbl-puntuacion').childNodes[0].textContent = t.aciertos + " ";
+            document.getElementById('next-btn').textContent = t.siguiente;
+            document.getElementById('restart-btn').textContent = t.jugarOtraVez;
+            
+            if (optionA && optionB) {
+                document.getElementById('title-0').textContent = optionA.name[lang] || optionA.name.es;
+                document.getElementById('title-1').textContent = optionB.name[lang] || optionB.name.es;
+            }
+        }
+
+        function formatWeight(kg) {
+            if (kg >= 1000000) {
+                return (kg / 1000000).toLocaleString() + " Mill. kg";
+            } else if (kg >= 1000) {
+                return kg.toLocaleString() + " kg";
+            } else if (kg < 0.1) {
+                return kg + " kg";
+            } else {
+                return kg + " kg";
+            }
+        }
+
+        function initGame() {
+            currentRound = 1;
+            totalScore = 0;
+            document.getElementById('game-interface').style.display = 'block';
+            document.getElementById('result-interface').style.display = 'none';
+            loadRound();
+        }
+
+        function getRandomItems() {
+            let idx1, idx2;
+            do {
+                idx1 = Math.floor(Math.random() * itemsDB.length);
+                idx2 = Math.floor(Math.random() * itemsDB.length);
+            } while (idx1 === idx2 || itemsDB[idx1].weight === itemsDB[idx2].weight);
+
+            return [itemsDB[idx1], itemsDB[idx2]];
+        }
+
+        function loadRound() {
+            answered = false;
+            const lang = localStorage.getItem('whenwastimeline_idioma') || 'es';
+
+            document.getElementById('round-num').textContent = currentRound;
+            document.getElementById('total-score').textContent = totalScore;
+            document.getElementById('feedback-box').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+
+            for (let i = 0; i < 2; i++) {
+                const card = document.getElementById(`card-${i}`);
+                card.style.borderColor = 'var(--border-color)';
+                card.style.cursor = 'pointer';
+                document.getElementById(`weight-${i}`).style.display = 'none';
+            }
+
+            const pair = getRandomItems();
+            optionA = pair[0];
+            optionB = pair[1];
+
+            document.getElementById('emoji-0').textContent = optionA.emoji;
+            document.getElementById('title-0').textContent = optionA.name[lang] || optionA.name.es;
+            document.getElementById('weight-0').textContent = formatWeight(optionA.weight);
+
+            document.getElementById('emoji-1').textContent = optionB.emoji;
+            document.getElementById('title-1').textContent = optionB.name[lang] || optionB.name.es;
+            document.getElementById('weight-1').textContent = formatWeight(optionB.weight);
+        }
+
+        function selectOption(selectedIndex) {
+            if (answered) return;
+            answered = true;
+
+            const lang = localStorage.getItem('whenwastimeline_idioma') || 'es';
+            const t = i18nHH[lang] || i18nHH.es;
+
+            const selectedItem = selectedIndex === 0 ? optionA : optionB;
+            const otherItem = selectedIndex === 0 ? optionB : optionA;
+
+            const isCorrect = selectedItem.weight > otherItem.weight;
+
+            if (isCorrect) {
+                totalScore++;
+                document.getElementById('total-score').textContent = totalScore;
+            }
+
+            document.getElementById('weight-0').style.display = 'block';
+            document.getElementById('weight-1').style.display = 'block';
+
+            document.getElementById('card-0').style.cursor = 'default';
+            document.getElementById('card-1').style.cursor = 'default';
+
+            const winningIndex = optionA.weight > optionB.weight ? 0 : 1;
+            document.getElementById(`card-${winningIndex}`).style.borderColor = 'var(--success-green)';
+            document.getElementById(`card-${1 - winningIndex}`).style.borderColor = 'var(--error-red)';
+
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.style.display = 'block';
+            if (isCorrect) {
+                feedbackBox.className = 'feedback-box feedback-correct';
+                feedbackBox.textContent = t.correcto;
+            } else {
+                feedbackBox.className = 'feedback-box feedback-incorrect';
+                feedbackBox.textContent = t.incorrecto;
+            }
+
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function nextRound() {
+            currentRound++;
+            if (currentRound > 5) {
+                endGame();
+            } else {
+                loadRound();
+            }
+        }
+
+        function endGame() {
+            const lang = localStorage.getItem('whenwastimeline_idioma') || 'es';
+            const t = i18nHH[lang] || i18nHH.es;
+
+            document.getElementById('game-interface').style.display = 'none';
+            document.getElementById('result-interface').style.display = 'block';
+
+            document.getElementById('final-score').textContent = `${totalScore} / 5`;
+            document.getElementById('final-rank').textContent = t.ranks[totalScore] || t.ranks[0];
+            document.getElementById('final-desc').textContent = t.completado;
+        }
+
+        window.onload = () => {
+            const langGuardado = localStorage.getItem('whenwastimeline_idioma') || 'es';
+            aplicarTextosUI(langGuardado);
+            initGame();
+        };
+    </script>
+</body>
+</html>
