@@ -789,7 +789,7 @@
                             </p>
                             <div style="display: flex; flex-direction: column; gap: 8px;">
                                 <button class="btn-secondary" style="background: linear-gradient(135deg, var(--gold-color), #f39c12); color:#000; font-weight:900;" onclick="chooseRisk('double')">
-                                    🔥 DOBLE O NADA (x2 Puntos)
+                                    🔥 RIESGO (+50% Puntos / x1.5)
                                 </button>
                                 <button class="btn-secondary" onclick="chooseRisk('safe')">
                                     🛡️ SEGURO (-50% PUNTOS, sigues vivo si fallas)
@@ -1150,7 +1150,7 @@
             document.getElementById('xp-bar-fill').style.width = pct + '%';
         }
 
-        /* LÓGICA DE LIGAS Y PROGRESO VERTICAL */
+        /* LÓGICA DE LIGAS Y PROGRESO VERTICAL (CORREGIDO) */
         function updateSidebarProgress() {
             const maxTrackScore = 30000;
             let percentCurrent = Math.min(100, Math.max(0, (totalScore / maxTrackScore) * 100));
@@ -1161,16 +1161,15 @@
             document.getElementById('sidebar-max-marker').style.bottom = percentMax + '%';
 
             let activeCurrentIdx = 0;
-            let unlockedMaxIdx = 0;
 
             for (let i = 0; i < LEAGUES.length; i++) {
                 if (totalScore >= LEAGUES[i].min) activeCurrentIdx = i;
-                if (maxScore >= LEAGUES[i].min) unlockedMaxIdx = i;
             }
 
             for (let i = 0; i < 7; i++) {
                 const node = document.getElementById(`node-${i}`);
-                if (i <= unlockedMaxIdx) node.classList.add('unlocked');
+                // CORRECCIÓN: Los nodos se desbloquean e iluminan según los puntos ACTUALES
+                if (i <= activeCurrentIdx) node.classList.add('unlocked');
                 else node.classList.remove('unlocked');
 
                 if (i === activeCurrentIdx) node.classList.add('active-current');
@@ -1185,20 +1184,40 @@
             return selected.name[currentLang] || selected.name.es;
         }
 
-        /* FUNCIÓN AUXILIAR PARA OBTENER UNA ENTIDAD (SIMPLE O COMBINADA) CON UN PROBABILIDAD DEL 25% */
-        function generateSingleOrCombinedEntity(excludedIds = []) {
+        /* FUNCIÓN AUXILIAR PARA GENERAR UNA OPCIÓN */
+        function generateOptionForTargetWeight(targetWeight = null, excludedIds = []) {
             let available = itemsDB.filter(item => !excludedIds.includes(item.id));
+
+            if (targetWeight !== null) {
+                let filtered = available.filter(item => {
+                    let ratio = item.weight / targetWeight;
+                    return ratio >= 0.35 && ratio <= 2.8;
+                });
+                if (filtered.length > 0) available = filtered;
+            }
+
             let base1 = available[Math.floor(Math.random() * available.length)];
-            
-            // Registrar descubrimiento en colección de la entidad base
             registerCollectionDiscovery(base1.id);
 
-            // 25% de probabilidad de combinar con una segunda opción
-            if (Math.random() < 0.25) {
-                let available2 = available.filter(item => item.id !== base1.id);
-                let base2 = available2[Math.floor(Math.random() * available2.length)];
-                
-                // Registrar descubrimiento en colección de la segunda entidad base
+            let combineChance = 0.35;
+            if (targetWeight !== null && targetWeight > base1.weight) {
+                combineChance = 0.70;
+            }
+
+            if (Math.random() < combineChance) {
+                let diffNeeded = targetWeight ? Math.abs(targetWeight - base1.weight) : null;
+                let candidates2 = available.filter(item => item.id !== base1.id);
+
+                if (diffNeeded !== null) {
+                    let sorted = candidates2.filter(item => {
+                        let total = base1.weight + item.weight;
+                        let ratio = total / targetWeight;
+                        return ratio >= 0.4 && ratio <= 2.5;
+                    });
+                    if (sorted.length > 0) candidates2 = sorted;
+                }
+
+                let base2 = candidates2[Math.floor(Math.random() * candidates2.length)];
                 registerCollectionDiscovery(base2.id);
 
                 return {
@@ -1222,16 +1241,15 @@
             };
         }
 
-        /* GENERADOR DE PAREJA DE OPCIONES EQUILIBRADA */
+        /* GENERADOR DE PAREJA DE OPCIONES DE PESO SIMILAR */
         function getRandomItems() {
-            let item1 = generateSingleOrCombinedEntity();
-            let excluded = item1.baseIds;
+            let item1 = generateOptionForTargetWeight(null, []);
+            let item2 = generateOptionForTargetWeight(item1.weight, item1.baseIds);
 
-            let item2 = generateSingleOrCombinedEntity(excluded);
-
-            // Evitar pesos exactamente iguales
-            while (item1.weight === item2.weight) {
-                item2 = generateSingleOrCombinedEntity(excluded);
+            let attempts = 0;
+            while ((item1.weight === item2.weight || (item2.weight / item1.weight < 0.35) || (item2.weight / item1.weight > 2.8)) && attempts < 15) {
+                item2 = generateOptionForTargetWeight(item1.weight, item1.baseIds);
+                attempts++;
             }
 
             return Math.random() < 0.5 ? [item1, item2] : [item2, item1];
@@ -1365,7 +1383,9 @@
                 }
 
                 let gainedPts = roundBonusPts;
-                if (riskChoice === 'double') gainedPts = totalScore === 0 ? 200 : totalScore;
+                if (riskChoice === 'double') {
+                    gainedPts = totalScore === 0 ? 150 : Math.floor(totalScore * 0.5);
+                }
 
                 totalScore += gainedPts;
                 addXP(Math.floor(gainedPts / 5));
