@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4pizzas but Coke Light | GNIXO</title>
+    <title>4 Pizzas but coke light | GNIXO</title>
     <!-- Fuente Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
     <!-- FontAwesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas para la función de descargar/compartir resultado -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <script>
         if (!localStorage.getItem('whenwastimeline_idioma')) {
             localStorage.setItem('whenwastimeline_idioma', 'es');
         }
     </script>
+
     <style>
         :root {
             --bg-color: #0f0f0f;
@@ -21,9 +25,16 @@
             --primary-red-hover: #e02424;
             --success-green: #2ecc71;
             --error-red: #e74c3c;
+            --gold-color: #f1c40f;
             --text-white: #ffffff;
             --text-gray: #b0b0b0;
             --border-color: #333333;
+
+            /* Colores de Rareza */
+            --rarity-normal: #ffffff;
+            --rarity-rara: #3498db;
+            --rarity-epica: #9b59b6;
+            --rarity-legendaria: #f1c40f;
         }
 
         * {
@@ -39,28 +50,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
             overflow-x: hidden;
             user-select: none;
+            padding-bottom: 30px;
         }
 
         .container {
             width: 100%;
-            max-width: 500px;
+            max-width: 580px;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* BARRA SUPERIOR */
+        /* BARRA SUPERIOR Y BARRA DE Nivel / XP */
         .top-bar {
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .btn-volver {
@@ -92,13 +104,68 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
 
+        /* BANNER PERMANENTE DE JUGADOR (NIVEL Y XP) */
+        .player-xp-card {
+            width: 100%;
+            background: #141414;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 10px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .level-badge {
+            background: linear-gradient(135deg, var(--primary-red), #b30000);
+            color: #fff;
+            font-weight: 900;
+            font-size: 0.85rem;
+            padding: 6px 10px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 70px;
+            box-shadow: 0 0 10px rgba(255, 42, 42, 0.3);
+        }
+
+        .xp-progress-container {
+            flex: 1;
+        }
+
+        .xp-info-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .xp-bar-bg {
+            width: 100%;
+            height: 8px;
+            background-color: #2b2b2b;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff2a2a, #f1c40f);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
         header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         header h1 {
-            font-size: 2.2rem;
+            font-size: 2.1rem;
             font-weight: 900;
             letter-spacing: -1px;
             color: var(--text-white);
@@ -110,15 +177,130 @@
 
         header p {
             color: var(--text-gray);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
-        .game-card {
+        /* NAVEGACIÓN POR PESTAÑAS (JUEGO, ESTADÍSTICAS, COLECCIÓN) */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 14px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background-color: #1a1a1a;
+            border: 1px solid var(--border-color);
+            color: var(--text-gray);
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-red);
+            color: #ffffff;
+            border-color: var(--primary-red);
+            box-shadow: 0 2px 8px rgba(255, 42, 42, 0.4);
+        }
+
+        /* ESTRUCTURA COMPACTA DE JUEGO */
+        .main-game-layout {
+            display: flex;
+            gap: 14px;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        .sidebar-league-container {
+            width: 50px;
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
+            padding: 14px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+
+        .sidebar-league-track {
+            position: absolute;
+            top: 40px;
+            bottom: 40px;
+            width: 6px;
+            background: #252525;
+            border-radius: 3px;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .sidebar-league-fill {
+            position: absolute;
+            bottom: 0;
             width: 100%;
-            padding: 24px;
+            height: 0%;
+            background: linear-gradient(0deg, #ff2a2a, #f1c40f);
+            border-radius: 3px;
+            transition: height 0.5s ease-out;
+            box-shadow: 0 0 10px rgba(255, 42, 42, 0.7);
+        }
+
+        .sidebar-max-marker {
+            position: absolute;
+            left: -3px;
+            right: -3px;
+            height: 3px;
+            background-color: #ffffff;
+            box-shadow: 0 0 8px #ffffff;
+            z-index: 3;
+            bottom: 0%;
+            transition: bottom 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-max-marker::after {
+            content: '👑';
+            position: absolute;
+            right: -16px;
+            font-size: 0.7rem;
+        }
+
+        .sidebar-node {
+            z-index: 2;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: transform 0.2s, filter 0.2s, opacity 0.2s;
+            filter: grayscale(0.8);
+            opacity: 0.4;
+        }
+
+        .sidebar-node.unlocked {
+            filter: grayscale(0);
+            opacity: 1;
+        }
+
+        .sidebar-node.active-current {
+            transform: scale(1.35);
+            filter: drop-shadow(0 0 6px var(--gold-color)) grayscale(0);
+        }
+
+        .game-card {
+            flex: 1;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 18px 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
@@ -129,15 +311,64 @@
         .score-board {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             width: 100%;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
             color: var(--text-gray);
             font-weight: 600;
         }
 
-        .score-board span span {
-            color: var(--text-white);
+        .score-display {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--primary-red);
+            text-shadow: 0 0 10px rgba(255, 42, 42, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .score-display.pulse {
+            transform: scale(1.2);
+        }
+
+        /* INSIGNIA Y RAREZA DE PREGUNTAS */
+        .rarity-banner {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .round-bonus-tag {
+            background-color: rgba(255, 42, 42, 0.15);
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .rarity-tag {
+            font-size: 0.75rem;
+            font-weight: 900;
+            padding: 3px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .rarity-tag.normal { background: #2a2a2a; color: var(--rarity-normal); border: 1px solid #444; }
+        .rarity-tag.rara { background: rgba(52, 152, 219, 0.2); color: var(--rarity-rara); border: 1px solid var(--rarity-rara); }
+        .rarity-tag.epica { background: rgba(155, 89, 182, 0.25); color: var(--rarity-epica); border: 1px solid var(--rarity-epica); animation: pulseGlow 1.5s infinite alternate; }
+        .rarity-tag.legendaria { background: rgba(241, 196, 15, 0.25); color: var(--rarity-legendaria); border: 1px solid var(--rarity-legendaria); animation: pulseGlow 1s infinite alternate; }
+
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 4px currentColor; }
+            to { box-shadow: 0 0 12px currentColor; }
         }
 
         /* OPCIONES DE COMPARACIÓN */
@@ -145,16 +376,16 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             position: relative;
-            margin-bottom: 20px;
+            margin: 10px 0;
         }
 
         .option-card {
             background-color: #222222;
             border: 2px solid var(--border-color);
             border-radius: 14px;
-            padding: 20px 16px;
+            padding: 14px;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -162,7 +393,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            min-height: 110px;
+            min-height: 125px;
             position: relative;
         }
 
@@ -174,22 +405,23 @@
 
         .option-emoji {
             font-size: 2.2rem;
-            margin-bottom: 6px;
+            margin-bottom: 2px;
         }
 
         .option-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: var(--text-white);
-            line-height: 1.3;
+            line-height: 1.2;
         }
 
         .option-weight {
-            margin-top: 8px;
+            margin-top: 4px;
             font-size: 1.25rem;
             font-weight: 900;
             color: var(--primary-red);
-            display: none;
+            visibility: hidden;
+            height: 26px;
         }
 
         .vs-badge {
@@ -212,28 +444,10 @@
             z-index: 5;
         }
 
-        /* FEEDBACK DE RESPUESTA */
-        .feedback-box {
-            display: none;
+        .btn-container-wrapper {
             width: 100%;
-            text-align: center;
-            margin-bottom: 16px;
-            padding: 10px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .feedback-correct {
-            background: rgba(46, 204, 113, 0.15);
-            color: var(--success-green);
-            border: 1px solid var(--success-green);
-        }
-
-        .feedback-incorrect {
-            background: rgba(231, 76, 60, 0.15);
-            color: var(--error-red);
-            border: 1px solid var(--error-red);
+            min-height: 48px;
+            margin-top: 4px;
         }
 
         .btn {
@@ -241,14 +455,20 @@
             color: var(--text-white);
             border: none;
             width: 100%;
-            padding: 14px;
-            font-size: 1rem;
+            padding: 12px;
+            font-size: 0.95rem;
             font-weight: 700;
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.2s, transform 0.1s;
             box-shadow: 0 4px 15px rgba(255, 42, 42, 0.4);
-            display: none;
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .btn.visible {
+            visibility: visible;
+            opacity: 1;
         }
 
         .btn:hover {
@@ -259,22 +479,95 @@
             transform: scale(0.98);
         }
 
-        /* PANTALLA FINAL */
-        .final-screen-badge {
-            background: linear-gradient(135deg, rgba(255, 42, 42, 0.15), rgba(255, 42, 42, 0.05));
+        /* MODALES Y OVERLAYS (RIESGO Y OTRA OPORTUNIDAD) */
+        .overlay-modal {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(6px);
+            border-radius: 16px;
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .modal-box {
+            background: #222222;
+            border: 2px solid var(--gold-color);
+            border-radius: 14px;
+            padding: 18px;
+            width: 100%;
+            box-shadow: 0 0 20px rgba(241, 196, 15, 0.3);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--gold-color);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .modal-desc {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            margin-bottom: 14px;
+            line-height: 1.3;
+        }
+
+        /* RETO OTRA OPORTUNIDAD (MODAL) */
+        .second-chance-box {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 20px rgba(255, 42, 42, 0.4);
+        }
+
+        .timer-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .timer-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--primary-red);
+            transition: width 0.1s linear;
+        }
+
+        /* PANTALLA FINAL Y TARJETA COMPARTIBLE */
+        #result-interface {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .share-card-canvas-container {
+            background: linear-gradient(135deg, #1f1f1f, #121212);
             border: 2px solid var(--primary-red);
             border-radius: 16px;
             padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 25px rgba(255, 42, 42, 0.2);
             text-align: center;
             width: 100%;
+            box-shadow: 0 0 25px rgba(255, 42, 42, 0.25);
+            position: relative;
         }
 
-        .final-screen-badge i {
-            font-size: 2.5rem;
-            color: var(--primary-red);
-            margin-bottom: 10px;
+        .share-header {
+            font-size: 0.8rem;
+            font-weight: 900;
+            color: var(--text-gray);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
         .final-score-big {
@@ -282,20 +575,156 @@
             font-weight: 900;
             color: var(--primary-red);
             text-shadow: 0 0 15px rgba(255, 42, 42, 0.4);
-            margin-bottom: 5px;
+            margin: 2px 0;
         }
 
-        .final-subtitle {
+        .share-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 12px 0;
+            text-align: left;
+        }
+
+        .share-stat-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid #333;
+            padding: 8px 10px;
+            border-radius: 8px;
+        }
+
+        .share-stat-label {
+            font-size: 0.68rem;
             color: var(--text-gray);
+            text-transform: uppercase;
+        }
+
+        .share-stat-val {
             font-size: 0.95rem;
-            margin-bottom: 20px;
+            font-weight: 800;
+            color: var(--text-white);
+        }
+
+        .action-btns-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-secondary {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            flex: 1;
+            transition: background 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #444;
+        }
+
+        /* ESTILOS DE VISTAS SECUNDARIAS (ESTADÍSTICAS Y COLECCIONES) */
+        .section-view {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            display: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-card-box {
+            background: #222;
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .stat-card-label {
+            font-size: 0.72rem;
+            color: var(--text-gray);
+        }
+
+        .stat-card-val {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            margin-top: 2px;
+        }
+
+        /* COLECCIONES GRID */
+        .collection-progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #2b2b2b;
+            border-radius: 5px;
+            margin: 8px 0 16px 0;
+            overflow: hidden;
+        }
+
+        .collection-progress-fill {
+            height: 100%;
+            background: var(--gold-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 10px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .collection-item-card {
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 10px 6px;
             text-align: center;
+            opacity: 0.35;
+            filter: grayscale(1);
+            transition: all 0.2s;
+        }
+
+        .collection-item-card.unlocked {
+            opacity: 1;
+            filter: grayscale(0);
+            border-color: var(--gold-color);
+            background: rgba(241, 196, 15, 0.05);
+        }
+
+        .collection-emoji {
+            font-size: 1.8rem;
+        }
+
+        .collection-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- BARRA SUPERIOR Y NAVEGACIÓN DE IDIOMA -->
         <div class="top-bar">
             <a href="../" id="txt-volver" class="btn-volver">← Volver al Menú</a>
             <select id="select-idioma" onchange="cambiarIdioma(this.value)" class="select-idioma">
@@ -304,340 +733,576 @@
             </select>
         </div>
 
+        <!-- TARJETA PERMANENTE DE JUGADOR (NIVEL Y XP) -->
+        <div class="player-xp-card">
+            <div class="level-badge" id="player-level-badge">NIVEL 1</div>
+            <div class="xp-progress-container">
+                <div class="xp-info-text">
+                    <span>Progreso XP</span>
+                    <span id="xp-text-detail">0 / 200 XP</span>
+                </div>
+                <div class="xp-bar-bg">
+                    <div class="xp-bar-fill" id="xp-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+
         <header>
-            <h1>4pizzas <span>but Coke Light</span></h1>
+            <h1>4 Pizzas <span>but coke light</span></h1>
             <p id="txt-subtitulo">¿Cuál de las dos opciones pesa más en kg?</p>
         </header>
 
-        <div class="game-card">
-            <!-- INTERFAZ DE JUEGO -->
-            <div id="game-interface" style="width: 100%;">
-                <div class="score-board">
-                    <span id="lbl-ronda">Ronda: <span id="round-num">1</span> / 5</span>
-                    <span id="lbl-puntuacion">Aciertos: <span id="total-score">0</span></span>
+        <!-- PESTAÑAS DE NAVEGACIÓN -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="tab-game" onclick="switchTab('game')">🎮 JUEGO</button>
+            <button class="tab-btn" id="tab-stats" onclick="switchTab('stats')">📊 ESTADÍSTICAS</button>
+            <button class="tab-btn" id="tab-collection" onclick="switchTab('collection')">🏆 COLECCIÓN</button>
+        </div>
+
+        <!-- VISTA 1: JUEGO PRINCIPAL -->
+        <div id="view-game" style="width: 100%;">
+            <div class="main-game-layout">
+                <!-- BARRA LATERAL DE LIGAS Y RANGOS -->
+                <div class="sidebar-league-container">
+                    <div class="sidebar-node" id="node-6" title="Báscula Universal (30000+ pts)">🌌</div>
+                    <div class="sidebar-node" id="node-5" title="Master (15000+ pts)">👑</div>
+                    <div class="sidebar-node" id="node-4" title="Diamante (7500+ pts)">💎</div>
+                    <div class="sidebar-node" id="node-3" title="Oro (3500+ pts)">🥇</div>
+                    <div class="sidebar-node" id="node-2" title="Plata (1500+ pts)">🥈</div>
+                    <div class="sidebar-node" id="node-1" title="Bronce (500+ pts)">🥉</div>
+                    <div class="sidebar-node unlocked" id="node-0" title="Caca (0+ pts)">💩</div>
+
+                    <div class="sidebar-league-track">
+                        <div class="sidebar-league-fill" id="sidebar-fill"></div>
+                        <div class="sidebar-max-marker" id="sidebar-max-marker"></div>
+                    </div>
                 </div>
 
-                <div class="versus-container">
-                    <div class="option-card" id="card-0" onclick="selectOption(0)">
-                        <div class="option-emoji" id="emoji-0">⚖️</div>
-                        <div class="option-title" id="title-0">Cargando...</div>
-                        <div class="option-weight" id="weight-0">0 kg</div>
+                <!-- TARJETA DEL JUEGO -->
+                <div class="game-card">
+                    <!-- OVERLAY: RONDA DE RIESGO (CADA 5 RONDAS) -->
+                    <div class="overlay-modal" id="risk-modal">
+                        <div class="modal-box">
+                            <div class="modal-title">⚡ RONDA DE RIESGO ⚡</div>
+                            <p class="modal-desc">
+                                ¡Llegaste a una ronda clave! Elige tu estrategia antes de ver las opciones:
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <button class="btn-secondary" style="background: linear-gradient(135deg, var(--gold-color), #f39c12); color:#000; font-weight:900;" onclick="chooseRisk('double')">
+                                    🔥 DOBLE O NADA (x2 Puntos)
+                                </button>
+                                <button class="btn-secondary" onclick="chooseRisk('safe')">
+                                    🛡️ SEGURO (-50% PUNTOS, sigues vivo si fallas)
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="vs-badge">VS</div>
+                    <!-- OVERLAY: RETO DE OTRA OPORTUNIDAD (AL PERDER) -->
+                    <div class="overlay-modal" id="second-chance-modal">
+                        <div class="modal-box second-chance-box">
+                            <div class="modal-title" style="color: var(--primary-red);">💀 RETORNO IMPOSIBLE</div>
+                            <p class="modal-desc">
+                                ¡Has fallado! Tienes <b>5 segundos</b> para responder acertadamente esta pregunta rápida y RECUPERAR tu partida:
+                            </p>
 
-                    <div class="option-card" id="card-1" onclick="selectOption(1)">
-                        <div class="option-emoji" id="emoji-1">⚖️</div>
-                        <div class="option-title" id="title-1">Cargando...</div>
-                        <div class="option-weight" id="weight-1">0 kg</div>
+                            <div class="timer-bar-bg">
+                                <div class="timer-bar-fill" id="chance-timer-fill"></div>
+                            </div>
+
+                            <div id="chance-question-title" style="font-size: 0.95rem; font-weight: 800; margin-bottom: 12px; color:#fff;">
+                                ¿Cargando reto...
+                            </div>
+
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-secondary" id="chance-opt-0" onclick="resolveSecondChance(0)">Opción A</button>
+                                <button class="btn-secondary" id="chance-opt-1" onclick="resolveSecondChance(1)">Opción B</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INTERFAZ DE JUEGO ACTIVA -->
+                    <div id="game-interface" style="width: 100%;">
+                        <div class="score-board">
+                            <span>Ronda: <b id="round-num" style="color:#fff;">1</b> (Récord: <b id="survival-record-tag" style="color:var(--gold-color)">0</b>)</span>
+                            <span>Puntos: <span class="score-display" id="total-score">0</span></span>
+                        </div>
+
+                        <!-- BADGE DE RONDA Y RAREZA -->
+                        <div class="rarity-banner">
+                            <div class="round-bonus-tag" id="bonus-tag">+100 PTS</div>
+                            <div class="rarity-tag normal" id="rarity-tag">⚪ Normal</div>
+                        </div>
+
+                        <!-- CONTENEDOR DE OPCIONES -->
+                        <div class="versus-container">
+                            <div class="option-card" id="card-0" onclick="selectOption(0)">
+                                <div class="option-emoji" id="emoji-0">⚖️</div>
+                                <div class="option-title" id="title-0">Cargando...</div>
+                                <div class="option-weight" id="weight-0">0 kg</div>
+                            </div>
+
+                            <div class="vs-badge">VS</div>
+
+                            <div class="option-card" id="card-1" onclick="selectOption(1)">
+                                <div class="option-emoji" id="emoji-1">⚖️</div>
+                                <div class="option-title" id="title-1">Cargando...</div>
+                                <div class="option-weight" id="weight-1">0 kg</div>
+                            </div>
+                        </div>
+
+                        <div class="btn-container-wrapper">
+                            <button class="btn" id="next-btn" onclick="nextRound()">SIGUIENTE RONDA ➔</button>
+                        </div>
+                    </div>
+
+                    <!-- INTERFAZ DE RESULTADO FINAL COMPARTIBLE -->
+                    <div id="result-interface" style="display: none; width: 100%;">
+                        <div class="share-card-canvas-container" id="share-card-node">
+                            <div class="share-header">4 Pizzas but coke light</div>
+                            <i class="fa-solid fa-trophy" style="font-size: 2rem; color: var(--gold-color); margin-top: 4px;"></i>
+                            <div class="final-score-big" id="final-score">0 PTS</div>
+                            <div style="font-size: 0.85rem; color: var(--gold-color); font-weight:800;" id="final-rank-name">💩 Caca</div>
+
+                            <div class="share-stats-grid">
+                                <div class="share-stat-item">
+                                    <div class="share-stat-label">Rondas Pasadas</div>
+                                    <div class="share-stat-val" id="share-val-rondas">0</div>
+                                </div>
+                                <div class="share-stat-item">
+                                    <div class="share-stat-label">Racha Máxima</div>
+                                    <div class="share-stat-val" id="share-val-racha">0</div>
+                                </div>
+                                <div class="share-stat-item">
+                                    <div class="share-stat-label">Rareza Máxima</div>
+                                    <div class="share-stat-val" id="share-val-rareza">⚪ Normal</div>
+                                </div>
+                                <div class="share-stat-item">
+                                    <div class="share-stat-label">Nivel de Jugador</div>
+                                    <div class="share-stat-val" id="share-val-nivel">Nivel 1</div>
+                                </div>
+                            </div>
+
+                            <div style="font-size: 0.72rem; color: var(--text-gray); font-style: italic;">¿Puedes superarme en gnixo.com?</div>
+                        </div>
+
+                        <div class="action-btns-row">
+                            <button class="btn-secondary" onclick="downloadShareCard()">📸 DESCARGAR TARJETA</button>
+                            <button class="btn visible" style="flex: 1;" id="restart-btn" onclick="initGame()">REINTENTAR 🔄</button>
+                        </div>
                     </div>
                 </div>
-
-                <div class="feedback-box" id="feedback-box"></div>
-
-                <button class="btn" id="next-btn" onclick="nextRound()">SIGUIENTE RONDA</button>
             </div>
+        </div>
 
-            <!-- INTERFAZ FINAL -->
-            <div id="result-interface" style="display: none; width: 100%;">
-                <div class="final-screen-badge">
-                    <i class="fa-solid fa-weight-hanging"></i>
-                    <h3 style="color: var(--text-gray); font-size: 1.1rem; margin-bottom: 5px;">PUNTUACIÓN FINAL</h3>
-                    <div class="final-score-big" id="final-score">0 / 5</div>
-                    <div class="player-tier" id="final-rank" style="font-size: 1.3rem; font-weight: 800; color: #fff;">-</div>
-                </div>
-                <p class="final-subtitle" id="final-desc">¡Has completado el reto de 4pizzas button Coke Light!</p>
-                <button class="btn" id="restart-btn" style="display: block;" onclick="initGame()">JUGAR OTRA VEZ 🔄</button>
+        <!-- VISTA 2: ESTADÍSTICAS PERSONALES -->
+        <div id="view-stats" class="section-view">
+            <h3 style="color: var(--primary-red); margin-bottom: 12px; font-weight: 900;">📊 ESTADÍSTICAS PERSONALES</h3>
+            <div class="stats-grid">
+                <div class="stat-card-box"><div class="stat-card-label">Partidas Jugadas</div><div class="stat-card-val" id="st-partidas">0</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Récord Supervivencia</div><div class="stat-card-val" id="st-supervivencia">0</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Preguntas Respondidas</div><div class="stat-card-val" id="st-preguntas">0</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">% Acierto Global</div><div class="stat-card-val" id="st-acierto">0%</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Mejor Racha</div><div class="stat-card-val" id="st-racha">0</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Puntuación Máxima</div><div class="stat-card-val" id="st-maxscore">0</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Épicas / Legendarias</div><div class="stat-card-val" id="st-especiales">0</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Remontadas "Otra Oportunidad"</div><div class="stat-card-val" id="st-remontadas">0</div></div>
+            </div>
+        </div>
+
+        <!-- VISTA 3: COLECCIÓN DE ENTIDADES -->
+        <div id="view-collection" class="section-view">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <h3 style="color: var(--gold-color); font-weight: 900;">🏆 COLECCIÓN DE ENTIDADES</h3>
+                <span id="collection-count-tag" style="font-size: 0.8rem; font-weight: 800; color: var(--text-gray);">0 / 0</span>
+            </div>
+            <div class="collection-progress-bar">
+                <div class="collection-progress-fill" id="collection-bar-fill"></div>
+            </div>
+            <div class="collection-grid" id="collection-grid-container">
+                <!-- Se poblará dinámicamente -->
             </div>
         </div>
     </div>
 
     <script>
+        /* BASE DE DATOS DE LIGAS Y RANGOS */
+        const LEAGUES = [
+            { min: 0, max: 500, name: { es: "💩 Caca", en: "💩 Poop" } },
+            { min: 500, max: 1500, name: { es: "🥉 Bronce", en: "🥉 Bronze" } },
+            { min: 1500, max: 3500, name: { es: "🥈 Plata", en: "🥈 Silver" } },
+            { min: 3500, max: 7500, name: { es: "🥇 Oro", en: "🥇 Gold" } },
+            { min: 7500, max: 15000, name: { es: "💎 Diamante", en: "💎 Diamond" } },
+            { min: 15000, max: 30000, name: { es: "👑 Master", en: "👑 Master" } },
+            { min: 30000, max: 1000000, name: { es: "🌌 Báscula Universal", en: "🌌 Universal Scale" } }
+        ];
+
         const i18nHH = {
-            es: {
-                volver: "← Volver al Menú",
-                subtitulo: "¿Cuál de las dos opciones pesa más en kg?",
-                ronda: "Ronda:",
-                aciertos: "Aciertos:",
-                correcto: "¡CORRECTO! 🎯",
-                incorrecto: "¡INCORRECTO! ❌",
-                siguiente: "SIGUIENTE RONDA",
-                jugarOtraVez: "JUGAR OTRA VEZ 🔄",
-                completado: "¡Has completado el reto de 4pizzas button Coke Light!",
-                ranks: [
-                    "0/5 — ¡Pluma de pavo real! 🪶",
-                    "1/5 — ¡Peso pluma total! 🎈",
-                    "2/5 — Intuición ligera ⚖️",
-                    "3/5 — ¡Buen ojo báscula! 📦",
-                    "4/5 — ¡Experto en peso pesado! 🏋️",
-                    "5/5 — ¡Báscula humana legendaria! 🐘"
-                ]
-            },
-            en: {
-                volver: "← Back to Menu",
-                subtitulo: "Which of the two options weighs more in kg?",
-                ronda: "Round:",
-                aciertos: "Score:",
-                correcto: "CORRECT! 🎯",
-                incorrecto: "INCORRECT! ❌",
-                siguiente: "NEXT ROUND",
-                jugarOtraVez: "PLAY AGAIN 🔄",
-                completado: "You completed the 4pizzas button Coke Light challenge!",
-                ranks: [
-                    "0/5 — Peacock feather! 🪶",
-                    "1/5 — Total featherweight! 🎈",
-                    "2/5 — Light intuition ⚖️",
-                    "3/5 — Great scale eye! 📦",
-                    "4/5 — Heavyweight expert! 🏋️",
-                    "5/5 — Legendary human scale! 🐘"
-                ]
-            }
+            es: { volver: "← Volver al Menú", subtitulo: "¿Cuál de las dos opciones pesa más en kg?", siguiente: "SIGUIENTE RONDA ➔", jugarOtraVez: "REINTENTAR 🔄" },
+            en: { volver: "← Back to Menu", subtitulo: "Which of the two options weighs more in kg?", siguiente: "NEXT ROUND ➔", jugarOtraVez: "TRY AGAIN 🔄" }
         };
 
+        /* BASE DE DATOS CON MÁS DE 120 ENTIDADES INDIVIDUALES BASE */
         const itemsDB = [
-            // --- PERSONAS Y FAMOSOS ---
-            { name: { es: "Alberto Chicote", en: "Alberto Chicote" }, weight: 100, emoji: "👨‍🍳" },
-            { name: { es: "Ibai Llanos", en: "Ibai Llanos" }, weight: 150, emoji: "🎙️" },
-            { name: { es: "MrBeast", en: "MrBeast" }, weight: 110, emoji: "💵" },
-            { name: { es: "The Rock (Dwayne Johnson)", en: "The Rock" }, weight: 120, emoji: "🤨" },
-            { name: { es: "Arnold Schwarzenegger", en: "Arnold Schwarzenegger" }, weight: 110, emoji: "🤖" },
-            { name: { es: "Shaquille O'Neal", en: "Shaquille O'Neal" }, weight: 150, emoji: "🏀" },
-            { name: { es: "Leo Messi", en: "Leo Messi" }, weight: 72, emoji: "🐐" },
-            { name: { es: "Cristiano Ronaldo", en: "Cristiano Ronaldo" }, weight: 83, emoji: "🇵🇹" },
-            { name: { es: "Mike Tyson", en: "Mike Tyson" }, weight: 100, emoji: "🥊" },
-            { name: { es: "Conor McGregor", en: "Conor McGregor" }, weight: 77, emoji: "☘️" },
-            { name: { es: "Elon Musk", en: "Elon Musk" }, weight: 100, emoji: "🚀" },
-            { name: { es: "Mark Zuckerberg", en: "Mark Zuckerberg" }, weight: 75, emoji: "🦎" },
-            { name: { es: "Jeff Bezos", en: "Jeff Bezos" }, weight: 80, emoji: "📦" },
-            { name: { es: "Donald Trump", en: "Donald Trump" }, weight: 110, emoji: "👱‍♂️" },
-            { name: { es: "Pedro Sánchez", en: "Pedro Sánchez" }, weight: 90, emoji: "👔" },
-            { name: { es: "AuronPlay", en: "AuronPlay" }, weight: 80, emoji: "😎" },
-            { name: { es: "Jordi Wild", en: "Jordi Wild" }, weight: 90, emoji: "🎙️" },
-            { name: { es: "David Broncano", en: "David Broncano" }, weight: 80, emoji: "🛋️" },
-            { name: { es: "Karlos Arguiñano", en: "Karlos Arguiñano" }, weight: 85, emoji: "👨‍🍳" },
-            { name: { es: "Fernando Alonso", en: "Fernando Alonso" }, weight: 70, emoji: "🏎️" },
-            { name: { es: "Carlos Sainz", en: "Carlos Sainz" }, weight: 70, emoji: "🌶️" },
-            { name: { es: "José Mourinho", en: "José Mourinho" }, weight: 85, emoji: "⚽" },
-            { name: { es: "Un Mr. Olympia profesional", en: "A Mr. Olympia pro" }, weight: 120, emoji: "🏋️‍♂️" },
-            { name: { es: "Un culturista random de gimnasio", en: "A random gym bodybuilder" }, weight: 100, emoji: "💪" },
-            { name: { es: "Tu profesor de matemáticas", en: "Your math teacher" }, weight: 85, emoji: "📐" },
-            { name: { es: "El Rubius", en: "El Rubius" }, weight: 73, emoji: "🎮" },
-            { name: { es: "Hasbulla", en: "Hasbulla" }, weight: 18, emoji: "🥊" },
-            { name: { es: "Gordon Ramsay encendido", en: "Angry Gordon Ramsay" }, weight: 82, emoji: "🔥" },
-            { name: { es: "Kanye West con botas gigantes", en: "Kanye West in giant boots" }, weight: 85, emoji: "👟" },
+            // FAMOSOS Y STREAMERS ESPAÑOLES / INTERNACIONALES
+            { id: "e1", name: { es: "Alberto Chicote", en: "Alberto Chicote" }, weight: 100, emoji: "👨‍🍳" },
+            { id: "e2", name: { es: "Ibai Llanos", en: "Ibai Llanos" }, weight: 140, emoji: "🎙️" },
+            { id: "e3", name: { es: "MrBeast", en: "MrBeast" }, weight: 110, emoji: "💵" },
+            { id: "e4", name: { es: "The Rock (Dwayne Johnson)", en: "The Rock" }, weight: 120, emoji: "🤨" },
+            { id: "e5", name: { es: "Shaquille O'Neal", en: "Shaquille O'Neal" }, weight: 150, emoji: "🏀" },
+            { id: "e6", name: { es: "Leo Messi", en: "Leo Messi" }, weight: 72, emoji: "🐐" },
+            { id: "e7", name: { es: "Cristiano Ronaldo", en: "Cristiano Ronaldo" }, weight: 83, emoji: "🇵🇹" },
+            { id: "e8", name: { es: "Elon Musk", en: "Elon Musk" }, weight: 95, emoji: "🚀" },
+            { id: "e9", name: { es: "Pedro Sánchez", en: "Pedro Sánchez" }, weight: 88, emoji: "👔" },
+            { id: "e10", name: { es: "AuronPlay", en: "AuronPlay" }, weight: 78, emoji: "😎" },
+            { id: "e11", name: { es: "Jordi Wild", en: "Jordi Wild" }, weight: 92, emoji: "🎙️" },
+            { id: "e12", name: { es: "David Broncano", en: "David Broncano" }, weight: 81, emoji: "🛋️" },
+            { id: "e13", name: { es: "El Rubius", en: "El Rubius" }, weight: 74, emoji: "🎮" },
+            { id: "e14", name: { es: "Hasbulla", en: "Hasbulla" }, weight: 18, emoji: "🥊" },
+            { id: "e15", name: { es: "Karlos Arguiñano", en: "Karlos Arguiñano" }, weight: 84, emoji: "👨‍🍳" },
+            { id: "e16", name: { es: "IlloJuan", en: "IlloJuan" }, weight: 85, emoji: "🥑" },
+            { id: "e17", name: { es: "Mariano Rajoy", en: "Mariano Rajoy" }, weight: 82, emoji: "📜" },
+            { id: "e18", name: { es: "Kanye West", en: "Kanye West" }, weight: 75, emoji: "🕶️" },
+            { id: "e19", name: { es: "Gordon Ramsay", en: "Gordon Ramsay" }, weight: 82, emoji: "🔪" },
+            { id: "e20", name: { es: "Vin Diesel", en: "Vin Diesel" }, weight: 102, emoji: "🏎️" },
 
-            // --- POKÉMON ---
-            { name: { es: "Pikachu", en: "Pikachu" }, weight: 6, emoji: "⚡" },
-            { name: { es: "Eevee", en: "Eevee" }, weight: 6.5, emoji: "🦊" },
-            { name: { es: "Charmander", en: "Charmander" }, weight: 8.5, emoji: "🔥" },
-            { name: { es: "Squirtle", en: "Squirtle" }, weight: 9, emoji: "🐢" },
-            { name: { es: "Bulbasaur", en: "Bulbasaur" }, weight: 6.9, emoji: "🍃" },
-            { name: { es: "Psyduck", en: "Psyduck" }, weight: 19.6, emoji: "🦆" },
-            { name: { es: "Meowth", en: "Meowth" }, weight: 4.2, emoji: "🐱" },
-            { name: { es: "Jigglypuff", en: "Jigglypuff" }, weight: 5.5, emoji: "🎤" },
-            { name: { es: "Gengar", en: "Gengar" }, weight: 40.5, emoji: "👻" },
-            { name: { es: "Charizard", en: "Charizard" }, weight: 90.5, emoji: "🐉" },
-            { name: { es: "Blastoise", en: "Blastoise" }, weight: 85.5, emoji: "🌊" },
-            { name: { es: "Venusaur", en: "Venusaur" }, weight: 100, emoji: "🌺" },
-            { name: { es: "Machamp", en: "Machamp" }, weight: 130, emoji: "🥊" },
-            { name: { es: "Snorlax", en: "Snorlax" }, weight: 460, emoji: "💤" },
-            { name: { es: "Gyarados", en: "Gyarados" }, weight: 235, emoji: "🐉" },
-            { name: { es: "Wailord", en: "Wailord" }, weight: 398, emoji: "🐳" },
-            { name: { es: "Steelix", en: "Steelix" }, weight: 400, emoji: "⛓️" },
-            { name: { es: "Metagross", en: "Metagross" }, weight: 550, emoji: "🤖" },
-            { name: { es: "Groudon", en: "Groudon" }, weight: 950, emoji: "🌋" },
-            { name: { es: "Kyogre", en: "Kyogre" }, weight: 352, emoji: "🌧️" },
-            { name: { es: "Arceus", en: "Arceus" }, weight: 320, emoji: "✨" },
-            { name: { es: "Celesteela", en: "Celesteela" }, weight: 999.9, emoji: "🚀" },
-            { name: { es: "Cosmoem", en: "Cosmoem" }, weight: 999.9, emoji: "🌌" },
+            // POKÉMON Y PERSONAJES
+            { id: "e21", name: { es: "Pikachu", en: "Pikachu" }, weight: 6, emoji: "⚡" },
+            { id: "e22", name: { es: "Charizard", en: "Charizard" }, weight: 90.5, emoji: "🐉" },
+            { id: "e23", name: { es: "Blastoise", en: "Blastoise" }, weight: 85.5, emoji: "🌊" },
+            { id: "e24", name: { es: "Snorlax", en: "Snorlax" }, weight: 460, emoji: "💤" },
+            { id: "e25", name: { es: "Wailord", en: "Wailord" }, weight: 398, emoji: "🐳" },
+            { id: "e26", name: { es: "Groudon", en: "Groudon" }, weight: 950, emoji: "🌋" },
+            { id: "e27", name: { es: "Cosmoem", en: "Cosmoem" }, weight: 999.9, emoji: "🌌" },
+            { id: "e28", name: { es: "Mewtwo", en: "Mewtwo" }, weight: 122, emoji: "🔮" },
+            { id: "e29", name: { es: "Jigglypuff", en: "Jigglypuff" }, weight: 5.5, emoji: "🎤" },
 
-            // --- PERSONAJES DE FICCIÓN ---
-            { name: { es: "Bob Esponja (tamaño real de esponja)", en: "SpongeBob (real sponge size)" }, weight: 0.03, emoji: "🧽" },
-            { name: { es: "Bob Esponja (si fuera un humano)", en: "SpongeBob (human sized)" }, weight: 45, emoji: "👔" },
-            { name: { es: "Patricio Estrella (estrella real)", en: "Patrick Star (real starfish)" }, weight: 1, emoji: "⭐" },
-            { name: { es: "Gary el caracol", en: "Gary the snail" }, weight: 0.03, emoji: "🐌" },
-            { name: { es: "Homer Simpson", en: "Homer Simpson" }, weight: 120, emoji: "🍩" },
-            { name: { es: "Peter Griffin", en: "Peter Griffin" }, weight: 140, emoji: "👓" },
-            { name: { es: "Stewie Griffin", en: "Stewie Griffin" }, weight: 10, emoji: "👶" },
-            { name: { es: "Rick Sánchez", en: "Rick Sanchez" }, weight: 70, emoji: "🧪" },
-            { name: { es: "Morty Smith", en: "Morty Smith" }, weight: 50, emoji: "📻" },
-            { name: { es: "Shrek", en: "Shrek" }, weight: 200, emoji: "👹" },
-            { name: { es: "Fiona (forma ogro)", en: "Fiona (ogre form)" }, weight: 100, emoji: "👸" },
-            { name: { es: "Gru", en: "Gru" }, weight: 100, emoji: "🧣" },
-            { name: { es: "1 Minion", en: "1 Minion" }, weight: 1, emoji: "🍌" },
-            { name: { es: "Mario", en: "Mario" }, weight: 65, emoji: "🍄" },
-            { name: { es: "Luigi", en: "Luigi" }, weight: 65, emoji: "👻" },
-            { name: { es: "Bowser", en: "Bowser" }, weight: 150, emoji: "🔥" },
-            { name: { es: "Kirby", en: "Kirby" }, weight: 6, emoji: "🎀" },
-            { name: { es: "Yoshi", en: "Yoshi" }, weight: 30, emoji: "🦖" },
-            { name: { es: "Donkey Kong", en: "Donkey Kong" }, weight: 120, emoji: "🦧" },
-            { name: { es: "Sonic the Hedgehog", en: "Sonic the Hedgehog" }, weight: 35, emoji: "🦔" },
-            { name: { es: "Tails", en: "Tails" }, weight: 20, emoji: "🦊" },
-            { name: { es: "Knuckles", en: "Knuckles" }, weight: 40, emoji: "🥊" },
-            { name: { es: "Superman", en: "Superman" }, weight: 100, emoji: "🦸‍♂️" },
-            { name: { es: "Batman", en: "Batman" }, weight: 95, emoji: "🦇" },
-            { name: { es: "Hulk", en: "Hulk" }, weight: 470, emoji: "🟢" },
-            { name: { es: "Thanos", en: "Thanos" }, weight: 450, emoji: "🤌" },
-            { name: { es: "Groot", en: "Groot" }, weight: 500, emoji: "🪴" },
-            { name: { es: "Chewbacca", en: "Chewbacca" }, weight: 130, emoji: "🟤" },
-            { name: { es: "Darth Vader", en: "Darth Vader" }, weight: 140, emoji: "🖤" },
-            { name: { es: "Jabba the Hutt", en: "Jabba the Hutt" }, weight: 1300, emoji: "🐛" },
-            { name: { es: "Godzilla", en: "Godzilla" }, weight: 90000000, emoji: "🦖" },
-            { name: { es: "King Kong", en: "King Kong" }, weight: 150000, emoji: "🦍" },
-            { name: { es: "Optimus Prime", en: "Optimus Prime" }, weight: 4000, emoji: "🚛" },
-            { name: { es: "Megatron", en: "Megatron" }, weight: 5000, emoji: "🔫" },
-            { name: { es: "Pac-Man", en: "Pac-Man" }, weight: 500, emoji: "🟡" },
-            { name: { es: "Minecraft Steve", en: "Minecraft Steve" }, weight: 75, emoji: "🧱" },
-            { name: { es: "Un Creeper", en: "A Creeper" }, weight: 70, emoji: "💥" },
-            { name: { es: "Ender Dragon", en: "Ender Dragon" }, weight: 2500, emoji: "🐉" },
-            { name: { es: "Shrek + Fiona juntos", en: "Shrek + Fiona together" }, weight: 300, emoji: "💍" },
-            { name: { es: "Wrek-It Ralph", en: "Wreck-It Ralph" }, weight: 290, emoji: "🧱" },
+            // FICCIÓN Y MEMES
+            { id: "e30", name: { es: "Bob Esponja", en: "SpongeBob" }, weight: 45, emoji: "🧽" },
+            { id: "e31", name: { es: "Homer Simpson", en: "Homer Simpson" }, weight: 120, emoji: "🍩" },
+            { id: "e32", name: { es: "Shrek", en: "Shrek" }, weight: 200, emoji: "👹" },
+            { id: "e33", name: { es: "Hulk", en: "Hulk" }, weight: 470, emoji: "🟢" },
+            { id: "e34", name: { es: "Thanos", en: "Thanos" }, weight: 450, emoji: "🤌" },
+            { id: "e35", name: { es: "Godzilla", en: "Godzilla" }, weight: 90000000, emoji: "🦖" },
+            { id: "e36", name: { es: "King Kong", en: "King Kong" }, weight: 150000, emoji: "🦍" },
+            { id: "e37", name: { es: "El Pou", en: "Pou" }, weight: 2, emoji: "💩" },
+            { id: "e38", name: { es: "Mario Bros", en: "Mario Bros" }, weight: 88, emoji: "🍄" },
+            { id: "e39", name: { es: "Minecraft Steve", en: "Minecraft Steve" }, weight: 120, emoji: "⛏️" },
+            { id: "e40", name: { es: "Darth Vader", en: "Darth Vader" }, weight: 120, emoji: "🌌" },
 
-            // --- ANIMALES ABSURDAMENTE GRANDES (Y COMBOS) ---
-            { name: { es: "Un gato gordo de internet", en: "A fat internet cat" }, weight: 15, emoji: "🐱" },
-            { name: { es: "Un perro gigante Gran Danés", en: "A giant Great Dane dog" }, weight: 90, emoji: "🐕" },
-            { name: { es: "Un gorila de montaña", en: "A mountain gorilla" }, weight: 200, emoji: "🦍" },
-            { name: { es: "Un oso polar", en: "A polar bear" }, weight: 600, emoji: "🐻‍❄️" },
-            { name: { es: "Una morsa marina", en: "A walrus" }, weight: 1500, emoji: "🦭" },
-            { name: { es: "Un hipopótamo", en: "A hippo" }, weight: 1500, emoji: "🦛" },
-            { name: { es: "Un rinoceronte blanco", en: "A white rhino" }, weight: 2300, emoji: "🦏" },
-            { name: { es: "Una jirafa adulta", en: "An adult giraffe" }, weight: 1200, emoji: "🦒" },
-            { name: { es: "Un elefante africano", en: "An African elephant" }, weight: 6000, emoji: "🐘" },
-            { name: { es: "Una orca macho", en: "A male Orca" }, weight: 5500, emoji: "🐋" },
-            { name: { es: "Un tiburón blanco", en: "A great white shark" }, weight: 3300, emoji: "🦈" },
-            { name: { es: "Un tiburón ballena gigante", en: "A giant whale shark" }, weight: 21500, emoji: "🦈" },
-            { name: { es: "Un calamar gigante", en: "A giant squid" }, weight: 500, emoji: "🦑" },
-            { name: { es: "Un cocodrilo del Nilo gigante", en: "A giant Nile crocodile" }, weight: 1000, emoji: "🐊" },
-            { name: { es: "Una ballena jorobada", en: "A humpback whale" }, weight: 29000, emoji: "🐋" },
-            { name: { es: "Un cachalote", en: "A sperm whale" }, weight: 31000, emoji: "🐳" },
-            { name: { es: "Una ballena azul promedio", en: "An average blue whale" }, weight: 110000, emoji: "🐋" },
-            { name: { es: "Una ballena azul + Alberto Chicote", en: "A blue whale + Alberto Chicote" }, weight: 110100, emoji: "🐋" },
-            { name: { es: "Tres hipopótamos + Shaquille O'Neal", en: "3 hippos + Shaquille O'Neal" }, weight: 4650, emoji: "🦛" },
-            { name: { es: "50 Capibaras apelotonados", en: "50 Capybaras stacked" }, weight: 2500, emoji: "🥔" },
-            { name: { es: "Un enjambre de 1 millón de abejas", en: "A swarm of 1 million bees" }, weight: 90, emoji: "🐝" },
+            // ANIMALES
+            { id: "e41", name: { es: "Un Gato Gordo", en: "A Fat Cat" }, weight: 15, emoji: "🐱" },
+            { id: "e42", name: { es: "Un Capibara", en: "A Capybara" }, weight: 50, emoji: "🦫" },
+            { id: "e43", name: { es: "Un Gorila", en: "A Gorilla" }, weight: 200, emoji: "🦍" },
+            { id: "e44", name: { es: "Un Hipopótamo", en: "A Hippo" }, weight: 1500, emoji: "🦛" },
+            { id: "e45", name: { es: "Un Elefante Africano", en: "An African Elephant" }, weight: 6000, emoji: "🐘" },
+            { id: "e46", name: { es: "Una Ballena Azul", en: "A Blue Whale" }, weight: 110000, emoji: "🐋" },
+            { id: "e47", name: { es: "Un Oso Polar", en: "A Polar Bear" }, weight: 450, emoji: "🐻‍❄️" },
+            { id: "e48", name: { es: "Una Gallina", en: "A Chicken" }, weight: 2.5, emoji: "🐔" },
+            { id: "e49", name: { es: "Un Avestruz", en: "An Ostrich" }, weight: 120, emoji: "🦩" },
+            { id: "e50", name: { es: "Un Canguro", en: "A Kangaroo" }, weight: 85, emoji: "🦘" },
+            { id: "e51", name: { es: "Un Cocodrilo del Nilo", en: "A Nile Crocodile" }, weight: 750, emoji: "🐊" },
+            { id: "e52", name: { es: "Un Panda Gigante", en: "A Giant Panda" }, weight: 110, emoji: "🐼" },
 
-            // --- OBJETOS COMPLETAMENTE RANDOM ---
-            { name: { es: "Una PlayStation 5", en: "A PlayStation 5" }, weight: 4.5, emoji: "🎮" },
-            { name: { es: "Una Xbox Series X", en: "An Xbox Series X" }, weight: 4.4, emoji: "🟩" },
-            { name: { es: "Un iPhone 15 Pro", en: "An iPhone 15 Pro" }, weight: 0.2, emoji: "📱" },
-            { name: { es: "Un portátil gaming", en: "A gaming laptop" }, weight: 2.5, emoji: "💻" },
-            { name: { es: "Una torre PC gaming llena de RGB", en: "A gaming PC tower with RGB" }, weight: 15, emoji: "🖥️" },
-            { name: { es: "Una silla gaming barata", en: "A cheap gaming chair" }, weight: 20, emoji: "🪑" },
-            { name: { es: "Una nevera americana llena de comida", en: "A full American fridge" }, weight: 80, emoji: "🧊" },
-            { name: { es: "Una lavadora industrial", en: "A washing machine" }, weight: 70, emoji: "🧺" },
-            { name: { es: "Un microondas", en: "A microwave" }, weight: 15, emoji: "🍲" },
-            { name: { es: "Una bicicleta de montaña", en: "A mountain bike" }, weight: 12, emoji: "🚲" },
-            { name: { es: "Una moto de cross", en: "A dirt bike" }, weight: 150, emoji: "🏍️" },
-            { name: { es: "Una Vespa clásica", en: "A classic Vespa" }, weight: 120, emoji: "🛵" },
-            { name: { es: "Un coche Smart Fortwo", en: "A Smart Fortwo car" }, weight: 1000, emoji: "🚗" },
-            { name: { es: "Un Tesla Model 3", en: "A Tesla Model 3" }, weight: 1800, emoji: "⚡" },
-            { name: { es: "Un autobús urbano articulado", en: "A city bus" }, weight: 12000, emoji: "🚌" },
-            { name: { es: "Un avión comercial vacío", en: "An empty commercial airplane" }, weight: 40000, emoji: "✈️" },
-            { name: { es: "Una excavadora de obras", en: "A construction excavator" }, weight: 20000, emoji: "🚜" },
-            { name: { es: "Un contenedor marítimo vacío", en: "An empty shipping container" }, weight: 4000, emoji: "📦" },
-            { name: { es: "Una estatua de bronce gigante", en: "A giant bronze statue" }, weight: 10000, emoji: "🗿" },
-            { name: { es: "La Torre Eiffel completa", en: "The entire Eiffel Tower" }, weight: 10100000, emoji: "🗼" },
-            { name: { es: "4 Pizzas familiares + 1 Coca-Cola Light", en: "4 Family pizzas + 1 Coke Light" }, weight: 5, emoji: "🍕" },
-            { name: { es: "1 Millón de palillos de dientes", en: "1 Million toothpicks" }, weight: 100, emoji: "🪵" },
-            { name: { es: "Un lingote de oro de banco", en: "A bank gold bar" }, weight: 12.4, emoji: "🧈" },
-            { name: { es: "Una piedra de curling", en: "A curling stone" }, weight: 19.1, emoji: "🥌" },
-            { name: { es: "Un carrito de supermercado lleno de patatas", en: "A supermarket cart full of potatoes" }, weight: 120, emoji: "🛒" },
-            { name: { es: "Un piano de cola de concierto", en: "A concert grand piano" }, weight: 500, emoji: "🎹" },
-            { name: { es: "Un semáforo de calle entero", en: "A full street traffic light" }, weight: 50, emoji: "🚦" },
-            { name: { es: "10.000 Patitos de goma", en: "10,000 Rubber ducks" }, weight: 500, emoji: "🐥" },
-            { name: { es: "Un trozo de queso Parmesano entero", en: "A whole wheel of Parmesan cheese" }, weight: 40, emoji: "🧀" },
+            // VEHÍCULOS Y TRANSPORTES
+            { id: "e53", name: { es: "Un Fiat Multipla", en: "A Fiat Multipla" }, weight: 1300, emoji: "🚗" },
+            { id: "e54", name: { es: "Un Tesla Model 3", en: "A Tesla Model 3" }, weight: 1800, emoji: "⚡" },
+            { id: "e55", name: { es: "Un Autobús Urbano", en: "A City Bus" }, weight: 12000, emoji: "🚌" },
+            { id: "e56", name: { es: "Un Avión Boeing 747", en: "A Boeing 747" }, weight: 183000, emoji: "✈️" },
+            { id: "e57", name: { es: "Un Camión de Bomberos", en: "A Fire Truck" }, weight: 19000, emoji: "🚒" },
+            { id: "e58", name: { es: "Un Tanque M1 Abrams", en: "An M1 Abrams Tank" }, weight: 60000, emoji: "🎖️" },
+            { id: "e59", name: { es: "Un Patinete Eléctrico", en: "An Electric Scooter" }, weight: 14, emoji: "🛴" },
+            { id: "e60", name: { es: "Un Tractor Agrícola", en: "A Farm Tractor" }, weight: 5000, emoji: "🚜" },
+            { id: "e61", name: { es: "Un Submarino Nuclear", en: "A Nuclear Submarine" }, weight: 18000000, emoji: "⚓" },
+            { id: "e62", name: { es: "Un Crucero de Lujo", en: "A Cruise Ship" }, weight: 100000000, emoji: "🚢" },
 
-            // --- EXTRAS Y OPCIONES FUNABLES Y ABSURDAS ---
-            { name: { es: "Tu historial de navegación de Google", en: "Your Google search history" }, weight: 0.000001, emoji: "🌐" },
-            { name: { es: "El ego de un DJ de discoteca", en: "A club DJ's ego" }, weight: 9999999, emoji: "🎧" },
-            { name: { es: "Una mochila escolar de un niño de primaria", en: "An elementary schooler's backpack" }, weight: 45, emoji: "🎒" },
-            { name: { es: "100 Litros de aceite de oliva virgen extra", en: "100 Liters of extra virgin olive oil" }, weight: 92, emoji: "🫒" },
-            { name: { es: "La deuda pública de un país pequeño", en: "Small country national debt" }, weight: 50000000, emoji: "💸" },
-            { name: { es: "100 Cajas de kebab con salsa de ajo", en: "100 Kebab boxes with garlic sauce" }, weight: 50, emoji: "🥙" },
-            { name: { es: "Una cabina telefónica de Londres", en: "A London phone booth" }, weight: 750, emoji: "☎️" },
-            { name: { es: "Un colchón viscoelástico de matrimonio mojado", en: "A wet double memory foam mattress" }, weight: 85, emoji: "🛏️" },
-            { name: { es: "Un bidón lleno de Nutella", en: "A barrel filled with Nutella" }, weight: 220, emoji: "🍫" },
-            { name: { es: "Una máquina de gimnasio para piernas", en: "A leg press gym machine" }, weight: 250, emoji: "🏋️" },
-            { name: { es: "Una fotocopiadora de oficina gigante", en: "A giant office printer" }, weight: 140, emoji: "printer" },
-            { name: { es: "Un traje completo de Pikachu hinchable", en: "Inflatable Pikachu costume" }, weight: 3, emoji: "⚡" },
-            { name: { es: "10.000 Bolas de piscina de parque infantil", en: "10,000 Ball pit balls" }, weight: 80, emoji: "🔴" },
-            { name: { es: "Un kebab entero vertical en el asador", en: "A whole vertical Kebab skewer" }, weight: 40, emoji: "🥙" },
-            { name: { es: "1.000 Rollos de papel higiénico", en: "1,000 Toilet paper rolls" }, weight: 150, emoji: "🧻" },
-            { name: { es: "La cartera de un padre llena de tickets de 2012", en: "Dad's wallet full of old receipts" }, weight: 2.5, emoji: "👛" },
-            { name: { es: "Un extintor de incendios de garaje", en: "A garage fire extinguisher" }, weight: 12, emoji: "🧯" }
+            // OBJETOS Y TECNOLOGÍA
+            { id: "e63", name: { es: "Una PlayStation 5", en: "A PlayStation 5" }, weight: 4.5, emoji: "🎮" },
+            { id: "e64", name: { es: "Una Nevera", en: "A Fridge" }, weight: 80, emoji: "🧊" },
+            { id: "e65", name: { es: "Una Lavadora", en: "A Washing Machine" }, weight: 70, emoji: "🧺" },
+            { id: "e66", name: { es: "Un Lingote de Oro", en: "A Gold Bar" }, weight: 12.4, emoji: "🪙" },
+            { id: "e67", name: { es: "Un Sofá de 3 Plazas", en: "A 3-Seater Sofa" }, weight: 65, emoji: "🛋️" },
+            { id: "e68", name: { es: "Una Mochila llena de Libros", en: "A Backpack full of books" }, weight: 18, emoji: "🎒" },
+            { id: "e69", name: { es: "Un Piano de Cola", en: "A Grand Piano" }, weight: 400, emoji: "🎹" },
+            { id: "e70", name: { es: "Una Yunque de Hierro", en: "An Anvil" }, weight: 100, emoji: "🔨" },
+            { id: "e71", name: { es: "Un Microondas", en: "A Microwave" }, weight: 15, emoji: "📻" },
+
+            // MONUMENTOS Y ESTRUCTURAS
+            { id: "e72", name: { es: "La Torre Eiffel", en: "The Eiffel Tower" }, weight: 10100000, emoji: "🗼" },
+            { id: "e73", name: { es: "La Estatua de la Libertad", en: "Statue of Liberty" }, weight: 225000, emoji: "🗽" },
+            { id: "e74", name: { es: "La Gran Pirámide de Giza", en: "Great Pyramid of Giza" }, weight: 5750000000, emoji: "🏜️" },
+            { id: "e75", name: { es: "El Big Ben", en: "Big Ben" }, weight: 8660000, emoji: "🕰️" },
+            { id: "e76", name: { es: "Un Ladrillo macizo", en: "A solid brick" }, weight: 2.3, emoji: "🧱" },
+
+            // COMIDA Y MEMES
+            { id: "e77", name: { es: "4 Pizzas familiares", en: "4 Family pizzas" }, weight: 4.5, emoji: "🍕" },
+            { id: "e78", name: { es: "Una lata de Coca-Cola Light", en: "A Diet Coke can" }, weight: 0.35, emoji: "🥤" },
+            { id: "e79", name: { es: "Una Paella Valenciana gigante", en: "A Giant Paella" }, weight: 120, emoji: "🥘" },
+            { id: "e80", name: { es: "Un Jamón Ibérico de Bellota", en: "An Iberian Ham" }, weight: 8, emoji: "🍖" },
+            { id: "e81", name: { es: "Una Sandía de 10 kg", en: "A 10kg Watermelon" }, weight: 10, emoji: "🍉" },
+            { id: "e82", name: { es: "Una Rueda de Queso Parmesano", en: "A Parmesan Cheese Wheel" }, weight: 40, emoji: "🧀" },
+            { id: "e83", name: { es: "Un Sacos de Patatas (25kg)", en: "A Potato Bag (25kg)" }, weight: 25, emoji: "🥔" },
+            { id: "e84", name: { es: "Una Tarta de Cumpleaños", en: "A Birthday Cake" }, weight: 3, emoji: "🎂" },
+            { id: "e85", name: { es: "Un Kebap Completo", en: "A Kebab" }, weight: 0.5, emoji: "🥙" },
+
+            // OBJETOS COTIDIANOS Y EXTRAÑOS
+            { id: "e86", name: { es: "Un Neumático de Camión", en: "A Truck Tire" }, weight: 55, emoji: "🛞" },
+            { id: "e87", name: { es: "Una Batería de Coche", en: "A Car Battery" }, weight: 16, emoji: "🔋" },
+            { id: "e88", name: { es: "Un Barril de Cerveza Lleno", en: "A Full Beer Keg" }, weight: 62, emoji: "🍺" },
+            { id: "e89", name: { es: "Un Saco de Cemento", en: "A Cement Bag" }, weight: 50, emoji: "🏗️" },
+            { id: "e90", name: { es: "Una Bola de Bolos", en: "A Bowling Ball" }, weight: 7, emoji: "🎳" },
+            { id: "e91", name: { es: "Una Bicicleta de Montaña", en: "A Mountain Bike" }, weight: 14, emoji: "🚲" },
+            { id: "e92", name: { es: "Un Extintor", en: "A Fire Extinguisher" }, weight: 9, emoji: "🧯" },
+            { id: "e93", name: { es: "Un Palé de Madera", en: "A Wooden Pallet" }, weight: 22, emoji: "📦" },
+            { id: "e94", name: { es: "Un Escudo de Capitán América", en: "Captain America Shield" }, weight: 5.4, emoji: "🛡️" },
+            { id: "e95", name: { es: "El Martillo Mjolnir", en: "Mjolnir Hammer" }, weight: 19, emoji: "🔨" },
+            { id: "e96", name: { es: "Una Motosierra", en: "A Chainsaw" }, weight: 6.5, emoji: "🪚" },
+            { id: "e97", name: { es: "Un Contenedor de Basura", en: "A Trash Dumpster" }, weight: 110, emoji: "🗑️" },
+            { id: "e98", name: { es: "Un Busto de Mármol", en: "A Marble Bust" }, weight: 35, emoji: "🗿" },
+            { id: "e99", name: { es: "Un Cañón Histórico", en: "An Old Cannon" }, weight: 1200, emoji: "💣" },
+            { id: "e100", name: { es: "Un Buitre Leonado", en: "A Griffon Vulture" }, weight: 10, emoji: "🦅" },
+            { id: "e101", name: { es: "Un Árbol de Navidad decorado", en: "A Decorated Christmas Tree" }, weight: 25, emoji: "🎄" },
+            { id: "e102", name: { es: "Un Jacuzzi portátil", en: "A Hot Tub" }, weight: 350, emoji: "🛁" },
+            { id: "e103", name: { es: "Un Satélite Espacial", en: "A Space Satellite" }, weight: 2300, emoji: "🛰️" },
+            { id: "e104", name: { es: "Un Meteorito Mediano", en: "A Medium Meteorite" }, weight: 85, emoji: "☄️" },
+            { id: "e105", name: { es: "Un Traje de Astronauta", en: "A Spacesuit" }, weight: 127, emoji: "👨‍🚀" }
         ];
+
+        /* ESTADO DEL JUEGO Y SISTEMA PERSISTENTE */
+        let playerStats = {
+            level: 1,
+            xp: 0,
+            partidas: 0,
+            preguntasTotal: 0,
+            preguntasAciertos: 0,
+            maxStreak: 0,
+            maxSurvival: 0,
+            maxScore: 0,
+            especialesAciertos: 0,
+            remontadas: 0,
+            collection: [] // IDs descubiertos
+        };
 
         let currentRound = 1;
         let totalScore = 0;
+        let currentStreak = 0;
+        let roundBonusPts = 100;
+        let currentRarity = "normal";
+        let maxRarityThisMatch = "normal";
+        let riskChoice = null;
         let optionA = null;
         let optionB = null;
         let answered = false;
+        let chanceTimerInterval = null;
 
-        function cambiarIdioma(lang) {
-            localStorage.setItem('whenwastimeline_idioma', lang);
-            aplicarTextosUI(lang);
-        }
+        /* MANEJO DE VISTAS / PESTAÑAS */
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.section-view, #view-game').forEach(v => v.style.display = 'none');
 
-        function aplicarTextosUI(lang) {
-            const t = i18nHH[lang] || i18nHH.es;
-            document.getElementById('select-idioma').value = lang;
-            document.getElementById('txt-volver').textContent = t.volver;
-            document.getElementById('txt-subtitulo').textContent = t.subtitulo;
-            document.getElementById('lbl-ronda').childNodes[0].textContent = t.ronda + " ";
-            document.getElementById('lbl-puntuacion').childNodes[0].textContent = t.aciertos + " ";
-            document.getElementById('next-btn').textContent = t.siguiente;
-            document.getElementById('restart-btn').textContent = t.jugarOtraVez;
-            
-            if (optionA && optionB) {
-                document.getElementById('title-0').textContent = optionA.name[lang] || optionA.name.es;
-                document.getElementById('title-1').textContent = optionB.name[lang] || optionB.name.es;
-            }
-        }
-
-        function formatWeight(kg) {
-            if (kg >= 1000000) {
-                return (kg / 1000000).toLocaleString() + " Mill. kg";
-            } else if (kg >= 1000) {
-                return kg.toLocaleString() + " kg";
-            } else if (kg < 0.1) {
-                return kg + " kg";
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            if (tabName === 'game') {
+                document.getElementById('view-game').style.display = 'block';
             } else {
-                return kg + " kg";
+                document.getElementById(`view-${tabName}`).style.display = 'block';
+                if (tabName === 'stats') updateStatsUI();
+                if (tabName === 'collection') updateCollectionUI();
             }
+        }
+
+        /* PERSISTENCIA EN LOCALSTORAGE */
+        function loadPlayerData() {
+            const saved = localStorage.getItem('4pizzas_player_stats_v2');
+            if (saved) {
+                try {
+                    playerStats = Object.assign(playerStats, JSON.parse(saved));
+                } catch(e){}
+            }
+            updatePlayerXPUI();
+        }
+
+        function savePlayerData() {
+            localStorage.setItem('4pizzas_player_stats_v2', JSON.stringify(playerStats));
+            updatePlayerXPUI();
+        }
+
+        /* SISTEMA DE NIVEL Y XP */
+        function getRequiredXP(level) {
+            return level * 200;
+        }
+
+        function addXP(amount) {
+            playerStats.xp += amount;
+            let req = getRequiredXP(playerStats.level);
+            while (playerStats.xp >= req) {
+                playerStats.xp -= req;
+                playerStats.level++;
+                req = getRequiredXP(playerStats.level);
+            }
+            savePlayerData();
+        }
+
+        function updatePlayerXPUI() {
+            const req = getRequiredXP(playerStats.level);
+            const pct = Math.min(100, Math.floor((playerStats.xp / req) * 100));
+            document.getElementById('player-level-badge').textContent = `NIVEL ${playerStats.level}`;
+            document.getElementById('xp-text-detail').textContent = `${playerStats.xp} / ${req} XP`;
+            document.getElementById('xp-bar-fill').style.width = pct + '%';
+        }
+
+        /* LÓGICA DE LIGAS Y PROGRESO VERTICAL */
+        function updateSidebarProgress() {
+            const maxTrackScore = 30000;
+            let percentCurrent = Math.min(100, Math.max(0, (totalScore / maxTrackScore) * 100));
+            document.getElementById('sidebar-fill').style.height = percentCurrent + '%';
+
+            let maxScore = playerStats.maxScore;
+            let percentMax = Math.min(100, Math.max(0, (maxScore / maxTrackScore) * 100));
+            document.getElementById('sidebar-max-marker').style.bottom = percentMax + '%';
+
+            let activeCurrentIdx = 0;
+            let unlockedMaxIdx = 0;
+
+            for (let i = 0; i < LEAGUES.length; i++) {
+                if (totalScore >= LEAGUES[i].min) activeCurrentIdx = i;
+                if (maxScore >= LEAGUES[i].min) unlockedMaxIdx = i;
+            }
+
+            for (let i = 0; i < 7; i++) {
+                const node = document.getElementById(`node-${i}`);
+                if (i <= unlockedMaxIdx) node.classList.add('unlocked');
+                else node.classList.remove('unlocked');
+
+                if (i === activeCurrentIdx) node.classList.add('active-current');
+                else node.classList.remove('active-current');
+            }
+        }
+
+        function getLeagueName(score) {
+            let currentLang = localStorage.getItem('whenwastimeline_idioma') || 'es';
+            let selected = LEAGUES[0];
+            for (let l of LEAGUES) { if (score >= l.min) selected = l; }
+            return selected.name[currentLang] || selected.name.es;
+        }
+
+        /* FUNCIÓN AUXILIAR PARA OBTENER UNA ENTIDAD (SIMPLE O COMBINADA) CON UN PROBABILIDAD DEL 25% */
+        function generateSingleOrCombinedEntity(excludedIds = []) {
+            let available = itemsDB.filter(item => !excludedIds.includes(item.id));
+            let base1 = available[Math.floor(Math.random() * available.length)];
+            
+            // Registrar descubrimiento en colección de la entidad base
+            registerCollectionDiscovery(base1.id);
+
+            // 25% de probabilidad de combinar con una segunda opción
+            if (Math.random() < 0.25) {
+                let available2 = available.filter(item => item.id !== base1.id);
+                let base2 = available2[Math.floor(Math.random() * available2.length)];
+                
+                // Registrar descubrimiento en colección de la segunda entidad base
+                registerCollectionDiscovery(base2.id);
+
+                return {
+                    id: `${base1.id}_${base2.id}`,
+                    baseIds: [base1.id, base2.id],
+                    name: {
+                        es: `${base1.name.es} + ${base2.name.es}`,
+                        en: `${base1.name.en} + ${base2.name.en}`
+                    },
+                    weight: parseFloat((base1.weight + base2.weight).toFixed(2)),
+                    emoji: `${base1.emoji}${base2.emoji}`
+                };
+            }
+
+            return {
+                id: base1.id,
+                baseIds: [base1.id],
+                name: base1.name,
+                weight: base1.weight,
+                emoji: base1.emoji
+            };
+        }
+
+        /* GENERADOR DE PAREJA DE OPCIONES EQUILIBRADA */
+        function getRandomItems() {
+            let item1 = generateSingleOrCombinedEntity();
+            let excluded = item1.baseIds;
+
+            let item2 = generateSingleOrCombinedEntity(excluded);
+
+            // Evitar pesos exactamente iguales
+            while (item1.weight === item2.weight) {
+                item2 = generateSingleOrCombinedEntity(excluded);
+            }
+
+            return Math.random() < 0.5 ? [item1, item2] : [item2, item1];
+        }
+
+        function determineRarity() {
+            let rand = Math.random();
+            if (rand < 0.05) return "legendaria";
+            if (rand < 0.18) return "epica";
+            if (rand < 0.45) return "rara";
+            return "normal";
         }
 
         function initGame() {
             currentRound = 1;
             totalScore = 0;
+            currentStreak = 0;
+            maxRarityThisMatch = "normal";
+
+            playerStats.partidas++;
+            savePlayerData();
+
             document.getElementById('game-interface').style.display = 'block';
             document.getElementById('result-interface').style.display = 'none';
+            document.getElementById('risk-modal').style.display = 'none';
+            document.getElementById('second-chance-modal').style.display = 'none';
+
+            document.getElementById('survival-record-tag').textContent = playerStats.maxSurvival;
+            updateSidebarProgress();
             loadRound();
-        }
-
-        function getRandomItems() {
-            let idx1, idx2;
-            do {
-                idx1 = Math.floor(Math.random() * itemsDB.length);
-                idx2 = Math.floor(Math.random() * itemsDB.length);
-            } while (idx1 === idx2 || itemsDB[idx1].weight === itemsDB[idx2].weight);
-
-            return [itemsDB[idx1], itemsDB[idx2]];
         }
 
         function loadRound() {
             answered = false;
+            riskChoice = null;
             const lang = localStorage.getItem('whenwastimeline_idioma') || 'es';
 
             document.getElementById('round-num').textContent = currentRound;
             document.getElementById('total-score').textContent = totalScore;
-            document.getElementById('feedback-box').style.display = 'none';
-            document.getElementById('next-btn').style.display = 'none';
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.classList.remove('visible');
+
+            // Ronda de Riesgo cada 5 rondas
+            if (currentRound > 1 && (currentRound - 1) % 5 === 0) {
+                document.getElementById('risk-modal').style.display = 'flex';
+            }
+
+            // Calcular Rareza
+            currentRarity = determineRarity();
+            const rarityTag = document.getElementById('rarity-tag');
+            rarityTag.className = `rarity-tag ${currentRarity}`;
+
+            let rarityMultiplier = 1;
+            if (currentRarity === 'rara') { rarityTag.textContent = "🔵 Rara"; rarityMultiplier = 1.5; }
+            else if (currentRarity === 'epica') { rarityTag.textContent = "🟣 Épica"; rarityMultiplier = 2.5; }
+            else if (currentRarity === 'legendaria') { rarityTag.textContent = "🟡 Legendaria"; rarityMultiplier = 4; }
+            else { rarityTag.textContent = "⚪ Normal"; rarityMultiplier = 1; }
+
+            const rarityWeights = { normal: 1, rara: 2, epica: 3, legendaria: 4 };
+            if (rarityWeights[currentRarity] > rarityWeights[maxRarityThisMatch]) {
+                maxRarityThisMatch = currentRarity;
+            }
+
+            roundBonusPts = Math.floor(100 * rarityMultiplier);
+            document.getElementById('bonus-tag').textContent = `+${roundBonusPts} PTS`;
 
             for (let i = 0; i < 2; i++) {
                 const card = document.getElementById(`card-${i}`);
                 card.style.borderColor = 'var(--border-color)';
                 card.style.cursor = 'pointer';
-                document.getElementById(`weight-${i}`).style.display = 'none';
+                document.getElementById(`weight-${i}`).style.visibility = 'hidden';
             }
 
             const pair = getRandomItems();
@@ -651,28 +1316,38 @@
             document.getElementById('emoji-1').textContent = optionB.emoji;
             document.getElementById('title-1').textContent = optionB.name[lang] || optionB.name.es;
             document.getElementById('weight-1').textContent = formatWeight(optionB.weight);
+
+            updateSidebarProgress();
+        }
+
+        function formatWeight(kg) {
+            if (kg >= 1000000) return (kg / 1000000).toLocaleString() + " Mill. kg";
+            if (kg >= 1000) return kg.toLocaleString() + " kg";
+            return kg + " kg";
+        }
+
+        function chooseRisk(type) {
+            riskChoice = type;
+            document.getElementById('risk-modal').style.display = 'none';
+            if (type === 'safe') {
+                totalScore = Math.floor(totalScore / 2);
+                document.getElementById('total-score').textContent = totalScore;
+                updateSidebarProgress();
+            }
         }
 
         function selectOption(selectedIndex) {
             if (answered) return;
             answered = true;
 
-            const lang = localStorage.getItem('whenwastimeline_idioma') || 'es';
-            const t = i18nHH[lang] || i18nHH.es;
+            playerStats.preguntasTotal++;
 
             const selectedItem = selectedIndex === 0 ? optionA : optionB;
             const otherItem = selectedIndex === 0 ? optionB : optionA;
-
             const isCorrect = selectedItem.weight > otherItem.weight;
 
-            if (isCorrect) {
-                totalScore++;
-                document.getElementById('total-score').textContent = totalScore;
-            }
-
-            document.getElementById('weight-0').style.display = 'block';
-            document.getElementById('weight-1').style.display = 'block';
-
+            document.getElementById('weight-0').style.visibility = 'visible';
+            document.getElementById('weight-1').style.visibility = 'visible';
             document.getElementById('card-0').style.cursor = 'default';
             document.getElementById('card-1').style.cursor = 'default';
 
@@ -680,43 +1355,190 @@
             document.getElementById(`card-${winningIndex}`).style.borderColor = 'var(--success-green)';
             document.getElementById(`card-${1 - winningIndex}`).style.borderColor = 'var(--error-red)';
 
-            const feedbackBox = document.getElementById('feedback-box');
-            feedbackBox.style.display = 'block';
             if (isCorrect) {
-                feedbackBox.className = 'feedback-box feedback-correct';
-                feedbackBox.textContent = t.correcto;
-            } else {
-                feedbackBox.className = 'feedback-box feedback-incorrect';
-                feedbackBox.textContent = t.incorrecto;
-            }
+                playerStats.preguntasAciertos++;
+                currentStreak++;
+                if (currentStreak > playerStats.maxStreak) playerStats.maxStreak = currentStreak;
 
-            document.getElementById('next-btn').style.display = 'block';
+                if (currentRarity === 'epica' || currentRarity === 'legendaria') {
+                    playerStats.especialesAciertos++;
+                }
+
+                let gainedPts = roundBonusPts;
+                if (riskChoice === 'double') gainedPts = totalScore === 0 ? 200 : totalScore;
+
+                totalScore += gainedPts;
+                addXP(Math.floor(gainedPts / 5));
+
+                const scoreEl = document.getElementById('total-score');
+                scoreEl.textContent = totalScore;
+                scoreEl.classList.add('pulse');
+                setTimeout(() => scoreEl.classList.remove('pulse'), 300);
+
+                updateSidebarProgress();
+                document.getElementById('next-btn').classList.add('visible');
+            } else {
+                currentStreak = 0;
+                savePlayerData();
+
+                if (riskChoice === 'safe') {
+                    document.getElementById('next-btn').classList.add('visible');
+                } else {
+                    setTimeout(() => triggerSecondChance(), 1000);
+                }
+            }
+        }
+
+        /* MECÁNICA "OTRA OPORTUNIDAD" (RETO RÁPIDO) */
+        let chancePair = null;
+        function triggerSecondChance() {
+            const modal = document.getElementById('second-chance-modal');
+            const timerFill = document.getElementById('chance-timer-fill');
+            modal.style.display = 'flex';
+
+            chancePair = getRandomItems();
+            const lang = localStorage.getItem('whenwastimeline_idioma') || 'es';
+            document.getElementById('chance-question-title').textContent = `¿Cuál pesa MÁS en kg?`;
+            document.getElementById('chance-opt-0').textContent = `${chancePair[0].emoji} ${chancePair[0].name[lang] || chancePair[0].name.es}`;
+            document.getElementById('chance-opt-1').textContent = `${chancePair[1].emoji} ${chancePair[1].name[lang] || chancePair[1].name.es}`;
+
+            let timeLeft = 100;
+            timerFill.style.width = '100%';
+
+            clearInterval(chanceTimerInterval);
+            chanceTimerInterval = setInterval(() => {
+                timeLeft -= 2;
+                timerFill.style.width = timeLeft + '%';
+                if (timeLeft <= 0) {
+                    clearInterval(chanceTimerInterval);
+                    modal.style.display = 'none';
+                    endGame();
+                }
+            }, 100);
+        }
+
+        function resolveSecondChance(idx) {
+            clearInterval(chanceTimerInterval);
+            document.getElementById('second-chance-modal').style.display = 'none';
+
+            const selected = chancePair[idx];
+            const other = chancePair[1 - idx];
+
+            if (selected.weight > other.weight) {
+                playerStats.remontadas++;
+                addXP(150);
+                savePlayerData();
+                nextRound();
+            } else {
+                endGame();
+            }
         }
 
         function nextRound() {
             currentRound++;
-            if (currentRound > 5) {
-                endGame();
-            } else {
-                loadRound();
+            if (currentRound > playerStats.maxSurvival) {
+                playerStats.maxSurvival = currentRound;
+            }
+            savePlayerData();
+            loadRound();
+        }
+
+        /* PANTALLA FINAL Y TARJETA GENERADA */
+        function endGame() {
+            if (totalScore > playerStats.maxScore) {
+                playerStats.maxScore = totalScore;
+            }
+            savePlayerData();
+
+            document.getElementById('game-interface').style.display = 'none';
+            document.getElementById('result-interface').style.display = 'flex';
+
+            document.getElementById('final-score').textContent = `${totalScore} PTS`;
+            document.getElementById('final-rank-name').textContent = getLeagueName(totalScore);
+
+            document.getElementById('share-val-rondas').textContent = `${currentRound} Rondas`;
+            document.getElementById('share-val-racha').textContent = `${currentStreak}`;
+            document.getElementById('share-val-rareza').textContent = maxRarityThisMatch.toUpperCase();
+            document.getElementById('share-val-nivel').textContent = `Nivel ${playerStats.level}`;
+
+            updateSidebarProgress();
+        }
+
+        function downloadShareCard() {
+            const cardNode = document.getElementById('share-card-node');
+            html2canvas(cardNode, { backgroundColor: '#121212', scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `4Pizzas_score_${totalScore}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        /* SISTEMA DE COLECCIONES */
+        function registerCollectionDiscovery(itemId) {
+            if (!playerStats.collection.includes(itemId)) {
+                playerStats.collection.push(itemId);
+                savePlayerData();
             }
         }
 
-        function endGame() {
+        function updateCollectionUI() {
+            const container = document.getElementById('collection-grid-container');
+            container.innerHTML = '';
+
+            const totalItems = itemsDB.length;
+            const unlockedCount = playerStats.collection.length;
+            const pct = Math.floor((unlockedCount / totalItems) * 100);
+
+            document.getElementById('collection-count-tag').textContent = `${unlockedCount} / ${totalItems} (${pct}%)`;
+            document.getElementById('collection-bar-fill').style.width = pct + '%';
+
             const lang = localStorage.getItem('whenwastimeline_idioma') || 'es';
+
+            itemsDB.forEach(item => {
+                const isUnlocked = playerStats.collection.includes(item.id);
+                const card = document.createElement('div');
+                card.className = `collection-item-card ${isUnlocked ? 'unlocked' : ''}`;
+                card.innerHTML = `
+                    <div class="collection-emoji">${isUnlocked ? item.emoji : '❓'}</div>
+                    <div class="collection-title">${isUnlocked ? (item.name[lang] || item.name.es) : 'Locked'}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateStatsUI() {
+            document.getElementById('st-partidas').textContent = playerStats.partidas;
+            document.getElementById('st-supervivencia').textContent = playerStats.maxSurvival;
+            document.getElementById('st-preguntas').textContent = playerStats.preguntasTotal;
+
+            const pct = playerStats.preguntasTotal > 0 ? Math.floor((playerStats.preguntasAciertos / playerStats.preguntasTotal) * 100) : 0;
+            document.getElementById('st-acierto').textContent = `${pct}%`;
+            document.getElementById('st-racha').textContent = playerStats.maxStreak;
+            document.getElementById('st-maxscore').textContent = playerStats.maxScore;
+            document.getElementById('st-especiales').textContent = playerStats.especialesAciertos;
+            document.getElementById('st-remontadas').textContent = playerStats.remontadas;
+        }
+
+        function cambiarIdioma(lang) {
+            localStorage.setItem('whenwastimeline_idioma', lang);
             const t = i18nHH[lang] || i18nHH.es;
-
-            document.getElementById('game-interface').style.display = 'none';
-            document.getElementById('result-interface').style.display = 'block';
-
-            document.getElementById('final-score').textContent = `${totalScore} / 5`;
-            document.getElementById('final-rank').textContent = t.ranks[totalScore] || t.ranks[0];
-            document.getElementById('final-desc').textContent = t.completado;
+            document.getElementById('select-idioma').value = lang;
+            document.getElementById('txt-volver').textContent = t.volver;
+            document.getElementById('txt-subtitulo').textContent = t.subtitulo;
+            document.getElementById('next-btn').textContent = t.siguiente;
+            document.getElementById('restart-btn').textContent = t.jugarOtraVez;
+            updateSidebarProgress();
+            if (optionA && optionB) {
+                document.getElementById('title-0').textContent = optionA.name[lang] || optionA.name.es;
+                document.getElementById('title-1').textContent = optionB.name[lang] || optionB.name.es;
+            }
         }
 
         window.onload = () => {
+            loadPlayerData();
             const langGuardado = localStorage.getItem('whenwastimeline_idioma') || 'es';
-            aplicarTextosUI(langGuardado);
+            cambiarIdioma(langGuardado);
             initGame();
         };
     </script>

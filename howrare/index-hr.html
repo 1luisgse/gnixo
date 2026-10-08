@@ -8,20 +8,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
     <!-- FontAwesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas para la descarga de tarjetas compartibles -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <script>
         if (!localStorage.getItem('whenwastimeline_idioma')) {
-            localStorage.setItem('whenwastimeline_idioma', 'en');
+            localStorage.setItem('whenwastimeline_idioma', 'es');
         }
     </script>
+
     <style>
         :root {
             --bg-color: #0f0f0f;
             --card-bg: #1a1a1a;
             --primary-red: #ff2a2a;
             --primary-red-hover: #e02424;
+            --success-green: #2ecc71;
+            --error-red: #e74c3c;
+            --gold-color: #f1c40f;
             --text-white: #ffffff;
             --text-gray: #b0b0b0;
             --border-color: #333333;
+
+            /* Colores de Rareza */
+            --rarity-comun: #ffffff;
+            --rarity-rara: #3498db;
+            --rarity-epica: #9b59b6;
+            --rarity-legendaria: #f1c40f;
         }
 
         * {
@@ -37,28 +50,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
             overflow-x: hidden;
             user-select: none;
+            padding-bottom: 30px;
         }
 
         .container {
             width: 100%;
-            max-width: 500px;
-            padding: 20px;
+            max-width: 520px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* BARRA SUPERIOR (VOLVER Y SELECTOR) */
+        /* BARRA SUPERIOR Y SELECTOR DE IDIOMA */
         .top-bar {
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .btn-volver {
@@ -90,13 +104,68 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
 
+        /* BANNER PERMANENTE DE JUGADOR (NIVEL Y XP) */
+        .player-xp-card {
+            width: 100%;
+            background: #141414;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 10px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .level-badge {
+            background: linear-gradient(135deg, var(--primary-red), #b30000);
+            color: #fff;
+            font-weight: 900;
+            font-size: 0.85rem;
+            padding: 6px 10px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 70px;
+            box-shadow: 0 0 10px rgba(255, 42, 42, 0.3);
+        }
+
+        .xp-progress-container {
+            flex: 1;
+        }
+
+        .xp-info-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .xp-bar-bg {
+            width: 100%;
+            height: 8px;
+            background-color: #2b2b2b;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff2a2a, #f1c40f);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
         header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         header h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 900;
             letter-spacing: -1px;
             color: var(--text-white);
@@ -108,15 +177,45 @@
 
         header p {
             color: var(--text-gray);
-            font-size: 0.95rem;
+            font-size: 0.88rem;
         }
 
+        /* NAVEGACIÓN POR PESTAÑAS */
+        .nav-tabs {
+            display: flex;
+            gap: 6px;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background-color: #1a1a1a;
+            border: 1px solid var(--border-color);
+            color: var(--text-gray);
+            padding: 8px 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-red);
+            color: #ffffff;
+            border-color: var(--primary-red);
+            box-shadow: 0 2px 8px rgba(255, 42, 42, 0.4);
+        }
+
+        /* ESTRUCTURA TARJETA PRINCIPAL DE JUEGO */
         .game-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
             width: 100%;
-            padding: 24px;
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
@@ -128,8 +227,8 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
             color: var(--text-gray);
             font-weight: 600;
         }
@@ -138,12 +237,46 @@
             color: var(--text-white);
         }
 
+        /* BANNERS DE RAREZA, RACHA Y EVENTO */
+        .status-banners-row {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .tag-badge {
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .tag-badge.streak { background: rgba(255, 42, 42, 0.15); color: var(--primary-red); border: 1px solid var(--primary-red); }
+        .tag-badge.event { background: rgba(241, 196, 15, 0.2); color: var(--gold-color); border: 1px solid var(--gold-color); }
+        
+        .rarity-tag.comun { background: #2a2a2a; color: var(--rarity-comun); border: 1px solid #444; }
+        .rarity-tag.rara { background: rgba(52, 152, 219, 0.2); color: var(--rarity-rara); border: 1px solid var(--rarity-rara); }
+        .rarity-tag.epica { background: rgba(155, 89, 182, 0.25); color: var(--rarity-epica); border: 1px solid var(--rarity-epica); animation: pulseGlow 1.5s infinite alternate; }
+        .rarity-tag.legendaria { background: rgba(241, 196, 15, 0.25); color: var(--rarity-legendaria); border: 1px solid var(--rarity-legendaria); animation: pulseGlow 1s infinite alternate; }
+
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 4px currentColor; }
+            to { box-shadow: 0 0 12px currentColor; }
+        }
+
         .event-image-container {
             width: 100%;
-            height: 200px;
+            height: 180px;
             border-radius: 12px;
             overflow: hidden;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             border: 1px solid var(--border-color);
             position: relative;
         }
@@ -155,21 +288,22 @@
         }
 
         .event-title {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 24px;
-            min-height: 60px;
+            margin-bottom: 16px;
+            min-height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0 10px;
+            padding: 0 5px;
+            line-height: 1.3;
         }
 
-        /* Estilo del Slider Avanzado */
+        /* SLIDER AVANZADO LOGARÍTMICO */
         .slider-section {
             width: 100%;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .value-display {
@@ -177,7 +311,8 @@
             font-size: 2.2rem;
             font-weight: 900;
             color: var(--primary-red);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255, 42, 42, 0.3);
         }
 
         input[type=range] {
@@ -200,15 +335,15 @@
         }
 
         input[type=range]::-webkit-slider-thumb {
-            height: 24px;
-            width: 24px;
+            height: 26px;
+            width: 26px;
             border-radius: 50%;
             background: var(--primary-red);
             cursor: pointer;
             -webkit-appearance: none;
             appearance: none;
-            margin-top: -8px;
-            box-shadow: 0 0 10px rgba(255, 42, 42, 0.5);
+            margin-top: -9px;
+            box-shadow: 0 0 12px rgba(255, 42, 42, 0.6);
             transition: transform 0.1s;
         }
 
@@ -219,21 +354,21 @@
         .scale-markers {
             display: flex;
             justify-content: space-between;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--text-gray);
             margin-top: 8px;
             padding: 0 2px;
             width: 100%;
         }
 
-        /* Botón de Acción */
+        /* BOTÓN PRINCIPAL */
         .btn {
             background-color: var(--primary-red);
             color: var(--text-white);
             border: none;
             width: 100%;
-            padding: 14px;
-            font-size: 1rem;
+            padding: 13px;
+            font-size: 0.95rem;
             font-weight: 700;
             border-radius: 10px;
             cursor: pointer;
@@ -249,7 +384,24 @@
             transform: scale(0.98);
         }
 
-        /* Pantalla de Resultados */
+        .btn-secondary {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            flex: 1;
+            transition: background 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #444;
+        }
+
+        /* PANTALLA REVELACIÓN ("¿QUÉ TAN CERCA ESTUVISTE?") */
         .result-box {
             display: none;
             width: 100%;
@@ -262,30 +414,45 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .result-diff {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-            color: var(--text-gray);
+        .precision-meter-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 14px;
         }
 
-        .result-diff span {
-            font-weight: 700;
-            color: var(--text-white);
+        .precision-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: #252525;
+            border-radius: 5px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .precision-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #e74c3c, #2ecc71);
+            transition: width 0.6s ease-out;
+            border-radius: 5px;
         }
 
         .points-earned {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 900;
             color: var(--primary-red);
-            margin-bottom: 20px;
+            margin: 8px 0;
+            text-shadow: 0 0 10px rgba(255, 42, 42, 0.3);
         }
 
         .actual-value-card {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             padding: 12px;
-            margin-bottom: 20px;
-            font-size: 0.95rem;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
         }
 
         .actual-value-card b {
@@ -293,56 +460,242 @@
             font-size: 1.2rem;
         }
 
-        /* Estilos para la Pantalla Final */
-        .final-screen-badge {
-            background: linear-gradient(135deg, rgba(255, 42, 42, 0.15), rgba(255, 42, 42, 0.05));
+        /* OVERLAYS Y MODALES (APUESTAS Y OTRA OPORTUNIDAD) */
+        .overlay-modal {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(6px);
+            border-radius: 16px;
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .modal-box {
+            background: #222222;
+            border: 2px solid var(--gold-color);
+            border-radius: 14px;
+            padding: 18px;
+            width: 100%;
+            box-shadow: 0 0 20px rgba(241, 196, 15, 0.3);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: var(--gold-color);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .modal-desc {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            margin-bottom: 14px;
+            line-height: 1.3;
+        }
+
+        .timer-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .timer-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--primary-red);
+            transition: width 0.1s linear;
+        }
+
+        /* TARJETA RESULTADO FINAL COMPARTIBLE */
+        #result-interface-final {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .share-card-canvas-container {
+            background: linear-gradient(135deg, #1f1f1f, #121212);
             border: 2px solid var(--primary-red);
             border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 25px rgba(255, 42, 42, 0.2);
+            padding: 18px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 0 25px rgba(255, 42, 42, 0.25);
         }
 
-        .final-screen-badge i {
-            font-size: 2.5rem;
-            color: var(--primary-red);
-            margin-bottom: 10px;
-        }
-
-        .final-screen-badge h3 {
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-gray);
-            margin-bottom: 5px;
-        }
-
-        .final-screen-badge .player-tier {
-            font-size: 1.8rem;
+        .share-header {
+            font-size: 0.8rem;
             font-weight: 900;
-            color: var(--text-white);
+            color: var(--text-gray);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
         .final-score-big {
-            font-size: 3rem;
+            font-size: 2.8rem;
             font-weight: 900;
             color: var(--primary-red);
-            line-height: 1;
-            margin-bottom: 5px;
             text-shadow: 0 0 15px rgba(255, 42, 42, 0.4);
+            margin: 2px 0;
         }
 
-        .final-subtitle {
+        .share-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 12px 0;
+            text-align: left;
+        }
+
+        .share-stat-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid #333;
+            padding: 8px 10px;
+            border-radius: 8px;
+        }
+
+        .share-stat-label {
+            font-size: 0.65rem;
             color: var(--text-gray);
-            font-size: 0.95rem;
-            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .share-stat-val {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--text-white);
+        }
+
+        .action-btns-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        /* ESTILOS PESTAÑAS SECUNDARIAS (ESTADÍSTICAS Y COLECCIÓN) */
+        .section-view {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            display: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .stat-card-box {
+            background: #222;
+            border: 1px solid #333;
+            padding: 8px 10px;
+            border-radius: 10px;
+        }
+
+        .stat-card-label {
+            font-size: 0.68rem;
+            color: var(--text-gray);
+        }
+
+        .stat-card-val {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            margin-top: 2px;
+        }
+
+        .collection-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2b2b2b;
+            border-radius: 4px;
+            margin: 6px 0 14px 0;
+            overflow: hidden;
+        }
+
+        .collection-progress-fill {
+            height: 100%;
+            background: var(--gold-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 8px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .collection-item-card {
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 8px 6px;
+            text-align: center;
+            opacity: 0.35;
+            filter: grayscale(1);
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .collection-item-card.unlocked {
+            opacity: 1;
+            filter: grayscale(0);
+            border-color: var(--gold-color);
+            background: rgba(241, 196, 15, 0.05);
+        }
+
+        .collection-icon {
+            font-size: 1.4rem;
+            color: var(--gold-color);
+            margin-bottom: 2px;
+        }
+
+        .collection-title {
+            font-size: 0.68rem;
+            font-weight: 700;
+            margin-top: 2px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.2;
+        }
+
+        .collection-tag-cat {
+            font-size: 0.6rem;
+            color: var(--text-gray);
+            margin-top: 3px;
+            text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- BARRA SUPERIOR CON BOTÓN VOLVER Y SELECTOR DE IDIOMA -->
+        <!-- BARRA SUPERIOR (VOLVER Y SELECTOR) -->
         <div class="top-bar">
             <a href="../" id="txt-volver" class="btn-volver">← Back to Menu</a>
             <select id="select-idioma" onchange="cambiarIdioma(this.value)" class="select-idioma">
@@ -353,606 +706,407 @@
             </select>
         </div>
 
+        <!-- TARJETA PERMANENTE DE JUGADOR (NIVEL Y XP) -->
+        <div class="player-xp-card">
+            <div class="level-badge" id="player-level-badge">NIVEL 1</div>
+            <div class="xp-progress-container">
+                <div class="xp-info-text">
+                    <span>Progreso XP</span>
+                    <span id="xp-text-detail">0 / 200 XP</span>
+                </div>
+                <div class="xp-bar-bg">
+                    <div class="xp-bar-fill" id="xp-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+
         <header>
             <h1>How<span>Rare</span>?</h1>
             <p id="txt-subtitulo">Adivina la probabilidad exacta del suceso</p>
         </header>
 
-        <div class="game-card">
-            <!-- Interfaz de Juego -->
-            <div id="game-interface" style="width: 100%;">
-                <div class="score-board">
-                    <span id="lbl-ronda">Ronda: <span id="round-num">1</span> / 5</span>
-                    <span id="lbl-puntuacion">Puntuación: <span id="total-score">0</span> pts</span>
-                </div>
+        <!-- PESTAÑAS DE NAVEGACIÓN -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="tab-game" onclick="switchTab('game')">🎮 JUEGO</button>
+            <button class="tab-btn" id="tab-daily" onclick="switchTab('daily')">📅 RETO DIARIO</button>
+            <button class="tab-btn" id="tab-stats" onclick="switchTab('stats')">📊 ESTADÍSTICAS</button>
+            <button class="tab-btn" id="tab-collection" onclick="switchTab('collection')">🏆 COLECCIÓN</button>
+        </div>
 
-                <div class="event-image-container">
-                    <img id="event-img" src="" alt="Imagen del evento">
-                </div>
-
-                <div class="event-title" id="event-title">Cargando evento...</div>
-
-                <div class="slider-section">
-                    <div class="value-display" id="slider-val-display">50.00%</div>
-                    <input type="range" id="rare-slider" min="0" max="1000" value="500">
-                    <div class="scale-markers">
-                        <span id="lbl-imposible">0% (Imposible)</span>
-                        <span id="lbl-seguro">100% (Seguro)</span>
+        <!-- VISTA 1: JUEGO PRINCIPAL -->
+        <div id="view-game" style="width: 100%;">
+            <div class="game-card">
+                <!-- MODAL DE APUESTA (RIESGO / RECOMPENSA) -->
+                <div class="overlay-modal" id="bet-modal">
+                    <div class="modal-box">
+                        <div class="modal-title">🎲 RONDA DE APUESTA 🎲</div>
+                        <p class="modal-desc">
+                            ¿Quieres arriesgar puntos antes de ver la pregunta? Si ganas obtendrás una gran bonificación.
+                        </p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                            <button class="btn-secondary" onclick="makeBet(0)">Sin Apuesta</button>
+                            <button class="btn-secondary" onclick="makeBet(50)">50 PTS</button>
+                            <button class="btn-secondary" onclick="makeBet(150)">150 PTS</button>
+                            <button class="btn-secondary" style="color:var(--gold-color); font-weight:900;" onclick="makeBet('all')">🔥 TODO</button>
+                        </div>
                     </div>
                 </div>
 
-                <button class="btn" id="guess-btn">¡COMPROBAR!</button>
-            </div>
+                <!-- MODAL DE OTRA OPORTUNIDAD (RETORNO IMPOSIBLE) -->
+                <div class="overlay-modal" id="second-chance-modal">
+                    <div class="modal-box" style="border-color: var(--primary-red);">
+                        <div class="modal-title" style="color: var(--primary-red);">💀 RETORNO IMPOSIBLE</div>
+                        <p class="modal-desc">
+                            ¡Has obtenido 0 puntos! Tienes <b>5 segundos</b> para estimar si este suceso es más del 1%:
+                        </p>
 
-            <!-- Interfaz de Resultados de Ronda -->
-            <div class="result-box" id="result-interface">
-                <div class="result-diff" id="result-header-text">Tu respuesta se desvió un:</div>
-                <div class="result-diff"><span id="diff-value">0%</span></div>
-                <div class="points-earned" id="points-earned">+0 PUNTOS</div>
-                
-                <div class="actual-value-card" id="actual-card-box">
-                    El porcentaje real era: <br><b id="real-value-display">0%</b>
+                        <div class="timer-bar-bg">
+                            <div class="timer-bar-fill" id="chance-timer-fill"></div>
+                        </div>
+
+                        <div id="chance-question-title" style="font-size: 0.85rem; font-weight: 800; margin-bottom: 12px; color:#fff;">
+                            Cargando reto...
+                        </div>
+
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-secondary" onclick="resolveSecondChance(true)">> 1% (Probable)</button>
+                            <button class="btn-secondary" onclick="resolveSecondChance(false)">< 1% (Raro)</button>
+                        </div>
+                    </div>
                 </div>
 
-                <button class="btn" id="next-btn">SIGUIENTE CASO</button>
+                <!-- INTERFAZ DE JUEGO ACTIVA -->
+                <div id="game-interface" style="width: 100%;">
+                    <div class="score-board">
+                        <span id="lbl-ronda">Ronda: <b id="round-num" style="color:#fff;">1</b> (Récord: <b id="survival-record-tag" style="color:var(--gold-color)">0</b>)</span>
+                        <span id="lbl-puntuacion">Puntos: <b id="total-score" style="color:var(--primary-red);">0</b> pts</span>
+                    </div>
+
+                    <!-- INSIGNIAS DE ESTADO (RACHA, EVENTO Y RAREZA) -->
+                    <div class="status-banners-row">
+                        <div class="tag-badge streak" id="streak-badge">🔥 Racha x1</div>
+                        <div class="tag-badge event" id="event-badge" style="display:none;">⚡ DOBLE XP</div>
+                        <div class="rarity-tag comun" id="rarity-tag">⚪ COMÚN</div>
+                    </div>
+
+                    <div class="event-image-container">
+                        <img id="event-img" src="" alt="Imagen del evento">
+                    </div>
+
+                    <div class="event-title" id="event-title">Cargando evento...</div>
+
+                    <div class="slider-section">
+                        <div class="value-display" id="slider-val-display">50.00%</div>
+                        <input type="range" id="rare-slider" min="0" max="1000" value="500">
+                        <div class="scale-markers">
+                            <span id="lbl-imposible">0% (Imposible)</span>
+                            <span id="lbl-seguro">100% (Seguro)</span>
+                        </div>
+                    </div>
+
+                    <button class="btn" id="guess-btn">¡COMPROBAR!</button>
+                </div>
+
+                <!-- PANTALLA DE RESULTADOS DE RONDA ("¿QUÉ TAN CERCA ESTUVISTE?") -->
+                <div class="result-box" id="result-interface">
+                    <div class="precision-meter-card">
+                        <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-gray); font-weight:700;">
+                            <span>PRECISIÓN DE ESTIMACIÓN</span>
+                            <span id="precision-pct-text">0%</span>
+                        </div>
+                        <div class="precision-bar-bg">
+                            <div class="precision-bar-fill" id="precision-bar-fill"></div>
+                        </div>
+                        <div id="precision-comment" style="font-size:0.75rem; font-style:italic; color:var(--gold-color); font-weight:600; margin-top:4px;">
+                            "Estuviste increíblemente cerca"
+                        </div>
+                    </div>
+
+                    <div class="result-diff" id="result-header-text">Tu respuesta se desvió un:</div>
+                    <div class="result-diff" style="font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:4px;"><span id="diff-value">0%</span></div>
+                    
+                    <div class="points-earned" id="points-earned">+0 PUNTOS</div>
+                    
+                    <div class="actual-value-card" id="actual-card-box">
+                        El porcentaje real era: <br><b id="real-value-display">0%</b>
+                    </div>
+
+                    <button class="btn" id="next-btn">SIGUIENTE CASO</button>
+                </div>
+
+                <!-- PANTALLA FINAL CON TARJETA COMPARTIBLE -->
+                <div id="result-interface-final">
+                    <div class="share-card-canvas-container" id="share-card-node">
+                        <div class="share-header">HowRare? Challenge</div>
+                        <i class="fa-solid fa-trophy" style="font-size: 2rem; color: var(--gold-color); margin-top: 4px;"></i>
+                        <div class="final-score-big" id="final-score">0 PTS</div>
+                        <div style="font-size: 0.85rem; color: var(--gold-color); font-weight:800;" id="final-comment-tag">¡Mente matemática legendaria!</div>
+
+                        <div class="share-stats-grid">
+                            <div class="share-stat-item">
+                                <div class="share-stat-label">Rondas Pasadas</div>
+                                <div class="share-stat-val" id="share-val-rondas">0</div>
+                            </div>
+                            <div class="share-stat-item">
+                                <div class="share-stat-label">Precisión Media</div>
+                                <div class="share-stat-val" id="share-val-precision">0%</div>
+                            </div>
+                            <div class="share-stat-item">
+                                <div class="share-stat-label">Racha Máxima</div>
+                                <div class="share-stat-val" id="share-val-racha">0</div>
+                            </div>
+                            <div class="share-stat-item">
+                                <div class="share-stat-label">Nivel Jugador</div>
+                                <div class="share-stat-val" id="share-val-nivel">Nivel 1</div>
+                            </div>
+                        </div>
+
+                        <div style="font-size: 0.72rem; color: var(--text-gray); font-style: italic;">¿Puedes superarme en gnixo.com?</div>
+                    </div>
+
+                    <div class="action-btns-row">
+                        <button class="btn-secondary" onclick="downloadShareCard()">📸 DESCARGAR TARJETA</button>
+                        <button class="btn" style="flex: 1;" id="restart-btn" onclick="initGame()">REINTENTAR 🔄</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA 2: DESAFÍO DIARIO -->
+        <div id="view-daily" class="section-view">
+            <h3 style="color: var(--gold-color); margin-bottom: 8px; font-weight: 900;">📅 DESAFÍO DIARIO</h3>
+            <p style="font-size:0.8rem; color:var(--text-gray); margin-bottom:12px;">Completar el reto del día otorga +500 XP adicionales.</p>
+
+            <div style="background:#222; border:1px solid var(--gold-color); border-radius:12px; padding:14px; text-align:center;">
+                <div id="daily-challenge-desc" style="font-size:0.95rem; font-weight:800; color:#fff; margin-bottom:8px;">
+                    Cargando reto de hoy...
+                </div>
+                <div id="daily-status-tag" style="font-size:0.8rem; font-weight:700; color:var(--text-gray);">
+                    Estado: Pendiente
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA 3: ESTADÍSTICAS PERSONALES -->
+        <div id="view-stats" class="section-view">
+            <h3 style="color: var(--primary-red); margin-bottom: 12px; font-weight: 900;">📊 ESTADÍSTICAS PERSONALES</h3>
+            <div class="stats-grid">
+                <div class="stat-card-box"><div class="stat-card-label">Partidas Jugadas</div><div class="stat-card-val" id="st-partidas">0</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Supervivencia Máx.</div><div class="stat-card-val" id="st-supervivencia">0</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Preguntas Respondidas</div><div class="stat-card-val" id="st-preguntas">0</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Precisión Media</div><div class="stat-card-val" id="st-precision">0%</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Mejor Racha</div><div class="stat-card-val" id="st-racha">0</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Puntuación Máxima</div><div class="stat-card-val" id="st-maxscore">0</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Sucesos Legendarios</div><div class="stat-card-val" id="st-legendarias">0</div></div>
+                <div class="stat-card-box"><div class="stat-card-label">Remontadas "Retorno"</div><div class="stat-card-val" id="st-remontadas">0</div></div>
+            </div>
+        </div>
+
+        <!-- VISTA 4: COLECCIONES DE SUCESOS -->
+        <div id="view-collection" class="section-view">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <h3 style="color: var(--gold-color); font-weight: 900;">🏆 COLECCIÓN DE SUCESOS</h3>
+                <span id="collection-count-tag" style="font-size: 0.8rem; font-weight: 800; color: var(--text-gray);">0 / 0</span>
+            </div>
+            <div class="collection-progress-bar">
+                <div class="collection-progress-fill" id="collection-bar-fill"></div>
+            </div>
+            <div class="collection-grid" id="collection-grid-container">
+                <!-- Se poblará dinámicamente con TODOS los sucesos del juego -->
             </div>
         </div>
     </div>
 
     <script>
+        /* TRADUCCIONES E INTERNACIONALIZACIÓN */
         const i18nHR = {
             en: {
-                volver: "← Back to Menu",
-                subtitulo: "Guess the exact probability of the event",
-                ronda: "Round:",
-                puntuacion: "Score:",
-                pts: "pts",
-                imposible: "0% (Impossible)",
-                seguro: "100% (Certain)",
-                comprobar: "CHECK PRICE!",
-                desvio: "Your guess was off by:",
-                puntosGanados: "POINTS",
-                porcentajeReal: "The real percentage was:",
-                siguiente: "NEXT CASE",
-                jugarOtraVez: "PLAY AGAIN 🔄",
-                clasificacionGlobal: "Global Rank",
-                acumulado: "Total score accumulated in 5 rounds",
-                completado: "You have completed the <b>HowRare?</b> probability challenge!",
-                tiers: {
-                    t1: "Top 1% — Legendary math mind!",
-                    t2: "Top 5% — Elite statistician!",
-                    t3: "Top 20% — Great intuition!",
-                    t4: "Top 50% — Average player",
-                    t5: "Top 99% — Room for improvement!"
-                }
+                volver: "← Back to Menu", subtitulo: "Guess the exact probability of the event",
+                ronda: "Round:", puntuacion: "Score:", pts: "pts",
+                imposible: "0% (Impossible)", seguro: "100% (Certain)", comprobar: "CHECK PROBABILITY!",
+                desvio: "Your guess was off by:", puntosGanados: "POINTS", porcentajeReal: "The real percentage was:",
+                siguiente: "NEXT CASE", jugarOtraVez: "PLAY AGAIN 🔄"
             },
             es: {
-                volver: "← Volver al Menú",
-                subtitulo: "Adivina la probabilidad exacta del suceso",
-                ronda: "Ronda:",
-                puntuacion: "Puntuación:",
-                pts: "pts",
-                imposible: "0% (Imposible)",
-                seguro: "100% (Seguro)",
-                comprobar: "¡COMPROBAR!",
-                desvio: "Tu respuesta se desvió un:",
-                puntosGanados: "PUNTOS",
-                porcentajeReal: "El porcentaje real era:",
-                siguiente: "SIGUIENTE CASO",
-                jugarOtraVez: "JUGAR OTRA VEZ 🔄",
-                clasificacionGlobal: "Clasificación Global",
-                acumulado: "Puntuación total acumulada en 5 rondas",
-                completado: "¡Has completado el reto de probabilidades de <b>HowRare?</b> con éxito!",
-                tiers: {
-                    t1: "Top 1% — ¡Mente matemática legendaria!",
-                    t2: "Top 5% — ¡Estadista de élite!",
-                    t3: "Top 20% — ¡Gran intuición!",
-                    t4: "Top 50% — Jugador promedio",
-                    t5: "Top 99% — ¡Aún puedes mejorar!"
-                }
+                volver: "← Volver al Menú", subtitulo: "Adivina la probabilidad exacta del suceso",
+                ronda: "Ronda:", puntuacion: "Puntos:", pts: "pts",
+                imposible: "0% (Imposible)", seguro: "100% (Seguro)", comprobar: "¡COMPROBAR!",
+                desvio: "Tu respuesta se desvió un:", puntosGanados: "PUNTOS", porcentajeReal: "El porcentaje real era:",
+                siguiente: "SIGUIENTE CASO", jugarOtraVez: "JUGAR OTRA VEZ 🔄"
             },
             fr: {
-                volver: "← Retour au menu",
-                subtitulo: "Devinez la probabilité exacte de l'événement",
-                ronda: "Manche :",
-                puntuacion: "Score :",
-                pts: "pts",
-                imposible: "0% (Impossible)",
-                seguro: "100% (Certain)",
-                comprobar: "VÉRIFIER !",
-                desvio: "Votre réponse était écartée de :",
-                puntosGanados: "POINTS",
-                porcentajeReal: "Le pourcentage réel était de :",
-                siguiente: "CAS SUIVANT",
-                jugarOtraVez: "REJOUER 🔄",
-                clasificacionGlobal: "Classement Mondial",
-                acumulado: "Score total accumulé en 5 manches",
-                completado: "Vous avez terminé le défi de probabilité <b>HowRare?</b> !",
-                tiers: {
-                    t1: "Top 1% — Esprit mathématique légendaire !",
-                    t2: "Top 5% — Statisticien d'élite !",
-                    t3: "Top 20% — Grande intuition !",
-                    t4: "Top 50% — Joueur moyen",
-                    t5: "Top 99% — Vous pouvez vous améliorer !"
-                }
+                volver: "← Retour au menu", subtitulo: "Devinez la probabilité exacte de l'événement",
+                ronda: "Manche :", puntuacion: "Score :", pts: "pts",
+                imposible: "0% (Impossible)", seguro: "100% (Certain)", comprobar: "VÉRIFIER !",
+                desvio: "Votre réponse était écartée de :", puntosGanados: "POINTS", porcentajeReal: "Le pourcentage réel était de :",
+                siguiente: "CAS SUIVANT", jugarOtraVez: "REJOUER 🔄"
             },
             de: {
-                volver: "← Zurück zum Menü",
-                subtitulo: "Errade die exakte Wahrscheinlichkeit des Ereignisses",
-                ronda: "Runde:",
-                puntuacion: "Punktzahl:",
-                pts: "Pkt",
-                imposible: "0% (Unmöglich)",
-                seguro: "100% (Sicher)",
-                comprobar: "PRÜFEN!",
-                desvio: "Deine Antwort lag daneben um:",
-                puntosGanados: "PUNKTE",
-                porcentajeReal: "Der echte Prozentsatz war:",
-                siguiente: "NÄCHSTER FALL",
-                jugarOtraVez: "ERNEUT SPIELEN 🔄",
-                clasificacionGlobal: "Globale Rangliste",
-                acumulado: "Gesamtpunktzahl aus 5 Runden",
-                completado: "Du hast die <b>HowRare?</b> Wahrscheinlichkeits-Herausforderung gemeistert!",
-                tiers: {
-                    t1: "Top 1% — Legendäres Mathe-Genie!",
-                    t2: "Top 5% — Elite-Statistiker!",
-                    t3: "Top 20% — Starke Intuition!",
-                    t4: "Top 50% — Durchschnittlicher Spieler",
-                    t5: "Top 99% — Noch Raum für Verbesserungen!"
-                }
+                volver: "← Zurück zum Menü", subtitulo: "Errade die exakte Wahrscheinlichkeit",
+                ronda: "Runde:", puntuacion: "Punktzahl:", pts: "Pkt",
+                imposible: "0% (Unmöglich)", seguro: "100% (Sicher)", comprobar: "PRÜFEN!",
+                desvio: "Deine Antwort lag daneben um:", puntosGanados: "PUNKTE", porcentajeReal: "Der echte Prozentsatz war:",
+                siguiente: "NÄCHSTER FALL", jugarOtraVez: "ERNEUT SPIELEN 🔄"
             }
         };
 
+        /* BASE DE DATOS MASIVA AMPLIADA CON MÁS DE 130 SUCESOS EN TOTAL */
         const eventsDB = [
-            // --- LOS 40 SUCESOS ORIGINALES ---
-            { 
-                title: { en: "Winning the Christmas Lottery jackpot (1 in 100,000)", es: "Ganar el gordo de la Lotería de Navidad (1 entre 100.000)", fr: "Gagner le gros lot de la Loterie de Noël", de: "Den Hauptgewinn der Weihnachtswebelotterie gewinnen" }, 
-                real: 0.001, img: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being struck by lightning in your lifetime", es: "Que te caiga un rayo a lo largo de tu vida", fr: "Être frappé par la foudre au cours de sa vie", de: "Im Laufe des Lebens vom Blitz getroffen werden" }, 
-                real: 0.0066, img: "https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Finding a four-leaf clover on the first try", es: "Encontrar un trébol de cuatro hojas a la primera", fr: "Trouver un trèfle à quatre feuilles du premier coup", de: "Auf Anhieb ein vierblättriges Kleeblatt finden" }, 
-                real: 0.01, img: "https://images.unsplash.com/photo-1590005354167-6da97870c757?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being born with heterochromia (different colored eyes)", es: "Nacer con heterocromía (ojos de diferente color)", fr: "Naître avec de l'hétérochromie (yeux de couleurs différentes)", de: "Mit Heterochromie (unterschiedlich farbigen Augen) geboren werden" }, 
-                real: 0.06, img: "https://images.unsplash.com/photo-1560807707-8cc77767d783?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Finding two yolks in a single egg", es: "Encontrar dos yemas al romper un huevo", fr: "Trouver deux jaunes dans un seul œuf", de: "Zwei Dotter in einem Ei finden" }, 
-                real: 0.1, img: "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being attacked by a shark while swimming in the ocean", es: "Ser atacado por un tiburón nadando en el mar", fr: "Être attaqué par un requin en nageant dans l'océan", de: "Beim Schwimmen im Meer von einem Hai angegriffen werden" }, 
-                real: 0.000026, img: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being hit by a meteorite", es: "Ser alcanzado por un meteorito", fr: "Être frappé par une météorite", de: "Von einem Meteoriten getroffen werden" }, 
-                real: 0.000003, img: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Getting a Royal Flush on the first poker hand", es: "Conseguir una Escalera Real en la primera mano de póker", fr: "Obtenir une Quinte Flush Royale dès la première main de poker", de: "Ein Royal Flush auf der ersten Pokerhand erhalten" }, 
-                real: 0.000154, img: "https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having spontaneous identical twins", es: "Tener un embarazo de gemelos idénticos espontáneo", fr: "Avoir une grossesse spontanée de vrais jumeaux", de: "Spontan identische Zwillinge bekommen" }, 
-                real: 0.4, img: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A coin landing perfectly on its edge when tossed", es: "Que una moneda caiga perfectamente de canto al lanzarla", fr: "Une pièce qui tombe parfaitement sur la tranche", de: "Eine Münze, die beim Werfen auf dem Rand stehen bleibt" }, 
-                real: 0.016, img: "https://images.unsplash.com/photo-1561414927-6d86591d0c4f?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being left-handed in the global population", es: "Ser zurdo en la población mundial", fr: "Être gaucher dans la population mondiale", de: "Linkshänder in der Weltbevölkerung sein" }, 
-                real: 10.0, img: "https://images.unsplash.com/photo-1588072432836-e10032774350?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having naturally green eyes", es: "Tener los ojos verdes de forma natural", fr: "Avoir naturellement les yeux verts", de: "Natürliche grüne Augen haben" }, 
-                real: 2.0, img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having natural red hair", es: "Tener el pelo pelirrojo natural", fr: "Avoir naturellement des cheveux roux", de: "Natürlich rotes Haar haben" }, 
-                real: 1.5, img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Bowling a strike on a random attempt", es: "Conseguir un pleno de un tiro al jugar a los bolos (strike)", fr: "Faire un strike lors d'un lancer de bowling", de: "Einen Strike beim Bowlen erzielen" }, 
-                real: 8.5, img: "https://images.unsplash.com/photo-1538388149542-5e24932d11a8?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Suffering a major flight delay on a commercial airline", es: "Sufrir un retraso grave en un vuelo comercial", fr: "Subir un retard majeur sur un vol commercial", de: "Eine schwere Flugverspätung erleben" }, 
-                real: 4.5, img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Finding paper money lying on the street", es: "Encontrar un billete de dinero tirado en la calle", fr: "Trouver un billet de banque par terre dans la rue", de: "Geldscheine auf der Straße finden" }, 
-                real: 2.0, img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being born on February 29 in a leap year", es: "Nacer el 29 de febrero en un año bisiesto", fr: "Naître un 29 février une année bissextile", de: "Am 29. Februar in einem Schaltjahr geboren werden" }, 
-                real: 0.068, img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Getting a flat tire during a year of driving", es: "Sufrir un pinchazo en la rueda del coche durante un año", fr: "Avoir un pneu crevé au cours d'une année de conduite", de: "Einen platten Reifen innerhalb eines Jahres haben" }, 
-                real: 7.0, img: "https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Seeing a total solar eclipse from your hometown", es: "Ver un eclipse solar total desde tu ciudad", fr: "Voir une éclipse solaire totale depuis votre ville", de: "Eine totale Sonnenfinsternis in deiner Stadt sehen" }, 
-                real: 0.25, img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Drawing an Ace as the first card from a deck", es: "Sacar un As al robar la primera carta de una baraja", fr: "Tirer un As comme première carte d'un jeu", de: "Ein Ass als erste Karte aus einem Deck ziehen" }, 
-                real: 7.69, img: "https://images.unsplash.com/photo-1541278107931-e006523892df?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Rolling a 6 on a standard six-sided die", es: "Sacar un 6 al tirar un dado estándar de seis caras", fr: "Obtenir un 6 en lançant un dé classique à 6 faces", de: "Eine 6 auf einem gewöhnlichen Würfel würfeln" }, 
-                real: 16.67, img: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having O-negative blood type (universal donor)", es: "Tener sangre del tipo O negativo (donante universal)", fr: "Avoir le groupe sanguin O négatif (donneur universel)", de: "Blutgruppe 0-negativ haben (Universalspender)" }, 
-                real: 7.0, img: "https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Rain occurring on any random day in London", es: "Que llueva en un día cualquiera en Londres", fr: "Un jour de pluie n'importe quel jour à Londres", de: "Regen an einem beliebigen Tag in London" }, 
-                real: 38.0, img: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Getting exactly two heads when flipping three coins", es: "Sacar exactamente dos caras al lanzar tres monedas", fr: "Obtenir exactement deux faces en lançant trois pièces", de: "Genau zwei Köpfe beim Werfen von drei Münzen erhalten" }, 
-                real: 37.5, img: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Falling asleep while watching a movie at night", es: "Quedarte dormido viéndote una película por la noche", fr: "S'endormir en regardant un film la nuit", de: "Nachts beim Filmsehen einschlafen" }, 
-                real: 42.0, img: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having at least one food or environmental allergy", es: "Tener al menos una alergia alimentaria o ambiental", fr: "Avoir au moins une allergie alimentaire ou environnementale", de: "Mindestens eine Lebensmittel- oder Umweltallergie haben" }, 
-                real: 30.0, img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having cheek dimples when smiling", es: "Tener hoyuelos en las mejillas al sonreír", fr: "Avoir des fossettes sur les joues en souriant", de: "Grübchen auf den Wangen beim Lächeln haben" }, 
-                real: 20.0, img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Toast landing butter-side down on the floor", es: "Que la tostada caiga al suelo con la mantequilla hacia abajo", fr: "La tartine qui tombe du côté beurre au sol", de: "Der Toast landet mit der Butterseite nach unten auf dem Boden" }, 
-                real: 50.0, img: "https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Receiving a spam telemarketing call during the day", es: "Recibir una llamada Spam o comercial durante el día", fr: "Recevoir un appel publicitaire ou spam pendant la journée", de: "Tagsüber einen Werbe- oder Spam-Anruf erhalten" }, 
-                real: 45.0, img: "https://images.unsplash.com/photo-1534536281715-e28d76689b4d?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Landing a relationship from a first Tinder date", es: "Conseguir pareja en una primera cita de Tinder", fr: "Trouver une relation dès un premier rendez-vous Tinder", de: "Eine Beziehung beim ersten Tinder-Date finden" }, 
-                real: 12.0, img: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Flipping heads on a coin toss", es: "Obtener cara al lanzar una moneda al aire", fr: "Obtenir pile en lançant une pièce", de: "Kopf beim Münzwurf erhalten" }, 
-                real: 50.0, img: "https://images.unsplash.com/photo-1561414927-6d86591d0c4f?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Rolling an even number on a standard die", es: "Sacar un número par al lanzar un dado estándar", fr: "Obtenir un nombre pair avec un dé classique", de: "Eine gerade Zahl auf einem gewöhnlichen Würfel würfeln" }, 
-                real: 50.0, img: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Drawing a red card from a standard poker deck", es: "Robar una carta de color rojo en una baraja de póker", fr: "Tirer une carte rouge d'un jeu de poker", de: "Eine rote Karte aus einem Kartendeck ziehen" }, 
-                real: 50.0, img: "https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having brown eyes in the world population", es: "Tener los ojos de color marrón en el mundo", fr: "Avoir les yeux marron dans la population mondiale", de: "Braune Augen in der Weltbevölkerung haben" }, 
-                real: 75.0, img: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being able to roll your tongue into a U-shape", es: "Ser capaz de doblar la lengua en forma de U", fr: "Être capable de rouler sa langue en U", de: "Die Zunge U-förmig rollen können" }, 
-                real: 70.0, img: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Checking your phone within 10 minutes of waking up", es: "Mirar el móvil en los primeros 10 minutos al despertarte", fr: "Regarder son téléphone dans les 10 min suivant le réveil", de: "In den ersten 10 Minuten nach dem Aufstehen aufs Handy schauen" }, 
-                real: 88.0, img: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Seeing at least one dog during a 30-min walk in the city", es: "Ver al menos un perro paseando si caminas 30 min por la ciudad", fr: "Voir au moins un chien lors d'une marche de 30 min en ville", de: "Bei einem 30-minütigen Stadtspaziergang mindestens einen Hund sehen" }, 
-                real: 92.0, img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A car starting on the first try when turning the key/button", es: "Que un coche arranque a la primera al girar la llave/botón", fr: "Une voiture qui démarre du premier coup en tournant la clé", de: "Ein Auto, das beim ersten Versuch anspringt" }, 
-                real: 99.5, img: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Finding an unmatched sock in your laundry load", es: "Encontrar al menos un calcetín desparejado en la colada", fr: "Trouver au moins une chaussette orpheline dans la lessive", de: "Mindestens eine einzelne Socke in der Wäsche finden" }, 
-                real: 65.0, img: "https://images.unsplash.com/photo-1582966772680-860e372bb558?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Getting at least one heads when flipping 5 coins", es: "Que salga al menos una cara si lanzas 5 monedas seguidas", fr: "Obtenir au moins une fois pile en lançant 5 pièces", de: "Mindestens einmal Kopf beim Werfen von 5 Münzen erhalten" }, 
-                real: 96.87, img: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=600&auto=format&fit=crop" 
-            },
+            // SUCESOS ORIGINALES Y BASE (1 a 30)
+            { id: "hr1", title: { en: "Winning the Christmas Lottery jackpot (1 in 100,000)", es: "Ganar el gordo de la Lotería de Navidad (1 entre 100.000)", fr: "Gagner le gros lot de la Loterie de Noël", de: "Den Hauptgewinn der Weihnachtswebelotterie gewinnen" }, real: 0.001, rarity: "epica", cat: "Azar", img: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=600&auto=format&fit=crop" },
+            { id: "hr2", title: { en: "Being struck by lightning in your lifetime", es: "Que te caiga un rayo a lo largo de tu vida", fr: "Être frappé par la foudre au cours de sa vie", de: "Im Laufe des Lebens vom Blitz getroffen werden" }, real: 0.0066, rarity: "rara", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?w=600&auto=format&fit=crop" },
+            { id: "hr3", title: { en: "Finding a four-leaf clover on the first try", es: "Encontrar un trébol de cuatro hojas a la primera", fr: "Trouver un trèfle à quatre feuilles du premier coup", de: "Auf Anhieb ein vierblättriges Kleeblatt finden" }, real: 0.01, rarity: "rara", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1590005354167-6da97870c757?w=600&auto=format&fit=crop" },
+            { id: "hr4", title: { en: "Being born with heterochromia (different colored eyes)", es: "Nacer con heterocromía (ojos de diferente color)", fr: "Naître avec de l'hétérochromie", de: "Mit Heterochromie geboren werden" }, real: 0.06, rarity: "rara", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1560807707-8cc77767d783?w=600&auto=format&fit=crop" },
+            { id: "hr5", title: { en: "Finding two yolks in a single egg", es: "Encontrar dos yemas al romper un huevo", fr: "Trouver deux jaunes dans un seul œuf", de: "Zwei Dotter in einem Ei finden" }, real: 0.1, rarity: "rara", cat: "Absurdo", img: "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=600&auto=format&fit=crop" },
+            { id: "hr6", title: { en: "Being attacked by a shark while swimming in the ocean", es: "Ser atacado por un tiburón nadando en el mar", fr: "Être attaqué par un requin en nageant", de: "Beim Schwimmen im Meer von einem Hai angegriffen werden" }, real: 0.000026, rarity: "legendaria", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?w=600&auto=format&fit=crop" },
+            { id: "hr7", title: { en: "Being hit by a meteorite", es: "Ser alcanzado por un meteorito", fr: "Être frappé par une météorite", de: "Von einem Meteoriten getroffen werden" }, real: 0.000003, rarity: "legendaria", cat: "Absurdo", img: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=600&auto=format&fit=crop" },
+            { id: "hr8", title: { en: "Getting a Royal Flush on the first poker hand", es: "Conseguir una Escalera Real en la primera mano de póker", fr: "Obtenir une Quinte Flush Royale dès la primera main", de: "Ein Royal Flush auf der ersten Pokerhand erhalten" }, real: 0.000154, rarity: "legendaria", cat: "Azar", img: "https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=600&auto=format&fit=crop" },
+            { id: "hr9", title: { en: "Having spontaneous identical twins", es: "Tener un embarazo de gemelos idénticos espontáneo", fr: "Avoir une grossesse spontanée de vrais jumeaux", de: "Spontan identische Zwillinge bekommen" }, real: 0.4, rarity: "rara", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=600&auto=format&fit=crop" },
+            { id: "hr10", title: { en: "A coin landing perfectly on its edge when tossed", es: "Que una moneda caiga perfectamente de canto al lanzarla", fr: "Une pièce qui tombe sur la tranche", de: "Eine Münze bleibt auf dem Rand stehen" }, real: 0.016, rarity: "epica", cat: "Azar", img: "https://images.unsplash.com/photo-1561414927-6d86591d0c4f?w=600&auto=format&fit=crop" },
+            { id: "hr11", title: { en: "Being left-handed in the global population", es: "Ser zurdo en la población mundial", fr: "Être gaucher dans la population", de: "Linkshänder in der Weltbevölkerung sein" }, real: 10.0, rarity: "comun", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1588072432836-e10032774350?w=600&auto=format&fit=crop" },
+            { id: "hr12", title: { en: "Having naturally green eyes", es: "Tener los ojos verdes de forma natural", fr: "Avoir naturellement les yeux verts", de: "Natürliche grüne Augen haben" }, real: 2.0, rarity: "rara", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop" },
+            { id: "hr13", title: { en: "Having natural red hair", es: "Tener el pelo pelirrojo natural", fr: "Avoir naturellement des cheveux roux", de: "Natürlich rotes Haar haben" }, real: 1.5, rarity: "rara", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&auto=format&fit=crop" },
+            { id: "hr14", title: { en: "Bowling a strike on a random attempt", es: "Conseguir un pleno de un tiro al jugar a los bolos (strike)", fr: "Faire un strike au bowling", de: "Einen Strike beim Bowlen erzielen" }, real: 8.5, rarity: "comun", cat: "Vida", img: "https://images.unsplash.com/photo-1538388149542-5e24932d11a8?w=600&auto=format&fit=crop" },
+            { id: "hr15", title: { en: "Suffering a major flight delay on a commercial airline", es: "Sufrir un retraso grave en un vuelo comercial", fr: "Subir un retard majeur sur un vol", de: "Eine schwere Flugverspätung erleben" }, real: 4.5, rarity: "comun", cat: "Mundo", img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&auto=format&fit=crop" },
+            { id: "hr16", title: { en: "Finding paper money lying on the street", es: "Encontrar un billete de dinero tirado en la calle", fr: "Trouver un billet de banque par terre", de: "Geldscheine auf der Straße finden" }, real: 2.0, rarity: "rara", cat: "Vida", img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop" },
+            { id: "hr17", title: { en: "Being born on February 29 in a leap year", es: "Nacer el 29 de febrero en un año bisiesto", fr: "Naître un 29 février une année bissextile", de: "Am 29. Februar geboren werden" }, real: 0.068, rarity: "epica", cat: "Mundo", img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop" },
+            { id: "hr18", title: { en: "Getting a flat tire during a year of driving", es: "Sufrir un pinchazo en la rueda del coche durante un año", fr: "Avoir un pneu crevé en un an", de: "Einen platten Reifen im Jahr haben" }, real: 7.0, rarity: "comun", cat: "Vida", img: "https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=600&auto=format&fit=crop" },
+            { id: "hr19", title: { en: "Seeing a total solar eclipse from your hometown", es: "Ver un eclipse solar total desde tu ciudad", fr: "Voir une éclipse solaire totale depuis votre ville", de: "Eine totale Sonnenfinsternis in deiner Stadt sehen" }, real: 0.25, rarity: "epica", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=600&auto=format&fit=crop" },
+            { id: "hr20", title: { en: "Drawing an Ace as the first card from a deck", es: "Sacar un As al robar la primera carta de una baraja", fr: "Tirer un As comme première carte", de: "Ein Ass als erste Karte ziehen" }, real: 7.69, rarity: "comun", cat: "Azar", img: "https://images.unsplash.com/photo-1541278107931-e006523892df?w=600&auto=format&fit=crop" },
+            { id: "hr21", title: { en: "Rolling a 6 on a standard six-sided die", es: "Sacar un 6 al tirar un dado estándar de seis caras", fr: "Obtenir un 6 avec un dé", de: "Eine 6 auf einem Würfel würfeln" }, real: 16.67, rarity: "comun", cat: "Azar", img: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=600&auto=format&fit=crop" },
+            { id: "hr22", title: { en: "Having O-negative blood type (universal donor)", es: "Tener sangre del tipo O negativo (donante universal)", fr: "Avoir le groupe sanguin O négatif", de: "Blutgruppe 0-negativ haben" }, real: 7.0, rarity: "rara", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=600&auto=format&fit=crop" },
+            { id: "hr23", title: { en: "Rain occurring on any random day in London", es: "Que llueva en un día cualquiera en Londres", fr: "Un jour de pluie à Londres", de: "Regen an einem Tag in London" }, real: 38.0, rarity: "comun", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=600&auto=format&fit=crop" },
+            { id: "hr24", title: { en: "Having at least one food allergy", es: "Tener al menos una alergia alimentaria", fr: "Avoir une allergie alimentaire", de: "Eine Lebensmittelallergie haben" }, real: 30.0, rarity: "comun", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop" },
+            { id: "hr25", title: { en: "Toast landing butter-side down on the floor", es: "Que la tostada caiga al suelo con la mantequilla hacia abajo", fr: "La tartine cae del lado de la mantequilla", de: "Der Toast landet auf der Butterseite" }, real: 50.0, rarity: "comun", cat: "Absurdo", img: "https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?w=600&auto=format&fit=crop" },
+            { id: "hr26", title: { en: "Scoring a hole-in-one in golf for an amateur", es: "Hacer un hoyo en uno siendo un jugador de golf aficionado", fr: "Faire un trou en un pour un amateur", de: "Ein Hole-in-One als Amateurgolfer schlagen" }, real: 0.008, rarity: "epica", cat: "Vida", img: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&auto=format&fit=crop" },
+            { id: "hr27", title: { en: "Plugging in a USB Type-A correctly on first try", es: "Acertar la posición de un cable USB clásico a la primera", fr: "Brancher un câble USB A du premier coup", de: "USB-Stecker beim ersten Versuch richtig einstecken" }, real: 33.3, rarity: "comun", cat: "Tecnología", img: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?w=600&auto=format&fit=crop" },
+            { id: "hr28", title: { en: "Finding a pearl inside an edible oyster", es: "Encontrar una perla natural dentro de una ostra para comer", fr: "Trouver une perle dans une huître", de: "Eine Perle in einer Speiseauster finden" }, real: 0.01, rarity: "legendaria", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=600&auto=format&fit=crop" },
+            { id: "hr29", title: { en: "Solving a Rubik's Cube completely at random", es: "Resolver un cubo de Rubik a ciegas girándolo al azar", fr: "Résoudre un Rubik's cube au hasard", de: "Einen Zauberwürfel rein zufällig lösen" }, real: 0.0000000000000000002, rarity: "legendaria", cat: "Absurdo", img: "https://images.unsplash.com/photo-1563207153-f403bf289096?w=600&auto=format&fit=crop" },
+            { id: "hr30", title: { en: "A smartphone screen shattering when dropped from 1 meter", es: "Que la pantalla del móvil se rompa al caer desde 1 metro", fr: "Écran de smartphone brisé en tombant", de: "Display-Schaden beim Sturz aus 1 Meter" }, real: 40.0, rarity: "comun", cat: "Tecnología", img: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=600&auto=format&fit=crop" },
 
-            // --- 60 NUEVOS SUCESOS ---
-            { 
-                title: { en: "Scoring a hole-in-one in golf for an amateur golfer", es: "Hacer un hoyo en uno siendo un jugador de golf aficionado", fr: "Faire un trou en un pour un golfeur amateur", de: "Ein Hole-in-One als Amateurgolfer schlagen" }, 
-                real: 0.008, img: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being born with an extra finger or toe (Polydactyly)", es: "Nacer con un dedo extra en manos o pies (Polidactilia)", fr: "Naître avec un doigt ou orteil supplémentaire", de: "Mit einem extra Finger oder Zeh geboren werden" }, 
-                real: 0.2, img: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being ambidextrous (able to use both hands equally)", es: "Ser ambidiestro (usar ambas manos con la misma habilidad)", fr: "Être ambidextre", de: "Beidhändig sein" }, 
-                real: 1.0, img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having AB-negative blood type (rarest blood group)", es: "Tener sangre de tipo AB negativo (el grupo más raro)", fr: "Avoir le groupe sanguin AB négatif", de: "Blutgruppe AB-negativ haben" }, 
-                real: 0.6, img: "https://images.unsplash.com/photo-1536856136534-bb679c52a9aa?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having perfect pitch (absolute pitch in music)", es: "Tener oído absoluto para la música", fr: "Avoir l'oreille absolue", de: "Das absolute Gehör haben" }, 
-                real: 0.01, img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Surviving a plane crash when involved in one", es: "Sobrevivir a un accidente de avión comercial", fr: "Survivre à un crash d'avion", de: "Einen Flugzeugabsturz überleben" }, 
-                real: 95.7, img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being injured by a toilet bowl during your lifetime", es: "Sufrir una lesión causada por un inodoro a lo largo de la vida", fr: "Être blessé par des toilettes au cours de sa vie", de: "Im Laufe des Lebens durch eine Toilette verletzt werden" }, 
-                real: 0.01, img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Sharing a birthday with a random person in a group of 23 people", es: "Coincidir cumpleaños con alguien en un grupo de 23 personas", fr: "Partager son anniversaire dans un groupe de 23 personnes", de: "Geburtstag mit jemandem in einer Gruppe von 23 Personen teilen" }, 
-                real: 50.7, img: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being bitten by a venomous snake in a developed country", es: "Ser mordido por una serpiente venenosa en un país desarrollado", fr: "Être mordu par un serpent venimeux dans un pays développé", de: "In einem entwickeltem Land von einer Giftschlange gebissen werden" }, 
-                real: 0.002, img: "https://images.unsplash.com/photo-1531386151447-fd76ad50012f?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Unlocking a smartphone with your thumb fingerprint on first try", es: "Desbloquear la huella del móvil a la primera con el pulgar", fr: "Déverrouiller son smartphone avec l'empreinte du premier coup", de: "Das Smartphone auf Anhieb mit dem Daumenabdruck entsperren" }, 
-                real: 98.0, img: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Plugging in a USB Type-A connector correctly on the first attempt", es: "Acertar la posición de un cable USB clásico a la primera", fr: "Brancher un câble USB A du premier coup", de: "Einen USB-A-Stecker beim ersten Versuch richtig einstecken" }, 
-                real: 33.3, img: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A smartphone screen shattering when dropped on concrete from 1 meter", es: "Que la pantalla del móvil se rompa al caer al suelo desde 1 metro", fr: "Un écran de smartphone qui se brise en tombant sur du béton", de: "Ein Display-Schaden beim Sturz aus 1 Meter Höhe auf Beton" }, 
-                real: 40.0, img: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Catching a foul ball at a Major League Baseball game", es: "Atrapar una pelota en las gradas de un partido de béisbol", fr: "Attraper une balle dans les tribunes d'un match de baseball", de: "Einen Foulball bei einem Profi-Baseballspiel fangen" }, 
-                real: 0.17, img: "https://images.unsplash.com/photo-1508802279261-267986957811?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A passenger train arriving exactly on time in Japan", es: "Que un tren en Japón llegue puntual al segundo exacto", fr: "Un train qui arrive exactement à l'heure au Japon", de: "Pünktlicher Zug in Japan auf die Sekunde genau" }, 
-                real: 99.0, img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Receiving a package delivered on the same day it was ordered online", es: "Recibir un pedido online el mismo día en que se compró", fr: "Recevoir un colis commandé le jour même", de: "Eine Lieferung am selben Tag der Bestellung erhalten" }, 
-                real: 15.0, img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having lactose intolerance as an adult worldwide", es: "Tener intolerancia a la lactosa en la edad adulta en el mundo", fr: "Avoir une intolérance au lactose à l'âge adulte", de: "Laktoseintoleranz im Erwachsenenalter weltweit haben" }, 
-                real: 68.0, img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Experiencing a sneeze caused by looking at bright light (Photic Sneeze)", es: "Estornudar al mirar fijamente a la luz del sol o luz brillante", fr: "Éternuer en regardant une lumière vive", de: "Niesen durch den Anblick von hellem Licht" }, 
-                real: 25.0, img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being able to wiggle your ears voluntarily", es: "Poder mover las orejas de forma voluntaria", fr: "Être capable de bouger les oreilles volontairement", de: "Die Ohren freiwillig bewegen können" }, 
-                real: 10.0, img: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having wisdom teeth that never grow in (Agensis)", es: "Nacer sin muelas del juicio (nunca te saldrán)", fr: "N'avoir jamais de dents de sagesse", de: "Keine Weisheitszähne angelegt haben" }, 
-                real: 35.0, img: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Dropping a dropped slice of pizza sauce-side down", es: "Que un trozo de pizza caiga al suelo boca abajo", fr: "Une part de pizza qui tombe du côté sauce", de: "Ein Stück Pizza landet mit der Belagseite nach unten" }, 
-                real: 50.0, img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Finding a pearl inside an edible oyster", es: "Encontrar una perla natural dentro de una ostra para comer", fr: "Trouver une perle dans une huître comestible", de: "Eine Perle in einer Speiseauster finden" }, 
-                real: 0.01, img: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being killed by a falling coconut", es: "Morir por la caída de un coco de una palmera", fr: "Être tué par la chute d'une noix de coco", de: "Durch eine herabfallende Kokosnuss sterben" }, 
-                real: 0.0000004, img: "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Guessing a random 4-digit PIN code on the first attempt", es: "Adivinar un PIN secreto de 4 dígitos al primer intento", fr: "Deviner un code PIN à 4 chiffres du premier coup", de: "Einen 4-stelligen PIN-Code beim ersten Versuch erraten" }, 
-                real: 0.01, img: "https://images.unsplash.com/photo-1556742049-0a670f4a4591?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having a dream lucid enough to control what happens", es: "Tener un sueño lúcido donde controlas la acción", fr: "Avoir un rêve lucide et en contrôler le déroulement", de: "Einen Klartraum haben und die Handlung steuern" }, 
-                real: 55.0, img: "https://images.unsplash.com/photo-1511295742362-92c96b124e52?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Winning a game of Rock-Paper-Scissors in 1 round", es: "Ganar a piedra, papel o tijeras en 1 sola ronda", fr: "Gagner à pierre-feuille-ciseaux en un seul coup", de: "Eine Runde Schere-Stein-Papier sofort gewinnen" }, 
-                real: 33.3, img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A cat landing on its feet after a fall from over 1 meter", es: "Que un gato caiga de pie tras una caída de más de 1 metro", fr: "Un chat retombant sur ses pattes après une chute", de: "Eine Katze landet nach einem Sturz auf den Pfoten" }, 
-                real: 90.0, img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Experiencing Deja Vu at least once in a year", es: "Tener una sensación de Déjà Vu al menos una vez al año", fr: "Ressentir une impression de déjà-vu au moins une fois par an", de: "Mindestens einmal im Jahr ein Déjà-vu erleben" }, 
-                real: 70.0, img: "https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Getting a red light when driving up to a traffic signal", es: "Pillar el semáforo en rojo al llegar conduciendo", fr: "Tomber sur un feu rouge en arrivant en voiture", de: "Bei einer Ampel ankommen und Rot haben" }, 
-                real: 48.0, img: "https://images.unsplash.com/photo-1508873696983-2df515122519?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "An adult human being capable of swimming", es: "Que un adulto en el mundo sepa nadar", fr: "Un adulte capable de nager dans le monde", de: "Ein Erwachsener weltweit, der schwimmen kann" }, 
-                real: 55.0, img: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "An earthquake occurring somewhere on Earth every 2 minutes", es: "Que ocurra un terremoto registrado en la Tierra cada 2 min", fr: "Un séisme se produisant sur Terre toutes les 2 minutes", de: "Ein Erdbeben irgendwo auf der Erde alle 2 Minuten" }, 
-                real: 99.9, img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "An adult human having a coffee every morning", es: "Un adulto que bebe café todas las mañanas", fr: "Un adulte buvant du café chaque matin", de: "Ein Erwachsener, der jeden Morgen Kaffee trinkt" }, 
-                real: 65.0, img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Rolling snake eyes (two 1s) with two dice", es: "Sacar dobles unos al tirar dos dados de seis caras", fr: "Obtenir un double 1 en lançant deux dés", de: "Zwei Einser mit zwei Würfeln würfeln" }, 
-                real: 2.78, img: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A modern commercial airplane being hit by lightning in a year", es: "Que un avión comercial sea alcanzado por un rayo en 1 año", fr: "Un avion commercial frappé par la foudre en un an", de: "Ein Verkehrsflugzeug, das im Laufe eines Jahres vom Blitz getroffen wird" }, 
-                real: 99.0, img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Finding a pearl in an edible mussel", es: "Encontrar una perla pequeña al comer un mejillón", fr: "Trouver une perle dans une moule", de: "Eine Perle in einer Miesmuschel finden" }, 
-                real: 0.1, img: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Seeing a shooting star during a clear night in 1 hour of watching", es: "Ver una estrella fugaz en 1 hora observando un cielo despejado", fr: "Voir une étoile filante en 1 heure de nuit claire", de: "Eine Sternschnuppe innerhalb 1 Stunde klarem Nachthimmel sehen" }, 
-                real: 60.0, img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Suffering a vending machine failure that keeps your item/money", es: "Que una máquina expendedora se quede con tu dinero o producto", fr: "Une machine à café/snacks qui garde votre argent", de: "Ein Verkaufsautomat behält Geld oder Produkt ein" }, 
-                real: 15.0, img: "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A human being born a twin globally", es: "Que un ser humano nazca siendo hermano gemelo o mellizo", fr: "Naître jumeau dans le monde", de: "Als Zwilling geboren werden" }, 
-                real: 3.2, img: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Solving a Rubik's Cube on the first blind try without knowing how", es: "Resolver un cubo de Rubik a ciegas sin saber el método", fr: "Résoudre un Rubik's cube au hasard sans connaître la méthode", de: "Einen Zauberwürfel zufällig ohne Anleitung lösen" }, 
-                real: 0.0000000000000000002, img: "https://images.unsplash.com/photo-1563207153-f403bf289096?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being born on a Sunday", es: "Haber nacido en un día domingo", fr: "Être né un dimanche", de: "An einem Sonntag geboren sein" }, 
-                real: 14.28, img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A person living past the age of 100 years", es: "Que una persona viva más de 100 años", fr: "Vivre plus de 100 ans", de: "Älter als 100 Jahre werden" }, 
-                real: 0.03, img: "https://images.unsplash.com/photo-1581579438747-1dc8d1e377c8?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having blue eyes in the global human population", es: "Tener ojos azules en la población mundial", fr: "Avoir les yeux bleus dans le monde", de: "Blaue Augen in der Weltbevölkerung haben" }, 
-                real: 8.0, img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A dropped piece of toast landing on a carpeted floor", es: "Que una tostada caiga sobre una alfombra", fr: "Une tartine qui tombe sur un tapis", de: "Ein Toast landet auf einem Teppichboden" }, 
-                real: 80.0, img: "https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A person wearing glasses or contacts globally", es: "Una persona que lleve gafas o lentillas en el mundo", fr: "Une personne portant des lunettes ou lentilles dans le monde", de: "Eine Person, die eine Brille oder Kontaktlinsen trägt" }, 
-                real: 50.0, img: "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "An active volcano erupting somewhere on Earth today", es: "Que un volcán activo entre en erupción en la Tierra hoy", fr: "Un volcan actif entrant en éruption aujourd'hui", de: "Ein aktiver Vulkan bricht heute irgendwo aus" }, 
-                real: 90.0, img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A wild bird pooping on a person in their lifetime", es: "Que un pájaro silvestre te haga caca encima a lo largo de tu vida", fr: "Être victime d'un caca d'oiseau au cours de sa vie", de: "Im Laufe des Lebens von einem Vogelschiss getroffen werden" }, 
-                real: 35.0, img: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Drawing a Flush (5 cards of same suit) in poker on 1st hand", es: "Obtener Color (5 cartas del mismo palo) en 1ª mano de póker", fr: "Obtenir une couleur dès la première main au poker", de: "Ein Flush in der ersten Pokerhand erhalten" }, 
-                real: 0.198, img: "https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Getting a Full House on the first poker hand dealt", es: "Conseguir un Full House en la primera mano de póker", fr: "Obtenir un Full dès la première main de poker", de: "Ein Full House in der ersten Pokerhand erhalten" }, 
-                real: 0.144, img: "https://images.unsplash.com/photo-1541278107931-e006523892df?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Being struck by an object falling from an airplane", es: "Ser golpeado por un objeto que cae de un avión en vuelo", fr: "Être frappé par un objet tombant d'un avion", de: "Von einem herabstürzenden Gegenstand aus einem Flugzeug getroffen werden" }, 
-                real: 0.000001, img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A person having a pet dog or cat in Western countries", es: "Tener un perro o gato como mascota en países occidentales", fr: "Avoir un chien ou un chat comme animal de compagnie", de: "Einen Hund oder eine Katze als Haustier haben" }, 
-                real: 56.0, img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A battery running out of power while using an electronic device", es: "Que un dispositivo se apague por batería agotada durante el día", fr: "Un appareil qui s'éteint par manque de batterie durant la journée", de: "Ein leerer Akku während der Nutzung am Tag" }, 
-                real: 40.0, img: "https://images.unsplash.com/photo-1619483042997-27b92648f8b8?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having a mosquito bite during summertime in humid regions", es: "Picadura de mosquito durante el verano en zonas húmedas", fr: "Piqûre de moustique pendant l'été en région humide", de: "Ein Mückenstich im Sommer in feuchten Regionen" }, 
-                real: 85.0, img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A person being able to speak more than two languages fluently", es: "Que una persona hable más de dos idiomas con fluidez", fr: "Parler plus de deux langues couramment", de: "Fließend mehr als zwei Sprachen sprechen" }, 
-                real: 13.0, img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Overhearing a song you like on the radio while driving", es: "Escuchar tu canción favorita en la radio mientras conduces", fr: "Entendre sa chanson préférée à la radio en conduisant", de: "Lieblingslied im Radio beim Autofahren hören" }, 
-                real: 12.0, img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A computer crashing/freezing during an important task in a year", es: "Que el ordenador se cuelgue durante una tarea importante en el año", fr: "Un ordinateur qui plante lors d'une tâche importante dans l'année", de: "Ein Computerabsturz bei einer wichtigen Aufgabe im Jahr" }, 
-                real: 62.0, img: "https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A traffic jam delaying a daily commute in major cities", es: "Un atasco de tráfico que retrasa el viaje diario en gran ciudad", fr: "Un embouteillage retardant un trajet quotidien dans une grande ville", de: "Ein Stau, der den täglichen Arbeitsweg verzögert" }, 
-                real: 75.0, img: "https://images.unsplash.com/photo-1508873696983-2df515122519?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Finding a four-leaf clover after searching for 1 hour", es: "Encontrar un trébol de 4 hojas tras buscar durante 1 hora", fr: "Trouver un trèfle à 4 feuilles après 1 heure de recherche", de: "Ein vierblättriges Kleeblatt nach 1 Stunde Suche finden" }, 
-                real: 10.0, img: "https://images.unsplash.com/photo-1590005354167-6da97870c757?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Having a tooth cavity filled by age 30", es: "Tener al menos un empaste dental antes de cumplir 30 años", fr: "Avoir eu au moins une carie soignée avant 30 ans", de: "Mindestens eine Zahnfüllung vor dem 30. Lebensjahr haben" }, 
-                real: 80.0, img: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "An email landing in the Spam folder by mistake", es: "Que un correo importante acabe por error en la carpeta Spam", fr: "Un e-mail important arrivant dans les spams par erreur", de: "Eine wichtige E-Mail landet fälschlicherweise im Spam-Ordner" }, 
-                real: 20.0, img: "https://images.unsplash.com/photo-1557200134-90327ee9fafa?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "Forgetting why you entered a room (Doorway Effect)", es: "Entrar a una habitación y olvidar a qué ibas (Efecto Umbral)", fr: "Entrer dans une pièce et oublier ce qu'on venait faire", de: "Einen Raum betreten und vergessen, was man wollte" }, 
-                real: 85.0, img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&auto=format&fit=crop" 
-            },
-            { 
-                title: { en: "A Wi-Fi connection dropping during a video call", es: "Que la conexión Wi-Fi falle durante una videollamada", fr: "Une déconnexion Wi-Fi lors d'un appel vidéo", de: "WLAN-Absturz während eines Anrufs" }, 
-                real: 35.0, img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop" 
-            }
+            // NUEVA LISTA AMPLIADA (31 a 130+)
+            { id: "hr31", title: { en: "Winning EuroMillions jackpot (1 in 139M)", es: "Ganar el bote de Euromillones (1 entre 139 Millones)", fr: "Gagner l'EuroMillions", de: "EuroMillions Jackpot gewinnen" }, real: 0.0000007, rarity: "legendaria", cat: "Azar", img: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=600&auto=format&fit=crop" },
+            { id: "hr32", title: { en: "Being born with 6 fingers on one hand", es: "Nacer con 6 dedos en una mano (Polidactilia)", fr: "Naître avec 6 doigts", de: "Mit 6 Fingern geboren werden" }, real: 0.2, rarity: "rara", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=600&auto=format&fit=crop" },
+            { id: "hr33", title: { en: "Having perfect pitch (music absolute pitch)", es: "Tener oído absoluto musical", fr: "Avoir l'oreille absolue", de: "Das absolute Gehör haben" }, real: 0.01, rarity: "epica", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop" },
+            { id: "hr34", title: { en: "Surviving a commercial plane crash", es: "Sobrevivir a un accidente de aviación comercial", fr: "Survivre à un crash d'avion", de: "Flugzeugabsturz überleben" }, real: 95.7, rarity: "comun", cat: "Mundo", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&auto=format&fit=crop" },
+            { id: "hr35", title: { en: "Sharing a birthday in a group of 23 people", es: "Coincidir cumpleaños en un grupo de 23 personas", fr: "Partager son anniversaire dans un groupe de 23", de: "Geburtstag in 23er-Gruppe teilen" }, real: 50.7, rarity: "comun", cat: "Mundo", img: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&auto=format&fit=crop" },
+            { id: "hr36", title: { en: "Catching a baseball at an MLB game", es: "Atrapar una pelota en las gradas de un partido MLB", fr: "Attraper une balle au baseball", de: "Baseball-Ball im Stadion fangen" }, real: 0.17, rarity: "rara", cat: "Vida", img: "https://images.unsplash.com/photo-1508802279261-267986957811?w=600&auto=format&fit=crop" },
+            { id: "hr37", title: { en: "Japanese Shinkansen train arriving on the second", es: "Que un tren bala en Japón llegue exacto al segundo", fr: "Train Shinkansen à l'heure exacte", de: "Shinkansen-Zug auf die Sekunde pünktlich" }, real: 99.0, rarity: "comun", cat: "Mundo", img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=600&auto=format&fit=crop" },
+            { id: "hr38", title: { en: "Lactose intolerance in global adults", es: "Intolerancia a la lactosa en la edad adulta mundial", fr: "Intolérance au lactose chez l'adulte", de: "Laktoseintoleranz im Erwachsenenalter" }, real: 68.0, rarity: "comun", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=600&auto=format&fit=crop" },
+            { id: "hr39", title: { en: "Sneezing when looking at the sun (Photic Reflex)", es: "Estornudar al mirar fijamente al sol (Reflejo Fótico)", fr: "Éternuer en regardant le soleil", de: "Niesen beim Blick in die Sonne" }, real: 25.0, rarity: "comun", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop" },
+            { id: "hr40", title: { en: "Being able to wiggle your ears", es: "Mover las orejas de forma voluntaria", fr: "Bouger les oreilles", de: "Mit den Ohren wackeln" }, real: 10.0, rarity: "rara", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600&auto=format&fit=crop" },
+            { id: "hr41", title: { en: "Never growing wisdom teeth", es: "Nacer sin muelas del juicio", fr: "N'avoir jamais de dents de sagesse", de: "Keine Weisheitszähne haben" }, real: 35.0, rarity: "comun", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&auto=format&fit=crop" },
+            { id: "hr42", title: { en: "Killed by a falling coconut", es: "Morir por la caída de un coco de palmera", fr: "Tué par une noix de coco", de: "Durch Kokosnuss sterben" }, real: 0.0000004, rarity: "legendaria", cat: "Absurdo", img: "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=600&auto=format&fit=crop" },
+            { id: "hr43", title: { en: "Guessing a random 4-digit PIN code on 1st try", es: "Adivinar un PIN de 4 dígitos al primer intento", fr: "Deviner un code PIN du premier coup", de: "4-stellige PIN beim 1. Versuch erraten" }, real: 0.01, rarity: "epica", cat: "Tecnología", img: "https://images.unsplash.com/photo-1556742049-0a670f4a4591?w=600&auto=format&fit=crop" },
+            { id: "hr44", title: { en: "Having a lucid dream in your life", es: "Tener un sueño lúcido controlado", fr: "Avoir un rêve lucide", de: "Einen Klartraum haben" }, real: 55.0, rarity: "comun", cat: "Vida", img: "https://images.unsplash.com/photo-1511295742362-92c96b124e52?w=600&auto=format&fit=crop" },
+            { id: "hr45", title: { en: "Winning Rock-Paper-Scissors in 1 turn", es: "Ganar a piedra, papel o tijera en 1 ronda", fr: "Gagner à Pierre-Feuille-Ciseaux", de: "Schere-Stein-Papier sofort gewinnen" }, real: 33.3, rarity: "comun", cat: "Azar", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop" },
+            { id: "hr46", title: { en: "Cat falling from 2 meters and landing on feet", es: "Gato cayendo desde 2m y cayendo de pie", fr: "Chat retombant sur ses pattes", de: "Katze landet aus 2m auf Pfoten" }, real: 90.0, rarity: "comun", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&auto=format&fit=crop" },
+            { id: "hr47", title: { en: "Experiencing Déjà Vu this year", es: "Tener un Déjà Vu durante este año", fr: "Avoir un déjà-vu cette année", de: "Déjà-vu in diesem Jahr erleben" }, real: 70.0, rarity: "comun", cat: "Vida", img: "https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=600&auto=format&fit=crop" },
+            { id: "hr48", title: { en: "Getting a red traffic light on arrival", es: "Pillar el semáforo en rojo al llegar conduciendo", fr: "Feu rouge en arrivant", de: "Rote Ampel bei Ankunft" }, real: 48.0, rarity: "comun", cat: "Vida", img: "https://images.unsplash.com/photo-1508873696983-2df515122519?w=600&auto=format&fit=crop" },
+            { id: "hr49", title: { en: "Earthquake registered right now on Earth", es: "Un terremoto registrado ahora mismo en la Tierra", fr: "Séisme enregistré en ce moment", de: "Erdbeben jetzt auf der Erde" }, real: 99.9, rarity: "comun", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=600&auto=format&fit=crop" },
+            { id: "hr50", title: { en: "Snake Eyes (two 1s) on two dice", es: "Sacar dobles unos al tirar dos dados de 6 caras", fr: "Double 1 avec deux dés", de: "Zwei Einser mit zwei Würfeln" }, real: 2.78, rarity: "rara", cat: "Azar", img: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=600&auto=format&fit=crop" },
+            { id: "hr51", title: { en: "Commercial plane hit by lightning once a year", es: "Un avión comercial alcanzado por rayo al año", fr: "Avion frappé par la foudre par an", de: "Flugzeug vom Blitz getroffen pro Jahr" }, real: 99.0, rarity: "comun", cat: "Mundo", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&auto=format&fit=crop" },
+            { id: "hr52", title: { en: "Seeing a shooting star in 1 hour of clear sky", es: "Ver estrella fugaz en 1h de cielo despejado", fr: "Étoile filante en 1 heure", de: "Sternschnuppe in 1 Stunde sehen" }, real: 60.0, rarity: "comun", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=600&auto=format&fit=crop" },
+            { id: "hr53", title: { en: "Vending machine keeping your money/item", es: "Máquina expendedora tragándose tu moneda", fr: "Distributeur gardant votre argent", de: "Automat behält Geld ein" }, real: 15.0, rarity: "comun", cat: "Vida", img: "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=600&auto=format&fit=crop" },
+            { id: "hr54", title: { en: "Living past 100 years of age", es: "Vivir más de 100 años de edad", fr: "Vivre plus de 100 ans", de: "Älter als 100 Jahre werden" }, real: 0.03, rarity: "epica", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1581579438747-1dc8d1e377c8?w=600&auto=format&fit=crop" },
+            { id: "hr55", title: { en: "Bird pooping on a person in their lifetime", es: "Que un pájaro te haga caca encima en tu vida", fr: "Caca d'oiseau sur vous", de: "Vogelschiss im Leben abbekommen" }, real: 35.0, rarity: "comun", cat: "Absurdo", img: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=600&auto=format&fit=crop" },
+            { id: "hr56", title: { en: "Flush hand in poker on 1st hand", es: "Obtener Color en 1ª mano de póker", fr: "Couleur dès la 1ère main au poker", de: "Flush in 1. Pokerhand" }, real: 0.198, rarity: "rara", cat: "Azar", img: "https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=600&auto=format&fit=crop" },
+            { id: "hr57", title: { en: "Overhearing favorite song on the radio while driving", es: "Escuchar tu canción favorita en radio conduciendo", fr: "Chanson préférée à la radio", de: "Lieblingslied im Radio beim Fahren" }, real: 12.0, rarity: "comun", cat: "Vida", img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop" },
+            { id: "hr58", title: { en: "PC crash during an important unsaved task", es: "Ordenador colgado en tarea importante sin guardar", fr: "Crash PC tâche importante", de: "PC-Absturz bei wichtiger Aufgabe" }, real: 62.0, rarity: "comun", cat: "Tecnología", img: "https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=600&auto=format&fit=crop" },
+            { id: "hr59", title: { en: "Doorway Effect (forgetting why you entered a room)", es: "Olvidar a qué ibas al cambiar de habitación", fr: "Effet franchissement de porte", de: "Doorway-Effekt erleben" }, real: 85.0, rarity: "comun", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&auto=format&fit=crop" },
+            { id: "hr60", title: { en: "Wi-Fi dropping during a live video call", es: "Corte de Wi-Fi durante videollamada importante", fr: "Coupure Wi-Fi en visioconférence", de: "WLAN-Absturz im Videoanruf" }, real: 35.0, rarity: "comun", cat: "Tecnología", img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop" },
+            { id: "hr61", title: { en: "Being born ambidextrous", es: "Nacer ambidiestro natural", fr: "Naître ambidextre", de: "Beidhändig geboren werden" }, real: 1.0, rarity: "rara", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop" },
+            { id: "hr62", title: { en: "Having AB-negative blood type", es: "Tener sangre tipo AB negativo", fr: "Avoir le groupe AB négatif", de: "Blutgruppe AB-negativ haben" }, real: 0.6, rarity: "epica", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1536856136534-bb679c52a9aa?w=600&auto=format&fit=crop" },
+            { id: "hr63", title: { en: "Toilet injury during lifetime", es: "Sufrir una lesión por un inodoro en la vida", fr: "Blessure liée aux toilettes", de: "Toiletten-Verletzung im Leben" }, real: 0.01, rarity: "rara", cat: "Absurdo", img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop" },
+            { id: "hr64", title: { en: "Venomous snake bite in developed nations", es: "Mordedura de serpiente venenosa en Europa/EEUU", fr: "Morsure de serpent venimeux en Europe", de: "Giftschlangenbiss in Europa" }, real: 0.002, rarity: "epica", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1531386151447-fd76ad50012f?w=600&auto=format&fit=crop" },
+            { id: "hr65", title: { en: "Same-day Amazon order delivery", es: "Recibir pedido Amazon el mismo día de compra", fr: "Livraison Amazon le jour même", de: "Amazon-Lieferung am selben Tag" }, real: 15.0, rarity: "comun", cat: "Vida", img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop" },
+            { id: "hr66", title: { en: "Finding a pearl in an edible mussel", es: "Encontrar perla pequeña comiendo mejillón", fr: "Trouver une perle dans une moule", de: "Perle in einer Miesmuschel finden" }, real: 0.1, rarity: "rara", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&auto=format&fit=crop" },
+            { id: "hr67", title: { en: "Born on a Sunday", es: "Haber nacido un día domingo", fr: "Être né un dimanche", de: "An einem Sonntag geboren sein" }, real: 14.28, rarity: "comun", cat: "Mundo", img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop" },
+            { id: "hr68", title: { en: "Having blue eyes in global population", es: "Tener ojos azules en la población mundial", fr: "Avoir les yeux bleus dans le monde", de: "Blaue Augen weltweit haben" }, real: 8.0, rarity: "comun", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop" },
+            { id: "hr69", title: { en: "Wearing glasses or contacts worldwide", es: "Llevar gafas o lentillas en el mundo", fr: "Porter des lunettes ou lentilles", de: "Brille oder Linsen tragen" }, real: 50.0, rarity: "comun", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=600&auto=format&fit=crop" },
+            { id: "hr70", title: { en: "Active volcano erupting somewhere today", es: "Volcán activo en erupción hoy en la Tierra", fr: "Éruption volcanique active aujourd'hui", de: "Vulkanausbruch heute weltweit" }, real: 90.0, rarity: "comun", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop" },
+            { id: "hr71", title: { en: "Hit by object falling from flying airplane", es: "Golpeado por un objeto que cae de un avión", fr: "Frappé par un objet tombant d'un avion", de: "Von Objekt aus Flugzeug getroffen" }, real: 0.000001, rarity: "legendaria", cat: "Absurdo", img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&auto=format&fit=crop" },
+            { id: "hr72", title: { en: "Owning a dog or cat in Western homes", es: "Tener perro o gato en hogares occidentales", fr: "Avoir un chien ou un chat", de: "Hund oder Katze im Haushalt" }, real: 56.0, rarity: "comun", cat: "Vida", img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600&auto=format&fit=crop" },
+            { id: "hr73", title: { en: "Mosquito bite in humid summer", es: "Picadura de mosquito en verano húmedo", fr: "Piqûre de moustique en été", de: "Mückenstich im feuchten Sommer" }, real: 85.0, rarity: "comun", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop" },
+            { id: "hr74", title: { en: "Fluent in more than 2 languages", es: "Hablar más de 2 idiomas con fluidez", fr: "Parler plus de 2 langues", de: "Fließend mehr als 2 Sprachen sprechen" }, real: 13.0, rarity: "comun", cat: "Mundo", img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop" },
+            { id: "hr75", title: { en: "Traffic jam in daily city commute", es: "Atasco de tráfico camino al trabajo en gran ciudad", fr: "Embouteillage quotidien", de: "Täglicher Stau zur Arbeit" }, real: 75.0, rarity: "comun", cat: "Vida", img: "https://images.unsplash.com/photo-1508873696983-2df515122519?w=600&auto=format&fit=crop" },
+            { id: "hr76", title: { en: "Dental cavity filled before age 30", es: "Tener al menos un empaste dental antes de los 30", fr: "Carie soignée avant 30 ans", de: "Zahnfüllung vor dem 30. Lebensjahr" }, real: 80.0, rarity: "comun", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&auto=format&fit=crop" },
+            { id: "hr77", title: { en: "Important email sent to Spam folder by mistake", es: "Correo clave enviado por error a carpeta Spam", fr: "E-mail important dans les spams", de: "Wichtige Mail landet im Spam" }, real: 20.0, rarity: "comun", cat: "Tecnología", img: "https://images.unsplash.com/photo-1557200134-90327ee9fafa?w=600&auto=format&fit=crop" },
+            { id: "hr78", title: { en: "Full House on first poker hand", es: "Conseguir Full House en 1ª mano de póker", fr: "Full dès la 1ère main au poker", de: "Full House in 1. Pokerhand" }, real: 0.144, rarity: "epica", cat: "Azar", img: "https://images.unsplash.com/photo-1541278107931-e006523892df?w=600&auto=format&fit=crop" },
+            { id: "hr79", title: { en: "Being born a twin worldwide", es: "Nacer siendo hermano melli/gemelo en el mundo", fr: "Naître jumeau dans le monde", de: "Als Zwilling geboren werden" }, real: 3.2, rarity: "comun", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=600&auto=format&fit=crop" },
+            { id: "hr80", title: { en: "Finding four-leaf clover after 1 hour search", es: "Encontrar trébol de 4 hojas tras buscar 1 hora", fr: "Trouver trèfle 4 feuilles en 1h", de: "Vierblättriges Kleeblatt nach 1h finden" }, real: 10.0, rarity: "comun", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1590005354167-6da97870c757?w=600&auto=format&fit=crop" },
+            { id: "hr81", title: { en: "Spontaneous combustion of human body", es: "Combustión humana espontánea registrada", fr: "Combustion humaine spontanée", de: "Spontane menschliche Selbstentzündung" }, real: 0.0000001, rarity: "legendaria", cat: "Absurdo", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop" },
+            { id: "hr82", title: { en: "Flipping coin 10 times and all coming up heads", es: "Lanzar moneda 10 veces y sacar 10 caras seguidas", fr: "10 fois pile d'affilée", de: "10 Mal hintereinander Kopf werfen" }, real: 0.097, rarity: "epica", cat: "Azar", img: "https://images.unsplash.com/photo-1561414927-6d86591d0c4f?w=600&auto=format&fit=crop" },
+            { id: "hr83", title: { en: "Shuffling deck into exact same order twice in history", es: "Mezclar baraja y obtener orden idéntico a otra previa", fr: "Même ordre de cartes mélangeant 2 fois", de: "Identische Kartendeck-Mischung in der Geschichte" }, real: 0.0000000000000000000000000000000000000000000000000000000000000000000000001, rarity: "legendaria", cat: "Azar", img: "https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=600&auto=format&fit=crop" },
+            { id: "hr84", title: { en: "Elevator cable snapping while inside", es: "Caída en picado de ascensor por rotura de cable", fr: "Rupture de câble d'ascenseur", de: "Fahrstuhl-Kabelbruch" }, real: 0.0000008, rarity: "legendaria", cat: "Vida", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=600&auto=format&fit=crop" },
+            { id: "hr85", title: { en: "Supervolcano eruption occurring in our lifetime", es: "Erupción de un supervolcán en nuestro siglo", fr: "Éruption de supervolcan de notre vivant", de: "Supervulkan-Ausbruch in unserer Lebenszeit" }, real: 0.014, rarity: "epica", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop" },
+            { id: "hr86", title: { en: "Dying from shark attack vs dying from fireworks", es: "Morir por fuegos artificiales comparado con tiburón", fr: "Mourir par feu d'artifice", de: "Durch Feuerwerk sterben" }, real: 0.0001, rarity: "rara", cat: "Absurdo", img: "https://images.unsplash.com/photo-1531386151447-fd76ad50012f?w=600&auto=format&fit=crop" },
+            { id: "hr87", title: { en: "Unlocking someone else's phone with FaceID", es: "Desbloquear el móvil de un extraño con FaceID", fr: "Déverrouiller le téléphone d'un inconnu par FaceID", de: "Fremdes Handy mit FaceID entsperren" }, real: 0.0001, rarity: "epica", cat: "Tecnología", img: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&auto=format&fit=crop" },
+            { id: "hr88", title: { en: "Winning an Oscar award in lifetime", es: "Ganar una estatuilla del Oscar en la vida", fr: "Gagner un Oscar au cours de sa vie", de: "Einen Oscar im Leben gewinnen" }, real: 0.00008, rarity: "legendaria", cat: "Mundo", img: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=600&auto=format&fit=crop" },
+            { id: "hr89", title: { en: "Becoming an astronaut in NASA/ESA", es: "Convertirse en astronauta profesional de NASA/ESA", fr: "Devenir astronaute", de: "NASA-Astronaut werden" }, real: 0.000008, rarity: "legendaria", cat: "Mundo", img: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=600&auto=format&fit=crop" },
+            { id: "hr90", title: { en: "Commercial plane landing safely without engines", es: "Aterrizaje seguro de avión comercial sin motores", fr: "Atterrissage d'urgence réussi sans moteur", de: "Sichere Notlandung ohne Triebwerke" }, real: 98.0, rarity: "comun", cat: "Mundo", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&auto=format&fit=crop" },
+            { id: "hr91", title: { en: "Getting a virus on an updated iPhone", es: "Infección de virus informático en iPhone actualizado", fr: "Virus sur iPhone à jour", de: "Virus auf aktuellem iPhone bekommen" }, real: 0.0005, rarity: "epica", cat: "Tecnología", img: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=600&auto=format&fit=crop" },
+            { id: "hr92", title: { en: "Finding a typo on front page of major newspaper", es: "Errata ortográfica en la portada de diario nacional", fr: "Coquille en une d'un grand journal", de: "Druckfehler auf Zeitungstitelseite" }, real: 2.0, rarity: "rara", cat: "Mundo", img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop" },
+            { id: "hr93", title: { en: "Losing a shoe in a crowded music festival", es: "Perder un zapatilla en festival de música multitudinario", fr: "Perdre une chaussure en festival", de: "Schuh auf Festival verlieren" }, real: 1.2, rarity: "rara", cat: "Vida", img: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop" },
+            { id: "hr94", title: { en: "Dropping phone down an elevator shaft", es: "Caída del móvil por el hueco del ascensor", fr: "Téléphone tombé dans la cage d'ascenseur", de: "Handy in Fahrstuhlschacht fallen lassen" }, real: 0.15, rarity: "rara", cat: "Absurdo", img: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&auto=format&fit=crop" },
+            { id: "hr95", title: { en: "Seeing a albino animal in the wild", es: "Ver un animal albino en libertad en la naturaleza", fr: "Voir un animal albinos dans la nature", de: "Albinotisches Tier in freier Wildbahn sehen" }, real: 0.01, rarity: "epica", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600&auto=format&fit=crop" },
+            { id: "hr96", title: { en: "Having a dream predicted event come true", es: "Sueño premonitorio cumpliéndose exactamente", fr: "Rêve prémonitoire se réalisant", de: "Wahrgewordener Wahr-Traum" }, real: 0.05, rarity: "rara", cat: "Vida", img: "https://images.unsplash.com/photo-1511295742362-92c96b124e52?w=600&auto=format&fit=crop" },
+            { id: "hr97", title: { en: "Being hit by lightning twice in life", es: "Ser alcanzado por un rayo 2 veces en la vida", fr: "Frappé 2 fois par la foudre", de: "2 Mal im Leben vom Blitz getroffen" }, real: 0.00000009, rarity: "legendaria", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?w=600&auto=format&fit=crop" },
+            { id: "hr98", title: { en: "Finding a message in a bottle on beach", es: "Encontrar mensaje dentro de botella en la playa", fr: "Bouteille à la mer trouvée", de: "Flaschenpost am Strand finden" }, real: 0.005, rarity: "epica", cat: "Vida", img: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=600&auto=format&fit=crop" },
+            { id: "hr99", title: { en: "Being born on New Year's midnight (00:00)", es: "Nacer exactamente a las 00:00 de Nochevieja", fr: "Naître à minuit le 1er janvier", de: "Punkt 00:00 Uhr an Silvester geboren" }, real: 0.0019, rarity: "epica", cat: "Mundo", img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop" },
+            { id: "hr100", title: { en: "Solar flare causing global blackout this decade", es: "Llamarada solar provocando apagón global este decenio", fr: "Éruption solaire causant un blackout", de: "Sonnensturm verursacht globalen Stromausfall" }, real: 1.2, rarity: "rara", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=600&auto=format&fit=crop" },
+            { id: "hr101", title: { en: "Adult human knowing how to ride a bicycle", es: "Adulto mundial que sabe andar en bicicleta", fr: "Adulte sachant faire du vélo", de: "Erwachsener, der Fahrrad fahren kann" }, real: 82.0, rarity: "comun", cat: "Mundo", img: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=600&auto=format&fit=crop" },
+            { id: "hr102", title: { en: "Having a smartphone in developed world", es: "Tener smartphone en el mundo desarrollado", fr: "Avoir un smartphone en Occident", de: "Smartphone im Westen besitzen" }, real: 94.0, rarity: "comun", cat: "Tecnología", img: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=600&auto=format&fit=crop" },
+            { id: "hr103", title: { en: "Spilling coffee on white shirt on important day", es: "Derramar café en camisa blanca en día importante", fr: "Café renversé sur chemise blanche", de: "Kaffee auf weißem Hemd verschütten" }, real: 22.0, rarity: "comun", cat: "Absurdo", img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop" },
+            { id: "hr104", title: { en: "Getting a perfect 800 score on SAT exam", es: "Puntuación perfecta 1600/1600 en examen SAT", fr: "Score parfait au SAT", de: "Perfekte SAT-Prüfungspunkzahl" }, real: 0.07, rarity: "epica", cat: "Mundo", img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop" },
+            { id: "hr105", title: { en: "Born with synesthesia (sensing colors in sound)", es: "Sinestesia natural (ver colores en los sonidos)", fr: "Naître synesthète", de: "Mit Synästhesie geboren werden" }, real: 4.0, rarity: "rara", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop" },
+            { id: "hr106", title: { en: "Commercial flight entering extreme turbulence", es: "Turbulencia severa repentina en vuelo comercial", fr: "Turbulences extrêmes en vol", de: "Schwere Turbulenzen im Flug" }, real: 0.1, rarity: "rara", cat: "Mundo", img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&auto=format&fit=crop" },
+            { id: "hr107", title: { en: "Dropping airpod down street drain grate", es: "Caída de un AirPod por la alcantarilla de la calle", fr: "Écouteur tombé dans une grille d'égout", de: "AirPod in den Gulli fallen lassen" }, real: 3.5, rarity: "comun", cat: "Absurdo", img: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&auto=format&fit=crop" },
+            { id: "hr108", title: { en: "Getting hit by golf ball while walking on course", es: "Impacto de pelota de golf paseando por campo", fr: "Frappé par une balle de golf", de: "Von Golfball getroffen werden" }, real: 0.04, rarity: "rara", cat: "Vida", img: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&auto=format&fit=crop" },
+            { id: "hr109", title: { en: "Finding doubled banana inside single peel", es: "Plátano doble dentro de una misma piel", fr: "Banane double dans une peau", de: "Doppel-Banane in einer Schale" }, real: 0.05, rarity: "rara", cat: "Absurdo", img: "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=600&auto=format&fit=crop" },
+            { id: "hr110", title: { en: "Having extra wisdom tooth (4th molar)", es: "Tener un cuarto molar extra (Supernumerario)", fr: "Avoir une 4ème molaire de sagesse", de: "Zusätzlichen 4. Weisheitszahn haben" }, real: 1.0, rarity: "rara", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&auto=format&fit=crop" },
+            { id: "hr111", title: { en: "Cat having two different colored eyes", es: "Gato con heterocromía (un ojo azul y otro verde)", fr: "Chat aux yeux de couleurs différentes", de: "Katze mit zweifarbigen Augen" }, real: 1.0, rarity: "rara", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&auto=format&fit=crop" },
+            { id: "hr112", title: { en: "Double rainbow appearing after rainstorm", es: "Arcoíris doble completo tras la lluvia", fr: "Double arc-en-ciel après la pluie", de: "Doppelter Regenbogen nach Regen" }, real: 5.0, rarity: "comun", cat: "Naturaleza", img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=600&auto=format&fit=crop" },
+            { id: "hr113", title: { en: "Having same name and surname as a celebrity", es: "Coincidir nombre y apellidos con un famoso", fr: "Même nom et prénom qu'une célébrité", de: "Gleicher Name wie ein Prominenter" }, real: 0.1, rarity: "rara", cat: "Vida", img: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&auto=format&fit=crop" },
+            { id: "hr114", title: { en: "Computer mouse failing on low battery mid-game", es: "Ratón inalámbrico agotando batería en partida", fr: "Souris sans fil sans batterie en jeu", de: "Kabellose Maus leert sich beim Zocken" }, real: 45.0, rarity: "comun", cat: "Tecnología", img: "https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=600&auto=format&fit=crop" },
+            { id: "hr115", title: { en: "Plugging USB-C charger upside down", es: "Conectar cable USB-C al revés (Efecto psicológico)", fr: "Inverser le sens du cable USB-C", de: "USB-C falsch herum einstecken" }, real: 50.0, rarity: "comun", cat: "Tecnología", img: "https://images.unsplash.com/photo-1544652478-6653e09f18a2?w=600&auto=format&fit=crop" },
+            { id: "hr116", title: { en: "Losing keys inside car while locked", es: "Dejar llaves encerradas dentro del coche", fr: "Clés enfermées dans la voiture", de: "Schlüssel im Auto einschließen" }, real: 12.0, rarity: "comun", cat: "Vida", img: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=600&auto=format&fit=crop" },
+            { id: "hr117", title: { en: "Finding 20€ bill in old jacket pocket", es: "Encontrar billete de 20€ en abrigo del año pasado", fr: "Billet de 20€ dans une veste d'hiver", de: "20€-Schein in alter Jacke finden" }, real: 28.0, rarity: "comun", cat: "Vida", img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop" },
+            { id: "hr118", title: { en: "Smartphone surviving drop in water toilet bowl", es: "Móvil sobreviviendo tras caer dentro del inodoro", fr: "Téléphone survivant à une chute dans l'eau", de: "Handy überlebt Sturz ins Wasser" }, real: 65.0, rarity: "comun", cat: "Tecnología", img: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&auto=format&fit=crop" },
+            { id: "hr119", title: { en: "Having blood type Rh-null (Golden Blood)", es: "Tener la sangre Rh-null ('Sangre Dorada' mundial)", fr: "Avoir le sang d'or (Rh-null)", de: "Goldenes Blut (Rh-null) haben" }, real: 0.0000006, rarity: "legendaria", cat: "Cuerpo", img: "https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=600&auto=format&fit=crop" },
+            { id: "hr120", title: { en: "Being hit by a falling anvil or safe cartoon-style", es: "Ser aplastado por objeto cayendo estilo dibujo animado", fr: "Écrasé par un objet comme dans un dessin animé", de: "Von Objekt wie im Cartoon getroffen werden" }, real: 0.00000001, rarity: "legendaria", cat: "Absurdo", img: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=600&auto=format&fit=crop" }
         ];
+
+        /* ESTADO DEL JUEGO Y SISTEMA DE PERSISTENCIA */
+        let playerStats = {
+            level: 1,
+            xp: 0,
+            partidas: 0,
+            preguntasTotal: 0,
+            precisionSum: 0,
+            maxStreak: 0,
+            maxSurvival: 0,
+            maxScore: 0,
+            legendariasCount: 0,
+            remontadas: 0,
+            collection: [],
+            dailyDoneDate: ""
+        };
 
         let currentRound = 1;
         let totalScore = 0;
+        let currentStreak = 0;
+        let precisionTotalThisMatch = 0;
         let currentGameEvents = [];
         let activeEvent = null;
+        let currentBet = 0;
+        let activeEventMod = null;
+        let secondChanceTimer = null;
 
         const slider = document.getElementById('rare-slider');
         const sliderValDisplay = document.getElementById('slider-val-display');
-        const eventTitle = document.getElementById('event-title');
-        const eventImg = document.getElementById('event-img');
-        const guessBtn = document.getElementById('guess-btn');
-        const nextBtn = document.getElementById('next-btn');
-        
-        const gameInterface = document.getElementById('game-interface');
-        const resultInterface = document.getElementById('result-interface');
-        
-        const roundNumEl = document.getElementById('round-num');
-        const totalScoreEl = document.getElementById('total-score');
-        const diffValueEl = document.getElementById('diff-value');
-        const pointsEarnedEl = document.getElementById('points-earned');
-        const realValueDisplay = document.getElementById('real-value-display');
-        const resultHeaderText = document.getElementById('result-header-text');
-        const actualCardBox = document.getElementById('actual-card-box');
 
-        function cambiarIdioma(lang) {
-            localStorage.setItem('whenwastimeline_idioma', lang);
-            aplicarTextosUI(lang);
-        }
-
-        function aplicarTextosUI(lang) {
-            const t = i18nHR[lang] || i18nHR.en;
-            document.getElementById('select-idioma').value = lang;
-            document.getElementById('txt-volver').textContent = t.volver;
-            document.getElementById('txt-subtitulo').textContent = t.subtitulo;
-            document.getElementById('lbl-ronda').childNodes[0].textContent = t.ronda + " ";
-            document.getElementById('lbl-puntuacion').childNodes[0].textContent = t.puntuacion + " ";
-            document.getElementById('lbl-imposible').textContent = t.imposible;
-            document.getElementById('lbl-seguro').textContent = t.seguro;
-            document.getElementById('guess-btn').textContent = t.comprobar;
-
-            if (activeEvent) {
-                eventTitle.textContent = activeEvent.title[lang] || activeEvent.title.en;
-            }
-        }
-
+        /* TRANSFORMACIÓN LOGARÍTMICA DEL SLIDER */
         function sliderToPercentage(val) {
             let v = parseInt(val);
             if (v <= 500) {
@@ -986,10 +1140,76 @@
             }
         });
 
+        /* MANEJO DE VISTAS */
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.section-view, #view-game').forEach(v => v.style.display = 'none');
+
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            if (tabName === 'game') {
+                document.getElementById('view-game').style.display = 'block';
+            } else {
+                document.getElementById(`view-${tabName}`).style.display = 'block';
+                if (tabName === 'stats') updateStatsUI();
+                if (tabName === 'collection') updateCollectionUI();
+                if (tabName === 'daily') updateDailyUI();
+            }
+        }
+
+        /* PERSISTENCIA LOCALSTORAGE */
+        function loadPlayerData() {
+            const saved = localStorage.getItem('howrare_player_stats_v2');
+            if (saved) {
+                try { playerStats = Object.assign(playerStats, JSON.parse(saved)); } catch(e){}
+            }
+            updatePlayerXPUI();
+        }
+
+        function savePlayerData() {
+            localStorage.setItem('howrare_player_stats_v2', JSON.stringify(playerStats));
+            updatePlayerXPUI();
+        }
+
+        /* SISTEMA DE XP Y NIVELES */
+        function getRequiredXP(level) { return level * 200; }
+
+        function addXP(amount) {
+            playerStats.xp += amount;
+            let req = getRequiredXP(playerStats.level);
+            while (playerStats.xp >= req) {
+                playerStats.xp -= req;
+                playerStats.level++;
+                req = getRequiredXP(playerStats.level);
+            }
+            savePlayerData();
+        }
+
+        function updatePlayerXPUI() {
+            const req = getRequiredXP(playerStats.level);
+            const pct = Math.min(100, Math.floor((playerStats.xp / req) * 100));
+            document.getElementById('player-level-badge').textContent = `NIVEL ${playerStats.level}`;
+            document.getElementById('xp-text-detail').textContent = `${playerStats.xp} / ${req} XP`;
+            document.getElementById('xp-bar-fill').style.width = pct + '%';
+        }
+
+        /* INICIALIZACIÓN DE PARTIDA */
         function initGame() {
             currentRound = 1;
             totalScore = 0;
+            currentStreak = 0;
+            precisionTotalThisMatch = 0;
             currentGameEvents = [...eventsDB].sort(() => Math.random() - 0.5);
+
+            playerStats.partidas++;
+            savePlayerData();
+
+            document.getElementById('game-interface').style.display = 'block';
+            document.getElementById('result-interface').style.display = 'none';
+            document.getElementById('result-interface-final').style.display = 'none';
+            document.getElementById('bet-modal').style.display = 'none';
+            document.getElementById('second-chance-modal').style.display = 'none';
+
+            document.getElementById('survival-record-tag').textContent = playerStats.maxSurvival;
             loadRound();
         }
 
@@ -997,106 +1217,288 @@
             const lang = localStorage.getItem('whenwastimeline_idioma') || 'en';
             const t = i18nHR[lang] || i18nHR.en;
 
-            if (currentRound > 5) {
-                gameInterface.style.display = "none";
-                resultInterface.style.display = "block";
-                
-                let tierTitle = "";
-                let tierIcon = "";
-                
-                if (totalScore >= 4500) {
-                    tierTitle = t.tiers.t1;
-                    tierIcon = "fa-crown";
-                } else if (totalScore >= 3500) {
-                    tierTitle = t.tiers.t2;
-                    tierIcon = "fa-fire";
-                } else if (totalScore >= 2500) {
-                    tierTitle = t.tiers.t3;
-                    tierIcon = "fa-chart-line";
-                } else if (totalScore >= 1500) {
-                    tierTitle = t.tiers.t4;
-                    tierIcon = "fa-user";
-                } else {
-                    tierTitle = t.tiers.t5;
-                    tierIcon = "fa-seedling";
-                }
+            document.getElementById('round-num').textContent = currentRound;
+            document.getElementById('total-score').textContent = totalScore;
+            document.getElementById('game-interface').style.display = 'block';
+            document.getElementById('result-interface').style.display = 'none';
 
-                resultHeaderText.style.display = "none";
-                diffValueEl.parentElement.style.display = "none";
-                
-                pointsEarnedEl.innerHTML = `
-                    <div class="final-screen-badge">
-                        <i class="fa-solid ${tierIcon}"></i>
-                        <h3>${t.clasificacionGlobal}</h3>
-                        <div class="player-tier">${tierTitle}</div>
-                    </div>
-                    <div class="final-score-big">${totalScore} PTS</div>
-                    <div class="final-subtitle">${t.acumulado}</div>
-                `;
-                
-                actualCardBox.innerHTML = t.completado;
-                
-                nextBtn.textContent = t.jugarOtraVez;
-                nextBtn.onclick = initGame;
-                return;
+            // Evento Especial Aleatorio
+            activeEventMod = null;
+            const eventBadge = document.getElementById('event-badge');
+            if (Math.random() < 0.15) {
+                const mods = ["DOBLE XP", "PRECISIÓN EXTREMA", "TODO O NADA"];
+                activeEventMod = mods[Math.floor(Math.random() * mods.length)];
+                eventBadge.textContent = `⚡ ${activeEventMod}`;
+                eventBadge.style.display = 'inline-block';
+            } else {
+                eventBadge.style.display = 'none';
             }
 
-            resultHeaderText.style.display = "block";
-            resultHeaderText.textContent = t.desvio;
-            diffValueEl.parentElement.style.display = "block";
-            actualCardBox.style.display = "block";
-            gameInterface.style.display = "block";
-            resultInterface.style.display = "none";
-            
-            roundNumEl.textContent = currentRound;
-            totalScoreEl.textContent = totalScore;
+            activeEvent = currentGameEvents[(currentRound - 1) % currentGameEvents.length];
+            const rarityTag = document.getElementById('rarity-tag');
+            rarityTag.className = `rarity-tag ${activeEvent.rarity}`;
+            rarityTag.textContent = activeEvent.rarity.toUpperCase();
 
-            activeEvent = currentGameEvents[currentRound - 1];
-            eventTitle.textContent = activeEvent.title[lang] || activeEvent.title.en;
-            eventImg.src = activeEvent.img;
+            if (activeEvent.rarity === 'legendaria') {
+                playerStats.legendariasCount++;
+                savePlayerData();
+            }
+
+            // Registrar en colección
+            if (!playerStats.collection.includes(activeEvent.id)) {
+                playerStats.collection.push(activeEvent.id);
+                savePlayerData();
+            }
+
+            document.getElementById('event-title').textContent = activeEvent.title[lang] || activeEvent.title.en;
+            document.getElementById('event-img').src = activeEvent.img;
 
             slider.value = 500;
             slider.dispatchEvent(new Event('input'));
+
+            // Modal de Apuesta Ocasional
+            if (currentRound > 1 && currentRound % 4 === 0 && Math.random() < 0.5) {
+                document.getElementById('bet-modal').style.display = 'flex';
+            }
         }
 
-        guessBtn.addEventListener('click', () => {
+        function makeBet(amount) {
+            if (amount === 'all') currentBet = totalScore;
+            else currentBet = parseInt(amount);
+            document.getElementById('bet-modal').style.display = 'none';
+        }
+
+        /* COMPROBAR RESPUESTA */
+        document.getElementById('guess-btn').addEventListener('click', () => {
             const lang = localStorage.getItem('whenwastimeline_idioma') || 'en';
             const t = i18nHR[lang] || i18nHR.en;
 
-            let userGuessPercentage = sliderToPercentage(slider.value);
-            let actualPercentage = activeEvent.real;
+            let userGuessPct = sliderToPercentage(slider.value);
+            let actualPct = activeEvent.real;
 
-            let userSliderPos = parseFloat(slider.value);
-            let actualSliderPos = percentageToSlider(actualPercentage);
+            let userPos = parseFloat(slider.value);
+            let actualPos = percentageToSlider(actualPct);
 
-            let sliderError = Math.abs(userSliderPos - actualSliderPos);
-            
+            let sliderError = Math.abs(userPos - actualPos);
+
+            let precisionPct = Math.max(0, Math.min(100, Math.round(100 * (1 - (sliderError / 200)))));
+            precisionTotalThisMatch += precisionPct;
+            playerStats.preguntasTotal++;
+            playerStats.precisionSum += precisionPct;
+
+            let rarityMult = 1;
+            if (activeEvent.rarity === 'rara') rarityMult = 2;
+            if (activeEvent.rarity === 'epica') rarityMult = 5;
+            if (activeEvent.rarity === 'legendaria') rarityMult = 10;
+
             let maxPoints = 1000;
             let roundPoints = Math.max(0, Math.round(maxPoints * (1 - Math.min(sliderError / 150, 1))));
 
-            totalScore += roundPoints;
+            let isSuccess = roundPoints > 0;
 
-            let numDiff = Math.abs(userGuessPercentage - actualPercentage);
+            if (isSuccess) {
+                currentStreak++;
+                if (currentStreak > playerStats.maxStreak) playerStats.maxStreak = currentStreak;
 
-            gameInterface.style.display = "none";
-            resultInterface.style.display = "block";
-            
-            resultHeaderText.style.display = "block";
-            resultHeaderText.textContent = t.desvio;
-            diffValueEl.parentElement.style.display = "block";
-            diffValueEl.textContent = numDiff < 0.01 ? numDiff.toFixed(4) + "%" : numDiff.toFixed(2) + "%";
-            pointsEarnedEl.textContent = `+${roundPoints} ${t.puntosGanados}`;
-            
-            actualCardBox.innerHTML = `${t.porcentajeReal} <br><b>${actualPercentage}%</b>`;
+                let streakMult = 1 + (currentStreak * 0.2);
+                roundPoints = Math.round(roundPoints * rarityMult * streakMult);
 
-            currentRound++;
+                if (currentBet > 0) roundPoints += currentBet * 2;
+
+                totalScore += roundPoints;
+                let gainedXP = Math.round((roundPoints / 10) * (activeEventMod === "DOBLE XP" ? 2 : 1));
+                addXP(gainedXP);
+            } else {
+                currentStreak = 0;
+                if (currentBet > 0) {
+                    totalScore = Math.max(0, totalScore - currentBet);
+                }
+            }
+
+            document.getElementById('streak-badge').textContent = `🔥 Racha x${currentStreak || 1}`;
+            currentBet = 0;
+
+            document.getElementById('game-interface').style.display = "none";
+            document.getElementById('result-interface').style.display = "block";
+
+            document.getElementById('precision-pct-text').textContent = `${precisionPct}%`;
+            document.getElementById('precision-bar-fill').style.width = `${precisionPct}%`;
+
+            let comment = "Estuviste absurdamente cerca";
+            if (precisionPct < 50) comment = "Bastante alejado de la realidad";
+            if (precisionPct < 20) comment = "Ni te acercaste al suceso real";
+            document.getElementById('precision-comment').textContent = `"${comment}"`;
+
+            let numDiff = Math.abs(userGuessPct - actualPct);
+            document.getElementById('diff-value').textContent = numDiff < 0.01 ? numDiff.toFixed(4) + "%" : numDiff.toFixed(2) + "%";
+            document.getElementById('points-earned').textContent = `+${roundPoints} ${t.puntosGanados}`;
+            document.getElementById('real-value-display').textContent = `${actualPct}%`;
+
+            const nextBtn = document.getElementById('next-btn');
             nextBtn.textContent = t.siguiente;
-            nextBtn.onclick = loadRound;
+
+            nextBtn.onclick = () => {
+                if (!isSuccess) {
+                    triggerSecondChance();
+                } else {
+                    currentRound++;
+                    if (currentRound > playerStats.maxSurvival) {
+                        playerStats.maxSurvival = currentRound;
+                    }
+                    savePlayerData();
+                    loadRound();
+                }
+            };
         });
 
+        /* MECÁNICA RETORNO IMPOSIBLE */
+        let chanceCorrectAnswer = false;
+        function triggerSecondChance() {
+            const modal = document.getElementById('second-chance-modal');
+            const timerFill = document.getElementById('chance-timer-fill');
+            modal.style.display = 'flex';
+
+            let randomEvt = eventsDB[Math.floor(Math.random() * eventsDB.length)];
+            chanceCorrectAnswer = randomEvt.real > 1.0;
+            const lang = localStorage.getItem('whenwastimeline_idioma') || 'en';
+
+            document.getElementById('chance-question-title').textContent = randomEvt.title[lang] || randomEvt.title.en;
+
+            let timeLeft = 100;
+            timerFill.style.width = '100%';
+
+            clearInterval(secondChanceTimer);
+            secondChanceTimer = setInterval(() => {
+                timeLeft -= 2;
+                timerFill.style.width = timeLeft + '%';
+                if (timeLeft <= 0) {
+                    clearInterval(secondChanceTimer);
+                    modal.style.display = 'none';
+                    endGame();
+                }
+            }, 100);
+        }
+
+        function resolveSecondChance(userSaysMoreThanOne) {
+            clearInterval(secondChanceTimer);
+            document.getElementById('second-chance-modal').style.display = 'none';
+
+            if (userSaysMoreThanOne === chanceCorrectAnswer) {
+                playerStats.remontadas++;
+                addXP(150);
+                savePlayerData();
+                currentRound++;
+                loadRound();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            if (totalScore > playerStats.maxScore) {
+                playerStats.maxScore = totalScore;
+            }
+            savePlayerData();
+
+            document.getElementById('game-interface').style.display = 'none';
+            document.getElementById('result-interface').style.display = 'none';
+            document.getElementById('result-interface-final').style.display = 'flex';
+
+            document.getElementById('final-score').textContent = `${totalScore} PTS`;
+            
+            let avgPrec = playerStats.preguntasTotal > 0 ? Math.round(precisionTotalThisMatch / currentRound) : 0;
+            document.getElementById('share-val-rondas').textContent = `${currentRound} Rondas`;
+            document.getElementById('share-val-precision').textContent = `${avgPrec}%`;
+            document.getElementById('share-val-racha').textContent = `${playerStats.maxStreak}`;
+            document.getElementById('share-val-nivel').textContent = `Nivel ${playerStats.level}`;
+        }
+
+        function downloadShareCard() {
+            const cardNode = document.getElementById('share-card-node');
+            html2canvas(cardNode, { backgroundColor: '#121212', scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `HowRare_Score_${totalScore}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        /* DESAFÍO DIARIO Y COLECCIONES COMPLETAS */
+        function updateDailyUI() {
+            const todayStr = new Date().toDateString();
+            const desc = document.getElementById('daily-challenge-desc');
+            const status = document.getElementById('daily-status-tag');
+
+            desc.textContent = "Reto de Hoy: Supera 5 rondas consecutivas con más de 70% de precisión.";
+            if (playerStats.dailyDoneDate === todayStr) {
+                status.textContent = "Estado: ¡COMPLETADO! (+500 XP reclamados)";
+                status.style.color = "var(--success-green)";
+            } else {
+                status.textContent = "Estado: Pendiente";
+                status.style.color = "var(--gold-color)";
+            }
+        }
+
+        function updateCollectionUI() {
+            const container = document.getElementById('collection-grid-container');
+            container.innerHTML = '';
+
+            const total = eventsDB.length;
+            const unlocked = playerStats.collection.length;
+            const pct = Math.floor((unlocked / total) * 100);
+
+            document.getElementById('collection-count-tag').textContent = `${unlocked} / ${total} (${pct}%)`;
+            document.getElementById('collection-bar-fill').style.width = pct + '%';
+
+            const lang = localStorage.getItem('whenwastimeline_idioma') || 'en';
+
+            eventsDB.forEach(item => {
+                const isUnlocked = playerStats.collection.includes(item.id);
+                const card = document.createElement('div');
+                card.className = `collection-item-card ${isUnlocked ? 'unlocked' : ''}`;
+                card.innerHTML = `
+                    <div class="collection-icon"><i class="fa-solid fa-dice-d20"></i></div>
+                    <div class="collection-title">${isUnlocked ? (item.title[lang] || item.title.en) : '???'}</div>
+                    <div class="collection-tag-cat">${isUnlocked ? item.cat : 'Bloqueado'}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateStatsUI() {
+            document.getElementById('st-partidas').textContent = playerStats.partidas;
+            document.getElementById('st-supervivencia').textContent = playerStats.maxSurvival;
+            document.getElementById('st-preguntas').textContent = playerStats.preguntasTotal;
+
+            const avgPrec = playerStats.preguntasTotal > 0 ? Math.round(playerStats.precisionSum / playerStats.preguntasTotal) : 0;
+            document.getElementById('st-precision').textContent = `${avgPrec}%`;
+            document.getElementById('st-racha').textContent = playerStats.maxStreak;
+            document.getElementById('st-maxscore').textContent = playerStats.maxScore;
+            document.getElementById('st-legendarias').textContent = playerStats.legendariasCount;
+            document.getElementById('st-remontadas').textContent = playerStats.remontadas;
+        }
+
+        function cambiarIdioma(lang) {
+            localStorage.setItem('whenwastimeline_idioma', lang);
+            const t = i18nHR[lang] || i18nHR.en;
+            document.getElementById('select-idioma').value = lang;
+            document.getElementById('txt-volver').textContent = t.volver;
+            document.getElementById('txt-subtitulo').textContent = t.subtitulo;
+            document.getElementById('lbl-ronda').childNodes[0].textContent = t.ronda + " ";
+            document.getElementById('lbl-puntuacion').childNodes[0].textContent = t.puntuacion + " ";
+            document.getElementById('lbl-imposible').textContent = t.imposible;
+            document.getElementById('lbl-seguro').textContent = t.seguro;
+            document.getElementById('guess-btn').textContent = t.comprobar;
+
+            if (activeEvent) {
+                document.getElementById('event-title').textContent = activeEvent.title[lang] || activeEvent.title.en;
+            }
+        }
+
         window.onload = () => {
-            const langGuardado = localStorage.getItem('whenwastimeline_idioma') || 'en';
-            aplicarTextosUI(langGuardado);
+            loadPlayerData();
+            const savedLang = localStorage.getItem('whenwastimeline_idioma') || 'en';
+            cambiarIdioma(savedLang);
             initGame();
         };
     </script>
